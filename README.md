@@ -6,35 +6,41 @@
 <br>
 
 Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tray"> youtube challenge electron tray </a></i> by <a href="https://github.com/rocketseat"> Rocketseat</a>
+
 </div>
 
 <p align="center">System tray application to provide a shortcut for your projects on vscode and github-desktop</p>
 
 <p align="center">
   <a href="https://github.com/Rocketseat/youtube-challenge-electron-tray/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/thejoaov/vs-tray?color=%237159c1&logoColor=%237159c1&style=flat" alt="Contributors">
+    <img src="https://img.shields.io/github/contributors/thejoaov/vs-tray?color=" alt="Contributors">
+  </a>
+  <a href="https://github.com/thejoaov/vs-tray/releases">
+    <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/thejoaov/vs-tray?include_prereleases&label=latest">
+  </a>
+  <a href="https://github.com/thejoaov/vs-tray/releases">
+    <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/thejoaov/vs-tray?label=latest%20stable">
   </a>
   <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/github/license/thejoaov/vs-tray?color=%237159c1&logo=mit" alt="License">
+    <img src="https://img.shields.io/github/license/thejoaov/vs-tray?logo=mit" alt="License">
   </a>
 </p>
 
 <hr>
 
 ## Participants
+
 Developed by:
 
 | [<img src="https://avatars0.githubusercontent.com/u/2254731?s=460&v=4" width="75px;"/>](https://github.com/diego3g) | [<img src="https://avatars3.githubusercontent.com/u/7268910?s=460&v=4" width="75px;"/>](https://github.com/jpdemagalhaes) |
 | :-----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
 |                                       [Diego F.](https://github.com/diego3g)                                        |                                      [João Paulo](https://github.com/jpdemagalhaes)                                       |
 
-
 Mantained by:
 
 | [<img src="https://avatars1.githubusercontent.com/u/45052080?s=460&v=4" width="75px">](https://github.com/thejoaov) |
-| --- |
-| [João Victor](https://github.com/thejoaov) |
-
+| ------------------------------------------------------------------------------------------------------------------- |
+| [João Victor](https://github.com/thejoaov)                                                                          |
 
 ## Features
 
@@ -48,17 +54,19 @@ Mantained by:
 - [Yarn](https://yarnpkg.com/pt-BR/docs/install)
 
 ## Compatibilty and Download
+
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/vs-tray/releases)
 
 Compatible with:
+
 - Windows
   - 10 (tested)
   - Versions under windows 10 are not tested yet, so test it out and submit a pr!
 - Linux
   snap and rpm packages not tested.
   - Ubuntu
-    - 19.* (tested) - working
-    - 16.* (not tested yet)
+    - 19.\* (tested) - working
+    - 16.\* (not tested yet)
     - Should work on any distro based on ubuntu too.
   - Another distros not tested, but there is a rpm package in releases, so test it out and submit a pr!
 - MacOS
