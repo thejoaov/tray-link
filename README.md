@@ -30,9 +30,10 @@ Developed by:
 
 
 Mantained by:
-| [<img src="https://avatars1.githubusercontent.com/u/45052080?s=460&v=4" width="75px;">](https://github.com/thejoaov)  |
+
+| [<img src="https://avatars1.githubusercontent.com/u/45052080?s=460&v=4" width="75px">](https://github.com/thejoaov) |
 | --- |
-| [João Victor](https://github.com/thejoaov)  |
+| [João Victor](https://github.com/thejoaov) |
 
 
 ## Features
