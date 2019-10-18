@@ -1,5 +1,6 @@
 <h1 align="center">VSTray</h1>
 <div align="center">
+
 <br>
   <img src="build/icon.png" alt="my-projects-tray" width="90">
 <br>
@@ -24,8 +25,12 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/github/license/thejoaov/vs-tray?logo=mit" alt="License">
   </a>
+
 </p>
 
+<div align="center">
+  <a href="https://snapcraft.io/vs-tray"> <img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" /> </a>
+</div>
 <hr>
 
 ## Participants
