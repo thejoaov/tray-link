@@ -19,8 +19,8 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
   <a href="https://github.com/thejoaov/vs-tray/releases">
     <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/thejoaov/vs-tray?include_prereleases&label=latest">
   </a>
-  <a href="https://github.com/thejoaov/vs-tray/releases">
-    <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/thejoaov/vs-tray?label=latest%20stable">
+  <a href="https://snapcraft.io/vs-tray">
+    <img alt="Vs Tray" src="https://snapcraft.io/vs-tray/badge.svg" />
   </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/github/license/thejoaov/vs-tray?logo=mit" alt="License">
