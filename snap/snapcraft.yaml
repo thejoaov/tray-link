@@ -1,0 +1,37 @@
+name: vs-tray
+version: '1.0.0'
+summary: VS Tray
+description: |
+  Open your projects on VSCode or Github desktop from the system tray.
+grade: devel
+confinement: classic
+
+apps:
+  vs-tray:
+    command: bin/desktop-launch $SNAP/app/vs-tray
+    plugs:
+    - browser-support
+    - desktop
+    - desktop-legacy
+    - gsettings
+    - home
+    - mount-observe
+    - network
+    - network-bind
+    - unity7
+    - x11
+    environment:
+      TMPDIR: $XDG_RUNTIME_DIR
+
+parts:
+  vs-tray:
+    source: .
+    plugin: dump
+    stage-packages:
+    - libnotify4
+    - libnss3
+    - libpcre3
+    - libxss1
+    - libxtst6
+    after:
+    - desktop-gtk2
