@@ -1,7 +1,7 @@
 {
   "name": "vs-tray",
   "description": "Open VSCode projects from tray menu.",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",
@@ -19,14 +19,14 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "@sentry/electron": "0.17.1",
-    "electron-store": "^4.0.0",
+    "@sentry/electron": "^0.17.4",
+    "electron-store": "^5.0.0",
     "fix-path": "^2.1.0",
     "npm-run-all": "^4.1.5"
   },
   "devDependencies": {
-    "electron": "^5.0.7",
-    "electron-builder": "^21.0.15",
+    "electron": "^4.0.0",
+    "electron-builder": "^19.0.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-config-prettier": "^6.4.0",
@@ -43,10 +43,10 @@
     },
     "linux": {
       "category": "Development",
-      "icon": "assets/icon.png",
+      "icon": "icon_launcher.png",
       "target": [
-        "deb",
         "snap",
+        "deb",
         "rpm"
       ]
     },

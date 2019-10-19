@@ -124,7 +124,7 @@ function render(tray = mainTray) {
 }
 
 app.on('ready', () => {
-  mainTray = new Tray(resolve(__dirname, 'assets', 'iconTemplate.png'));
+  mainTray = new Tray(resolve(__dirname, 'assets', 'icon.png'));
 
   render(mainTray);
 });
