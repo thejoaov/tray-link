@@ -1,7 +1,7 @@
 {
   "openCode": "Open with VSCode",
   "addProject": "Add new project folder...",
-  "openGithub": "Open in Github Desktop",
-  "close": "Quit",
+  "openGithub": "Open with Github Desktop",
+  "close": "Close VS Tray",
   "remove": "Remove"
 }

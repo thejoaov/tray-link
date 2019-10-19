@@ -52,14 +52,20 @@ function render(tray = mainTray) {
       {
         label: locale.openCode,
         click: () => {
-          spawn('code', [path], { shell: true });
+          spawn(
+            process.platform === 'linux' ? '/snap/bin/code' : 'code',
+            [path],
+            { shell: true }
+          );
         },
       },
       {
         label: locale.openGithub,
         click: () => {
           spawn(
-            process.platform === 'linux' ? 'github-desktop' : 'github',
+            process.platform === 'linux'
+              ? '/opt/GitHub*/github-desktop'
+              : 'github',
             [path],
             { shell: true }
           );
