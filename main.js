@@ -11,7 +11,7 @@ const Sentry = require('@sentry/electron');
 fixPath();
 
 Sentry.init({
-  dsn: 'https://18c9943a576d41248b195b5678f2724e@sentry.io/1506479',
+  dsn: 'https://adb27f3050df422f8828186222db76ab@sentry.io/1784496',
 });
 
 const schema = {
@@ -52,20 +52,14 @@ function render(tray = mainTray) {
       {
         label: locale.openCode,
         click: () => {
-          spawn(
-            process.platform === 'linux' ? '/snap/bin/code' : 'code',
-            [path],
-            { shell: true }
-          );
+          spawn('code', [path], { shell: true });
         },
       },
       {
         label: locale.openGithub,
         click: () => {
           spawn(
-            process.platform === 'linux'
-              ? '/opt/GitHub*/github-desktop'
-              : 'github',
+            process.platform === 'linux' ? 'github-desktop' : 'github',
             [path],
             { shell: true }
           );
