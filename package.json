@@ -43,7 +43,7 @@
     },
     "linux": {
       "category": "Development",
-      "icon": "icon_launcher.png",
+      "icon": "build/icon_launcher.png",
       "target": [
         "snap",
         "deb",
