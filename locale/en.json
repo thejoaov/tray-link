@@ -2,6 +2,7 @@
   "openCode": "Open with VSCode",
   "addProject": "Add new project folder...",
   "openGithub": "Open with Github Desktop",
+  "checkUpdate": "Check Updates",
   "close": "Close VS Tray",
   "remove": "Remove"
 }

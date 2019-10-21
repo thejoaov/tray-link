@@ -1,5 +1,5 @@
 const { resolve, basename } = require('path');
-const { app, Menu, Tray, dialog } = require('electron');
+const { app, Menu, Tray, dialog, shell } = require('electron');
 
 const { spawn } = require('child_process');
 const fixPath = require('fix-path');
@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const Store = require('electron-store');
 const Sentry = require('@sentry/electron');
+const { version } = require('./package.json');
 
 fixPath();
 
@@ -107,6 +108,21 @@ function render(tray = mainTray) {
       type: 'separator',
     },
     ...items,
+    {
+      type: 'separator',
+    },
+    {
+      type: 'normal',
+      label: locale.checkUpdate,
+      enabled: true,
+      click: () =>
+        shell.openExternal('https://github.com/thejoaov/vs-tray/releases'),
+    },
+    {
+      type: 'normal',
+      label: `Version: ${version}`,
+      enabled: false,
+    },
     {
       type: 'separator',
     },

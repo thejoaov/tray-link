@@ -1,7 +1,7 @@
 {
   "name": "vs-tray",
   "description": "Open VSCode projects from tray menu.",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",
@@ -12,7 +12,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:all": "npm-run-all -p dist:*",
-    "dist:lw": "yarn dist:linux && yarn dist:windows",
+    "dist:lw": "rm -rf dist && yarn dist:linux && yarn dist:windows",
     "dist:mac": "electron-builder --mac",
     "dist:windows": "electron-builder --windows",
     "dist:linux": "electron-builder --linux",
