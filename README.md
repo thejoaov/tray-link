@@ -19,18 +19,18 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
   <a href="https://github.com/thejoaov/vs-tray/releases">
     <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/thejoaov/vs-tray?include_prereleases&label=latest">
   </a>
-  <a href="https://snapcraft.io/vs-tray">
+  <!-- <a href="https://snapcraft.io/vs-tray">
     <img alt="Vs Tray" src="https://snapcraft.io/vs-tray/badge.svg" />
-  </a>
+  </a> -->
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/github/license/thejoaov/vs-tray?logo=mit" alt="License">
   </a>
 
 </p>
 
-<div align="center">
+<!-- <div align="center">
   <a href="https://snapcraft.io/vs-tray"> <img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" /> </a>
-</div>
+</div> -->
 <hr>
 
 ## Participants
