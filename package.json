@@ -1,7 +1,7 @@
 {
   "name": "vs-tray",
   "description": "Open VSCode projects from tray menu.",
-  "version": "0.0.8",
+  "version": "0.0.9-beta",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",

@@ -3,6 +3,7 @@
   "addProject": "Adicionar novo projeto...",
   "openGithub": "Abrir no Github Desktop",
   "checkUpdate": "Verificar Atualizações",
+  "version": "Versão",
   "close": "Fechar VS Tray",
   "remove": "Remover"
 }

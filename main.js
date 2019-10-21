@@ -120,7 +120,7 @@ function render(tray = mainTray) {
     },
     {
       type: 'normal',
-      label: `Version: ${version}`,
+      label: `${locale.version}: ${version}`,
       enabled: false,
     },
     {
