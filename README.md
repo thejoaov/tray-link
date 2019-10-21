@@ -28,6 +28,15 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
 
 </p>
 
+<div align="center">
+  <h2>
+    <a href="https://github.com/thejoaov/vs-tray/releases">
+      Download it Now!
+    </a>
+  </h2>
+</div>
+
+
 <!-- <div align="center">
   <a href="https://snapcraft.io/vs-tray"> <img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" /> </a>
 </div> -->
