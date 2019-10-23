@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const Store = require('electron-store');
 const Sentry = require('@sentry/electron');
-const { version } = require('./package.json');
+const { version, repository } = require('./package.json');
 
 fixPath();
 
@@ -56,6 +56,7 @@ function render(tray = mainTray) {
           spawn('code', [path], { shell: true });
         },
       },
+
       {
         label: locale.openGithub,
         click: () => {
@@ -65,6 +66,24 @@ function render(tray = mainTray) {
             { shell: true }
           );
         },
+      },
+      {
+        type: 'separator',
+      },
+      process.platform === 'linux' && {
+        label: locale.openTerminal,
+        click: () => {
+          spawn('gnome-terminal', { cwd: path });
+        },
+      },
+      {
+        label: locale.openFolder,
+        click: () => {
+          spawn(shell.openItem(path));
+        },
+      },
+      {
+        type: 'separator',
       },
       {
         label: locale.remove,
@@ -115,8 +134,7 @@ function render(tray = mainTray) {
       type: 'normal',
       label: locale.checkUpdate,
       enabled: true,
-      click: () =>
-        shell.openExternal('https://github.com/thejoaov/vs-tray/releases'),
+      click: () => shell.openExternal(repository),
     },
     {
       type: 'normal',

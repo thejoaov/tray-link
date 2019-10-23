@@ -10,7 +10,7 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
 
 </div>
 
-<p align="center">System tray application to provide a shortcut for your projects on vscode and github-desktop</p>
+<p align="center">Open your Projects from tray menu on Visual Studio Code, Github Desktop and other useful options.</p>
 
 <p align="center">
   <a href="https://github.com/Rocketseat/youtube-challenge-electron-tray/graphs/contributors">
@@ -75,25 +75,21 @@ Compatible with:
 
 - Windows
   - 10 (tested)
-  - Versions under windows 10 are not tested yet, so test it out and submit a pr!
+  - Versions under windows 10 are not tested yet, so test it out and if not works, submit a pr or issue!
 - Linux
-  snap and rpm packages not tested.
+  - Snap package should be installed with `--classic` flag.
   - Ubuntu
     - 19.\* (tested) - working
     - 16.\* (not tested yet)
     - Should work on any distro based on ubuntu too.
-  - Another distros not tested, but there is a rpm package in releases, so test it out and submit a pr!
-- MacOS
-  - To do!
+  - Another distros not tested, but there is a rpm package in releases, so test it out and if it now works, submit a pr or issue!
 
-## Getting started
+## Contributing
 
 1. Clone this repository;
 2. `cd vs-tray`;<br />
 3. Run `yarn` to install dependencies.<br />
 4. Run `yarn start`.
-
-## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 

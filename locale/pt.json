@@ -3,6 +3,8 @@
   "addProject": "Adicionar novo projeto...",
   "openGithub": "Abrir no Github Desktop",
   "checkUpdate": "Verificar Atualizações",
+  "openTerminal": "Abrir no Terminal do Gnome",
+  "openFolder": "Abrir pasta",
   "version": "Versão",
   "close": "Fechar VS Tray",
   "remove": "Remover"

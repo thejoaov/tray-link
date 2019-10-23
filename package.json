@@ -1,7 +1,7 @@
 {
   "name": "vs-tray",
-  "description": "Open VSCode projects from tray menu.",
-  "version": "0.0.8",
+  "description": "Open your Projects from tray menu on Visual Studio Code, and other useful options.",
+  "version": "0.0.9",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",
@@ -39,11 +39,15 @@
     "appId": "com.thejoaov.vstray",
     "productName": "VS Tray",
     "mac": {
+      "icon": "icons/icon.icns",
       "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "icon": "icons/icon.ico",
+      "publisherName": "thejoaov"
     },
     "linux": {
       "category": "Development",
-      "icon": "icon.png",
       "target": [
         "snap",
         "deb",
