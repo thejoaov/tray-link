@@ -36,10 +36,13 @@
     "prettier": "^1.18.2"
   },
   "build": {
+    "compression": "store",
     "appId": "com.thejoaov.vstray",
     "productName": "VS Tray",
+    "remoteBuild": true,
     "publish": [
-      "github"
+      "github",
+      "snap"
     ],
     "mac": {
       "icon": "icons/icon.icns",
