@@ -42,15 +42,7 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
 </div> -->
 <hr>
 
-## Participants
-
 Developed by:
-
-| [<img src="https://avatars0.githubusercontent.com/u/2254731?s=460&v=4" width="75px;"/>](https://github.com/diego3g) | [<img src="https://avatars3.githubusercontent.com/u/7268910?s=460&v=4" width="75px;"/>](https://github.com/jpdemagalhaes) |
-| :-----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
-|                                       [Diego F.](https://github.com/diego3g)                                        |                                      [João Paulo](https://github.com/jpdemagalhaes)                                       |
-
-Mantained by:
 
 | [<img src="https://avatars1.githubusercontent.com/u/45052080?s=460&v=4" width="75px">](https://github.com/thejoaov) |
 | ------------------------------------------------------------------------------------------------------------------- |
