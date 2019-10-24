@@ -1,7 +1,7 @@
 {
   "name": "vs-tray",
   "description": "Open your Projects from tray menu on Visual Studio Code, and other useful options.",
-  "version": "v0.0.10",
+  "version": "v0.0.12",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",
@@ -39,11 +39,9 @@
     "compression": "store",
     "appId": "com.thejoaov.vstray",
     "productName": "VS Tray",
-    "remoteBuild": true,
-    "publish": [
-      "github",
-      "snap"
-    ],
+    "publish": {
+      "provider": "github"
+    },
     "mac": {
       "icon": "icons/icon.icns",
       "category": "public.app-category.developer-tools"
@@ -61,7 +59,10 @@
       ]
     },
     "snap": {
-      "confinement": "classic"
+      "confinement": "classic",
+      "publish": {
+        "provider": "github"
+      }
     }
   }
 }
