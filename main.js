@@ -107,6 +107,7 @@ function render(tray = mainTray) {
         if (!result) return;
 
         const [path] = result;
+
         const name = basename(path);
 
         store.set(
