@@ -58,7 +58,10 @@
       ]
     },
     "snap": {
-      "confinement": "classic"
+      "confinement": "classic",
+      "publish": {
+        "provider": "github"
+      }
     }
   }
 }
