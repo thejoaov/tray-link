@@ -1,22 +1,22 @@
 {
   "name": "vs-tray",
   "description": "Open your Projects from tray menu on Visual Studio Code, and other useful options.",
-  "version": "v0.0.12",
+  "version": "v0.0.13",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "electron .",
+    "start": "yarn electron .",
     "dev": "nodemon --exec electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder",
+    "pack": "yarn electron-builder --dir",
+    "dist": "yarn electron-builder",
     "dist:all": "npm-run-all -p dist:*",
-    "dist:windows": "electron-builder --windows",
-    "dist:linux": "electron-builder --linux",
-    "dist:mac": "electron-builder --mac",
-    "postinstall": "electron-builder install-app-deps",
-    "release": "electron-builder -lw"
+    "dist:windows": "yarn electron-builder --windows",
+    "dist:linux": "yarn electron-builder --linux",
+    "dist:mac": "yarn electron-builder --mac",
+    "postinstall": "yarn electron-builder install-app-deps",
+    "release": "yarn electron-builder -lw"
   },
   "dependencies": {
     "@sentry/electron": "^0.17.4",
@@ -25,8 +25,8 @@
     "npm-run-all": "^4.1.5"
   },
   "devDependencies": {
-    "electron": "^4.2.12",
-    "electron-builder": "^21.2.0",
+    "electron": "^4.0.0",
+    "electron-builder": "^19.0.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-config-prettier": "^6.4.0",
@@ -38,9 +38,9 @@
   "build": {
     "appId": "com.thejoaov.vstray",
     "productName": "VS Tray",
-    "publish": {
-      "provider": "github"
-    },
+    "publish": [
+      "github"
+    ],
     "mac": {
       "icon": "icons/icon.icns",
       "category": "public.app-category.developer-tools"
@@ -58,10 +58,7 @@
       ]
     },
     "snap": {
-      "confinement": "classic",
-      "publish": {
-        "provider": "github"
-      }
+      "confinement": "classic"
     }
   }
 }
