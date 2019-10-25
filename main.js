@@ -73,7 +73,7 @@ function render(tray = mainTray) {
       process.platform === 'linux' && {
         label: locale.openTerminal,
         click: () => {
-          spawn('gnome-terminal', { cwd: path });
+          spawn('gnome-terminal', { cwd: path, shell: true });
         },
       },
       {
@@ -158,7 +158,7 @@ function render(tray = mainTray) {
 }
 
 app.on('ready', () => {
-  mainTray = new Tray(resolve(__dirname, 'assets', 'icon.png'));
+  mainTray = new Tray(String(resolve(__dirname, 'assets', 'icon.png')));
 
   render(mainTray);
 });

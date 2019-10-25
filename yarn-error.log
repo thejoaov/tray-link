@@ -1,8 +1,8 @@
 Arguments: 
-  /home/thejoaov/.nvm/versions/node/v12.13.0/bin/node /usr/share/yarn/bin/yarn.js
+  /home/thejoaov/.nvm/versions/node/v12.13.0/bin/node /usr/share/yarn/bin/yarn.js add electron-builder@^23
 
 PATH: 
-  /home/thejoaov/.zplugin/polaris/bin:/home/thejoaov/.nvm/versions/node/v12.13.0/bin:/home/thejoaov/.zplugin/polaris/bin:/opt/GitHub Desktop:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/thejoaov/.yarn/bin:/home/thejoaov/Android/Sdk/tools:/home/thejoaov/Android/Sdk/platform-tools:/home/thejoaov/.yarn/bin:/home/thejoaov/Android/Sdk/tools:/home/thejoaov/Android/Sdk/platform-tools
+  /home/thejoaov/.nvm/versions/node/v12.13.0/bin:/home/thejoaov/.zplugin/polaris/bin:/opt/GitHub Desktop:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/thejoaov/.yarn/bin:/home/thejoaov/Android/Sdk/tools:/home/thejoaov/Android/Sdk/platform-tools
 
 Yarn version: 
   1.19.1
@@ -21,7 +21,7 @@ npm manifest:
   {
     "name": "vs-tray",
     "description": "Open your Projects from tray menu on Visual Studio Code, and other useful options.",
-    "version": "v0.0.13",
+    "version": "v0.0.13-beta",
     "main": "main.js",
     "repository": "https://github.com/thejoaov/vs-tray",
     "author": "João Victor <jvictorsantos852@gmail.com>",
@@ -58,9 +58,9 @@ npm manifest:
     "build": {
       "appId": "com.thejoaov.vstray",
       "productName": "VS Tray",
-      "publish": [
-        "github"
-      ],
+      "publish": {
+        "provider": "github"
+      },
       "mac": {
         "icon": "icons/icon.icns",
         "category": "public.app-category.developer-tools"
@@ -1112,7 +1112,7 @@ Lockfile:
       semver "^5.5.0"
       temp-file "^3.1.1"
   
-  electron-builder@^19:
+  electron-builder@^19.0.0:
     version "19.56.2"
     resolved "https://registry.yarnpkg.com/electron-builder/-/electron-builder-19.56.2.tgz#11c0c4544c4d82f1f1a2837e7f349a67457f1d99"
     integrity sha512-3t6FY4Q/TPwkuL5XKSssBD0GKudWjYfMJcDIVWOE2okBfMB3LYkRj2FWG4ZxJ1FcybXLFSswQQZVbwiYpLIYxA==
@@ -1200,7 +1200,7 @@ Lockfile:
       conf "^6.0.0"
       type-fest "^0.7.1"
   
-  electron@^4:
+  electron@^4.0.0:
     version "4.2.12"
     resolved "https://registry.yarnpkg.com/electron/-/electron-4.2.12.tgz#8e8926a6a6654cde5eb0612952fed98a56941875"
     integrity sha512-EES8eMztoW8gEP5E4GQLP8slrfS2jqTYtHbu36mlu3k1xYAaNPyQQr6mCILkYxqj4l3la4CT2Vcs89CUG62vcQ==
@@ -1222,9 +1222,9 @@ Lockfile:
       iconv-lite "~0.4.13"
   
   end-of-stream@^1.1.0:
-    version "1.4.1"
-    resolved "https://registry.yarnpkg.com/end-of-stream/-/end-of-stream-1.4.1.tgz#ed29634d19baba463b6ce6b80a37213eab71ec43"
-    integrity sha512-1MkrZNvWTKCaigbn+W15elq2BB/L22nqrSY5DKlo3X6+vclJm8Bb5djXJBmEX6fS3+zCh/F4VBK5Z2KxJt4s2Q==
+    version "1.4.4"
+    resolved "https://registry.yarnpkg.com/end-of-stream/-/end-of-stream-1.4.4.tgz#5ae64a5f45057baf3626ec14da0ca5e4b2431eb0"
+    integrity sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==
     dependencies:
       once "^1.4.0"
   
@@ -1863,10 +1863,15 @@ Lockfile:
       unzip-response "^2.0.1"
       url-parse-lax "^1.0.0"
   
-  graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
+  graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
     version "4.2.1"
     resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.1.tgz#1c1f0c364882c868f5bff6512146328336a11b1d"
     integrity sha512-b9usnbDGnD928gJB3LrCmxoibr3VE4U2SMo5PBuBnokWyDADTqDPXg4YpwKF1trpH+UbGp7QLicO3+aWEy0+mw==
+  
+  graceful-fs@^4.2.0:
+    version "4.2.3"
+    resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
+    integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
   
   har-schema@^2.0.0:
     version "2.0.0"
