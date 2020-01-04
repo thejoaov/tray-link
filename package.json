@@ -1,7 +1,7 @@
 {
   "name": "vs-tray",
   "description": "Open your Projects from tray menu on Visual Studio Code, and other useful options.",
-  "version": "v0.0.13-beta",
+  "version": "0.1.0-beta",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",
@@ -9,31 +9,29 @@
   "scripts": {
     "start": "yarn electron .",
     "dev": "nodemon --exec electron .",
-    "pack": "yarn electron-builder --dir",
-    "dist": "yarn electron-builder",
-    "dist:all": "npm-run-all -p dist:*",
-    "dist:windows": "yarn electron-builder --windows",
-    "dist:linux": "yarn electron-builder --linux",
-    "dist:mac": "yarn electron-builder --mac",
-    "postinstall": "yarn electron-builder install-app-deps",
-    "release": "yarn electron-builder -lw"
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:all": "electron-builder -lwm",
+    "dist:mac": "electron-builder --mac",
+    "dist:windows": "electron-builder --windows",
+    "dist:linux": "electron-builder --linux",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "@sentry/electron": "^0.17.4",
-    "electron-store": "^5.0.0",
-    "fix-path": "^2.1.0",
-    "npm-run-all": "^4.1.5"
+    "@sentry/electron": "^1.1.0",
+    "electron-store": "^5.1.0",
+    "fix-path": "^2.1.0"
   },
   "devDependencies": {
-    "electron": "4.0",
-    "electron-builder": "^21.2.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-config-prettier": "^6.4.0",
-    "eslint-plugin-import": "^2.18.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "nodemon": "^1.19.1",
-    "prettier": "^1.18.2"
+    "electron": "^4.0.0",
+    "electron-builder": "^22.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "nodemon": "^2.0.2",
+    "prettier": "^1.19.1"
   },
   "build": {
     "appId": "com.thejoaov.vstray",
@@ -42,15 +40,12 @@
       "provider": "github"
     },
     "mac": {
-      "icon": "icons/icon.icns",
+      "icon": "icons/icons.icns",
       "category": "public.app-category.developer-tools"
-    },
-    "win": {
-      "icon": "icons/icon.ico",
-      "publisherName": "thejoaov"
     },
     "linux": {
       "category": "Development",
+      "icon": "icon.png",
       "target": [
         "snap",
         "deb",

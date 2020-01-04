@@ -1,11 +1,9 @@
 {
-  "openCode": "Abrir no VSCode",
   "addProject": "Adicionar novo projeto...",
+  "openCode": "Abrir no VSCode",
+  "openTerminal": "Abrir no Terminal",
   "openGithub": "Abrir no Github Desktop",
   "checkUpdate": "Verificar Atualizações",
-  "openTerminal": "Abrir no Terminal do Gnome",
-  "openFolder": "Abrir pasta",
-  "version": "Versão",
   "close": "Fechar VS Tray",
   "remove": "Remover"
 }
