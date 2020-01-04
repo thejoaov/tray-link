@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const Store = require('electron-store');
 const Sentry = require('@sentry/electron');
-const { version, repository } = require('./package.json');
+const { version } = require('./package.json');
 
 fixPath();
 
@@ -56,7 +56,6 @@ function render(tray = mainTray) {
           spawn('code', [path], { shell: true });
         },
       },
-
       {
         label: locale.openGithub,
         click: () => {
@@ -68,22 +67,18 @@ function render(tray = mainTray) {
         },
       },
       {
-        type: 'separator',
-      },
-      process.platform === 'linux' && {
         label: locale.openTerminal,
         click: () => {
-          spawn('gnome-terminal', { cwd: path });
+          spawn(
+            process.platform === 'linux'
+              ? 'gnome-terminal'
+              : process.platform === 'darwin'
+              ? 'open -a Terminal'
+              : 'cmd',
+            [path],
+            { shell: true }
+          );
         },
-      },
-      {
-        label: locale.openFolder,
-        click: () => {
-          spawn(shell.openItem(path));
-        },
-      },
-      {
-        type: 'separator',
       },
       {
         label: locale.remove,
@@ -107,7 +102,6 @@ function render(tray = mainTray) {
         if (!result) return;
 
         const [path] = result;
-
         const name = basename(path);
 
         store.set(
@@ -135,11 +129,12 @@ function render(tray = mainTray) {
       type: 'normal',
       label: locale.checkUpdate,
       enabled: true,
-      click: () => shell.openExternal(repository),
+      click: () =>
+        shell.openExternal('https://github.com/thejoaov/vs-tray/releases'),
     },
     {
       type: 'normal',
-      label: `${locale.version}: ${version}`,
+      label: `Version: ${version}`,
       enabled: false,
     },
     {

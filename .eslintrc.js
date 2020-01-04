@@ -13,7 +13,8 @@ module.exports = {
     ecmaVersion: 2018,
   },
   rules: {
-    'import/no-extraneous-dependencies': 'off',
-    'object-curly-newline': 'off',
+    'import/no-extraneous-dependencies': 0,
+    'object-curly-newline': 0,
+    'no-nested-ternary': 0,
   },
 };
