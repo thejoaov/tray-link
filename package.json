@@ -15,6 +15,7 @@
     "dist:mac": "electron-builder --mac",
     "dist:windows": "electron-builder --windows",
     "dist:linux": "electron-builder --linux",
+    "release": "electron-builder release",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
