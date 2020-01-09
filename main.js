@@ -1,5 +1,6 @@
 const { resolve, basename } = require('path');
 const { app, Menu, Tray, dialog, shell } = require('electron');
+const commandExists = require('command-exists');
 
 const { spawn } = require('child_process');
 const fixPath = require('fix-path');
@@ -67,7 +68,13 @@ function render(tray = mainTray) {
         },
       },
       {
-        label: locale.openTerminal,
+        label: `${locale.openTerminal} (${
+          process.platform === 'linux'
+            ? 'GNOME'
+            : process.platform === 'darwin'
+            ? 'Terminal'
+            : 'CMD'
+        })`,
         click: () => {
           spawn(
             process.platform === 'linux'
@@ -79,6 +86,27 @@ function render(tray = mainTray) {
             { shell: true }
           );
         },
+      },
+      {
+        label: locale.openHyper,
+        click: () => {
+          commandExists('hyper', () => {
+            if (commandExists) {
+              console.log('Hyper CLI is avaiable');
+              spawn('hyper', [path], { shell: true });
+            } else {
+              console.log('Hyper CLI is not in PATH');
+              dialog.showMessageBox({
+                type: 'error',
+                title: locale.messageTitle,
+                message: locale.messageText,
+              });
+            }
+          });
+        },
+      },
+      {
+        type: 'separator',
       },
       {
         label: locale.remove,
@@ -97,7 +125,9 @@ function render(tray = mainTray) {
     {
       label: locale.addProject,
       click: () => {
-        const result = dialog.showOpenDialog({ properties: ['openDirectory'] });
+        const result = dialog.showOpenDialog({
+          properties: ['openDirectory'],
+        });
 
         if (!result) return;
 
