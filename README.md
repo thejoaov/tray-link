@@ -37,23 +37,22 @@ Developed by:
 ## Features
 
 - :electron: **Electron** — desktop apps with JavaScript, HTML, and CSS
-- 🔺**Sentry** - cross platform application monitoring
-- 💖**Lint** — ESlint, Prettier and EditorConfig
+- :vertical_traffic_light:**Sentry** - cross platform application monitoring
+- :warning:**Lint** — ESlint, Prettier and EditorConfig
 
 ## Dependencies
 
 - [Node.js](https://nodejs.org/en/) >= 8.0.0
 - [Yarn](https://yarnpkg.com/pt-BR/docs/install)
 
-## Compatibilty and Download
+## Download and installation
 
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/vs-tray/releases)
-```markdown
-PS: All the files are not signed (yet, because i don't know how to sign them in every OS), so, you have to trust and install the application anyway. This is a free and open-source application, if you have any suspicion, just check the code ;)
-```
 
-Compatible with:
+### Signing Disclaimer
+All the download files are not signed yet, because i don't know how to sign them with electron in all OSes, so, you have to trust and install the application anyway. This is a free and open-source application, if you have any suspicion, just check the code :grin:
 
+#### Compatibilty
 - Windows
   - 10 (tested)
   - Versions under windows 10 are not tested yet, but should work as well.
