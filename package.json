@@ -1,7 +1,7 @@
 {
   "name": "vs-tray",
   "description": "Open your Projects from tray menu on Visual Studio Code, and other useful options.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "main.js",
   "repository": "https://github.com/thejoaov/vs-tray",
   "author": "João Victor <jvictorsantos852@gmail.com>",

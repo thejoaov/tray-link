@@ -52,6 +52,27 @@ function render(tray = mainTray) {
     label: name,
     submenu: [
       {
+        label: path,
+        enabled: false,
+      },
+      {
+        label: locale.openFolder,
+        click: () => {
+          spawn(
+            process.platform === 'linux'
+              ? 'nautilus'
+              : process.platform === 'darwin'
+              ? 'open'
+              : 'explorer',
+            [path],
+            { shell: true }
+          );
+        },
+      },
+      {
+        type: 'separator',
+      },
+      {
         label: locale.openCode,
         click: () => {
           spawn('code', [path], { shell: true });
@@ -60,11 +81,28 @@ function render(tray = mainTray) {
       {
         label: locale.openGithub,
         click: () => {
-          spawn(
-            process.platform === 'linux' ? 'github-desktop' : 'github',
-            [path],
-            { shell: true }
-          );
+          commandExists('github', () => {
+            if (commandExists) {
+              console.log('Github Desktop is avaiable in PATH');
+              spawn('github', [path], { shell: true });
+            } else {
+              commandExists('github-desktop', () => {
+                if (commandExists) {
+                  console.log(
+                    "Github Desktop is avaiable in PATH, but on linux, opening directly the project does'nt work. "
+                  );
+                  spawn('github-desktop', [path], { shell: true });
+                } else {
+                  console.log('Github Desktop is not in PATH');
+                  dialog.showMessageBox({
+                    type: 'error',
+                    title: locale.hyperMessageTitle,
+                    message: locale.hyperMessageText,
+                  });
+                }
+              });
+            }
+          });
         },
       },
       {
@@ -98,8 +136,8 @@ function render(tray = mainTray) {
               console.log('Hyper CLI is not in PATH');
               dialog.showMessageBox({
                 type: 'error',
-                title: locale.messageTitle,
-                message: locale.messageText,
+                title: locale.hyperMessageTitle,
+                message: locale.hyperMessageText,
               });
             }
           });
@@ -164,7 +202,7 @@ function render(tray = mainTray) {
     },
     {
       type: 'normal',
-      label: `Version: ${version}`,
+      label: `${locale.version}: ${version}`,
       enabled: false,
     },
     {
