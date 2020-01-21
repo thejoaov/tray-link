@@ -30,12 +30,6 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
 
 Developed by:
 
-| [<img src="https://avatars0.githubusercontent.com/u/2254731?s=460&v=4" width="75px;"/>](https://github.com/diego3g) | [<img src="https://avatars3.githubusercontent.com/u/7268910?s=460&v=4" width="75px;"/>](https://github.com/jpdemagalhaes) |
-| :-----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
-|                                       [Diego F.](https://github.com/diego3g)                                        |                                      [João Paulo](https://github.com/jpdemagalhaes)                                       |
-
-Mantained by:
-
 | [<img src="https://avatars1.githubusercontent.com/u/45052080?s=460&v=4" width="75px">](https://github.com/thejoaov) |
 | ------------------------------------------------------------------------------------------------------------------- |
 | [João Victor](https://github.com/thejoaov)                                                                          |
@@ -55,26 +49,28 @@ Mantained by:
 
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/vs-tray/releases)
 
+**PS:** All the files are not signed (yet, because i don't know how to sign them in every OS), so, you have to trust and install the application anyway. This is a free and open-source application, if you have any suspicion, just check the code ;)
+
 Compatible with:
 
 - Windows
   - 10 (tested)
-  - Versions under windows 10 are not tested yet, so test it out and submit a pr!
+  - Versions under windows 10 are not tested yet, but should work as well.
 - Linux
-  snap and rpm packages not tested.
+  - Snap and Debian packages (I personally recommend using debian packages over snap, classic confinement is sometimes buggy).
   - Ubuntu
     - 19.\* (tested) - working
     - 16.\* (not tested yet)
     - Should work on any distro based on ubuntu too.
-  - Another distros not tested, but there is a rpm package in releases, so test it out and submit a pr!
+  - Another distros not tested, but there is a rpm package in releases. Should work on all distros with app indicators.
 - MacOS
-  - To do!
+  - DMG package.
 
 ## Getting started
 
 1. Clone this repository;
-2. `cd vs-tray`;<br />
-3. Run `yarn` to install dependencies.<br />
+2. `cd vs-tray`;
+3. Run `yarn` to install dependencies.
 4. Run `yarn start`.
 
 ## Contributing
