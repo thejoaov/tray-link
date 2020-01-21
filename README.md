@@ -36,8 +36,8 @@ Developed by:
 
 ## Features
 
-- :electron: **Electron** — desktop apps with JavaScript, HTML, and CSS
-- :vertical_traffic_light:**Sentry** - cross platform application monitoring
+- :electron: **Electron** — Desktop apps with JavaScript, HTML, and CSS
+- :vertical_traffic_light:**Sentry** — Cross platform application monitoring
 - :warning:**Lint** — ESlint, Prettier and EditorConfig
 
 ## Dependencies
@@ -59,7 +59,7 @@ All the download files are not signed yet, because i don't know how to sign them
 - Linux
   - Snap and Debian packages (I personally recommend using debian packages over snap, classic confinement it's sometimes buggy).
   - Ubuntu
-    - 19.\* (tested) - working
+    - 18.\+ (tested) - working
     - 16.\* (not tested yet)
     - Should work on any distro based on ubuntu too.
   - Another distros not tested, but there is a rpm package in releases. Should work on all distros with app indicators.
