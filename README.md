@@ -27,16 +27,24 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
 <hr>
 
 ## Features
-
-
+- Open the project's folder;
+- You can open your project directly on VS Code!
+- Open your projects directly to your favorite terminal!
+  - Terminal.app for MacOS, Gnome-Terminal for linux distros, Or CMD for Windows.
+  - HyperJS terminal (*requires Hyper commands installed in your PATH*).
+- Open the project directly in the Github Desktop application (Works on MacOS and Windows, *requires Github Commands installed on PATH*)
+- Remove your project's from the application;
+- Get to the releases tab, for checking updates!
+- Translations to Spanish :es:, English :us:, and of course Brazilian Portuguese :beginner:!
 
 ## Dependencies
 
-- :green_heart:[Node.js](https://nodejs.org/en/) >= 8.0.0
-- :blue_heart:[Yarn](https://yarnpkg.com/pt-BR/docs/install)
-- :electron:**Electron** — Desktop apps with JavaScript, HTML, and CSS
-- :vertical_traffic_light:**Sentry** — Cross platform application monitoring
-- :warning:**Lint** — ESlint, Prettier and EditorConfig
+- :green_heart: [Node.js](https://nodejs.org/en/) >= 8.0.0
+- :blue_heart: [Yarn](https://yarnpkg.com/pt-BR/docs/install)
+- :electron: **Electron** — Desktop apps with JavaScript, HTML, and CSS
+- :vertical_traffic_light: **Sentry** — Cross platform application monitoring
+- :warning: **Lint** — ESlint, Prettier and EditorConfig
+
 ## Download and installation
 
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/vs-tray/releases)
