@@ -48,8 +48,9 @@ Developed by:
 ## Compatibilty and Download
 
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/vs-tray/releases)
-
-**PS:** All the files are not signed (yet, because i don't know how to sign them in every OS), so, you have to trust and install the application anyway. This is a free and open-source application, if you have any suspicion, just check the code ;)
+```markdown
+PS: All the files are not signed (yet, because i don't know how to sign them in every OS), so, you have to trust and install the application anyway. This is a free and open-source application, if you have any suspicion, just check the code ;)
+```
 
 Compatible with:
 
@@ -57,7 +58,7 @@ Compatible with:
   - 10 (tested)
   - Versions under windows 10 are not tested yet, but should work as well.
 - Linux
-  - Snap and Debian packages (I personally recommend using debian packages over snap, classic confinement is sometimes buggy).
+  - Snap and Debian packages (I personally recommend using debian packages over snap, classic confinement it's sometimes buggy).
   - Ubuntu
     - 19.\* (tested) - working
     - 16.\* (not tested yet)
