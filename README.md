@@ -26,25 +26,17 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
 </p>
 <hr>
 
-## Participants
-
-Developed by:
-
-| [<img src="https://avatars1.githubusercontent.com/u/45052080?s=460&v=4" width="75px">](https://github.com/thejoaov) |
-| ------------------------------------------------------------------------------------------------------------------- |
-| [João Victor](https://github.com/thejoaov)                                                                          |
-
 ## Features
 
-- :electron: **Electron** — Desktop apps with JavaScript, HTML, and CSS
-- :vertical_traffic_light:**Sentry** — Cross platform application monitoring
-- :warning:**Lint** — ESlint, Prettier and EditorConfig
+
 
 ## Dependencies
 
-- [Node.js](https://nodejs.org/en/) >= 8.0.0
-- [Yarn](https://yarnpkg.com/pt-BR/docs/install)
-
+- :green_heart:[Node.js](https://nodejs.org/en/) >= 8.0.0
+- :blue_heart:[Yarn](https://yarnpkg.com/pt-BR/docs/install)
+- :electron:**Electron** — Desktop apps with JavaScript, HTML, and CSS
+- :vertical_traffic_light:**Sentry** — Cross platform application monitoring
+- :warning:**Lint** — ESlint, Prettier and EditorConfig
 ## Download and installation
 
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/vs-tray/releases)
@@ -52,7 +44,7 @@ Downloads are under Releases section, [check it out!](https://github.com/thejoao
 ### Signing Disclaimer
 All the download files are not signed yet, because i don't know how to sign them with electron in all OSes, so, you have to trust and install the application anyway. This is a free and open-source application, if you have any suspicion, just check the code :grin:
 
-#### Compatibilty
+### Compatibilty
 - Windows
   - 10 (tested)
   - Versions under windows 10 are not tested yet, but should work as well.
@@ -65,6 +57,8 @@ All the download files are not signed yet, because i don't know how to sign them
   - Another distros not tested, but there is a rpm package in releases. Should work on all distros with app indicators.
 - MacOS
   - DMG package.
+
+---
 
 ## Getting started
 
