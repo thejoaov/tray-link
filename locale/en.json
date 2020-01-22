@@ -1,12 +1,14 @@
 {
   "addProject": "Add new project folder...",
+  "openFolder": "Open folder",
   "openCode": "Open with VSCode",
   "openTerminal": "Open in Default Terminal",
   "openHyper": "Open in Hyper",
   "openGithub": "Open with Github Desktop",
   "checkUpdate": "Check for updates",
-  "messageTitle": "Hyper CLI",
-  "messageText": "This function needs Hyper CLI installed on PATH",
+  "hyperMessageTitle": "Hyper CLI",
+  "hyperMessageText": "This function needs Hyper CLI installed on PATH",
   "close": "Close VS Tray",
-  "remove": "Remove"
+  "remove": "Remove",
+  "version": "Version"
 }
