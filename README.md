@@ -24,61 +24,55 @@ Based on <i><a href="https://github.com/Rocketseat/youtube-challenge-electron-tr
   </a>
 
 </p>
-
-<div align="center">
-  <a href="https://snapcraft.io/vs-tray"> <img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" /> </a>
-</div>
 <hr>
 
-## Participants
-
-Developed by:
-
-| [<img src="https://avatars0.githubusercontent.com/u/2254731?s=460&v=4" width="75px;"/>](https://github.com/diego3g) | [<img src="https://avatars3.githubusercontent.com/u/7268910?s=460&v=4" width="75px;"/>](https://github.com/jpdemagalhaes) |
-| :-----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
-|                                       [Diego F.](https://github.com/diego3g)                                        |                                      [João Paulo](https://github.com/jpdemagalhaes)                                       |
-
-Mantained by:
-
-| [<img src="https://avatars1.githubusercontent.com/u/45052080?s=460&v=4" width="75px">](https://github.com/thejoaov) |
-| ------------------------------------------------------------------------------------------------------------------- |
-| [João Victor](https://github.com/thejoaov)                                                                          |
-
 ## Features
-
-- :electron: **Electron** — desktop apps with JavaScript, HTML, and CSS
-- 🔺**Sentry** - cross platform application monitoring
-- 💖**Lint** — ESlint, Prettier and EditorConfig
+- Open the project's folder;
+- You can open your project directly on VS Code!
+- Open your projects directly to your favorite terminal!
+  - Terminal.app for MacOS, Gnome-Terminal for linux distros, Or CMD for Windows.
+  - HyperJS terminal (*requires Hyper commands installed in your PATH*).
+- Open the project directly in the Github Desktop application (Works on MacOS and Windows, *requires Github Commands installed on PATH*)
+- Remove your project's from the application;
+- Get to the releases tab, for checking updates!
+- Translations to Spanish :es:, English :us:, and of course Brazilian Portuguese :beginner:!
 
 ## Dependencies
 
-- [Node.js](https://nodejs.org/en/) >= 8.0.0
-- [Yarn](https://yarnpkg.com/pt-BR/docs/install)
+- :green_heart: [Node.js](https://nodejs.org/en/) >= 8.0.0
+- :blue_heart: [Yarn](https://yarnpkg.com/pt-BR/docs/install)
+- :electron: **Electron** — Desktop apps with JavaScript, HTML, and CSS
+- :vertical_traffic_light: **Sentry** — Cross platform application monitoring
+- :warning: **Lint** — ESlint, Prettier and EditorConfig
 
-## Compatibilty and Download
+## Download and installation
 
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/vs-tray/releases)
 
-Compatible with:
+### Signing Disclaimer
+All the download files are not signed yet, because i don't know how to sign them with electron in all OSes, so, you have to trust and install the application anyway. This is a free and open-source application, if you have any suspicion, just check the code :grin:
 
+### Compatibilty
 - Windows
   - 10 (tested)
-  - Versions under windows 10 are not tested yet, so test it out and submit a pr!
+  - Versions under windows 10 are not tested yet, but should work as well.
 - Linux
-  snap and rpm packages not tested.
+  - Snap and Debian packages (I personally recommend using debian packages over snap, classic confinement it's sometimes buggy).
   - Ubuntu
-    - 19.\* (tested) - working
+    - 18.\+ (tested) - working
     - 16.\* (not tested yet)
     - Should work on any distro based on ubuntu too.
-  - Another distros not tested, but there is a rpm package in releases, so test it out and submit a pr!
+  - Another distros not tested, but there is a rpm package in releases. Should work on all distros with app indicators.
 - MacOS
-  - To do!
+  - DMG package.
+
+---
 
 ## Getting started
 
 1. Clone this repository;
-2. `cd vs-tray`;<br />
-3. Run `yarn` to install dependencies.<br />
+2. `cd vs-tray`;
+3. Run `yarn` to install dependencies.
 4. Run `yarn start`.
 
 ## Contributing
