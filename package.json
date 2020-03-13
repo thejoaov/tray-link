@@ -9,6 +9,7 @@
   "scripts": {
     "start": "yarn electron .",
     "dev": "nodemon --exec electron .",
+    "predev": "prettier 'main.js' --write",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:all": "electron-builder -lwm",

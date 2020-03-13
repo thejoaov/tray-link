@@ -59,11 +59,7 @@ function render(tray = mainTray) {
         label: locale.openFolder,
         click: () => {
           spawn(
-            process.platform === 'linux'
-              ? 'nautilus'
-              : process.platform === 'darwin'
-              ? 'open'
-              : 'explorer',
+            process.platform === 'linux' ? 'nautilus' : process.platform === 'darwin' ? 'open' : 'explorer',
             [path],
             { shell: true }
           );
@@ -81,23 +77,25 @@ function render(tray = mainTray) {
       {
         label: locale.openGithub,
         click: () => {
-          commandExists('github', () => {
-            if (commandExists) {
-              console.log('Github Desktop is avaiable in PATH');
-              spawn('github', [path], { shell: true });
+          commandExists('github-desktop', () => {
+            if (commandExists && process.platform === 'linux') {
+              console.log(
+                "Github Desktop is avaiable in PATH, but on linux, opening the project on his folder doesn't work."
+              );
+              spawn(`nohup github-desktop ${path} > /dev/null &`, {
+                shell: true,
+              });
             } else {
-              commandExists('github-desktop', () => {
-                if (commandExists) {
-                  console.log(
-                    "Github Desktop is avaiable in PATH, but on linux, opening directly the project doesn't work. "
-                  );
-                  spawn(`nohup github-desktop ${path} > /dev/null &`, [path], { shell: true });
+              commandExists('github', () => {
+                if (commandExists && (process.platform === 'darwin' || process.platform === 'win32')) {
+                  console.log('Github Desktop is avaiable in PATH');
+                  spawn(`nohup github ${path} > /dev/null &`, { shell: true });
                 } else {
                   console.log('Github Desktop is not in PATH');
                   dialog.showMessageBox({
                     type: 'error',
-                    title: locale.hyperMessageTitle,
-                    message: locale.hyperMessageText,
+                    title: locale.githubMessageTitle,
+                    message: locale.githubMessageText,
                   });
                 }
               });
@@ -107,11 +105,7 @@ function render(tray = mainTray) {
       },
       {
         label: `${locale.openTerminal} (${
-          process.platform === 'linux'
-            ? 'GNOME'
-            : process.platform === 'darwin'
-            ? 'Terminal'
-            : 'CMD'
+          process.platform === 'linux' ? 'GNOME' : process.platform === 'darwin' ? 'Terminal' : 'CMD'
         })`,
         click: () => {
           spawn(
@@ -149,10 +143,7 @@ function render(tray = mainTray) {
       {
         label: locale.remove,
         click: () => {
-          store.set(
-            'projects',
-            JSON.stringify(projects.filter(item => item.path !== path))
-          );
+          store.set('projects', JSON.stringify(projects.filter(item => item.path !== path)));
           render();
         },
       },
@@ -197,8 +188,7 @@ function render(tray = mainTray) {
       type: 'normal',
       label: locale.checkUpdate,
       enabled: true,
-      click: () =>
-        shell.openExternal('https://github.com/thejoaov/vs-tray/releases'),
+      click: () => shell.openExternal('https://github.com/thejoaov/vs-tray/releases'),
     },
     {
       type: 'normal',

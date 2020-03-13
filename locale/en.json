@@ -7,7 +7,9 @@
   "openGithub": "Open with Github Desktop",
   "checkUpdate": "Check for updates",
   "hyperMessageTitle": "Hyper CLI",
-  "hyperMessageText": "This function needs Hyper CLI installed on PATH",
+  "hyperMessageText": "This function needs Hyper CLI installed in PATH.",
+  "githubMessageTitle": "Github Desktop",
+  "githubMessageText": "This function needs Github Desktop installed.",
   "close": "Close VS Tray",
   "remove": "Remove",
   "version": "Version"
