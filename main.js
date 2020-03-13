@@ -89,9 +89,9 @@ function render(tray = mainTray) {
               commandExists('github-desktop', () => {
                 if (commandExists) {
                   console.log(
-                    "Github Desktop is avaiable in PATH, but on linux, opening directly the project does'nt work. "
+                    "Github Desktop is avaiable in PATH, but on linux, opening directly the project doesn't work. "
                   );
-                  spawn('github-desktop', [path], { shell: true });
+                  spawn(`nohup github-desktop ${path} > /dev/null &`, [path], { shell: true });
                 } else {
                   console.log('Github Desktop is not in PATH');
                   dialog.showMessageBox({
