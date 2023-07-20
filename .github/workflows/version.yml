@@ -1,4 +1,4 @@
-name: Generate Version and push to repository
+name: Version
 permissions:
   contents: write
 on:
@@ -8,7 +8,7 @@ on:
       - master
       - main
 jobs:
-  version:
+  version-patch:
     name: Generate Version
     runs-on: ubuntu-latest
     steps:
@@ -20,9 +20,13 @@ jobs:
           node-version: 18
       - name: Install dependencies
         run: npm install
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email ""
       - name: Generate Version
         run: |
-          npm version from-git -m 'chore: release %s' --allow-same-version
+          npm version ${{ secrets.VERSION_CONTROL }} -m 'chore: release %s' --allow-same-version --no-commit-hooks
       - name: Push Version to tags
         uses: ad-m/github-push-action@master
         with:
