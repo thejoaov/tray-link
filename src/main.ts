@@ -1,4 +1,4 @@
-import 'update-electron-app'
+// import 'update-electron-app'
 import * as path from 'path'
 import { app, Tray, nativeImage } from 'electron'
 import renderer from './modules/renderer'

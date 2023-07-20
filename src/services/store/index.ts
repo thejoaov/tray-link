@@ -5,6 +5,10 @@ import { ProjectSchema } from './schema'
 export function getAllProjects(): Project[] {
   const projectsData = store.get('project') as ProjectSchema[]
 
+  if (!projectsData) {
+    return []
+  }
+
   return projectsData as Project[]
 }
 

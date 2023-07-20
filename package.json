@@ -2,16 +2,21 @@
   "name": "tray-link",
   "version": "1.0.0",
   "description": "An app to manage your projects from the system tray",
+  "main": "dist/main.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
-    "prewatch": "yarn prebuild",
+    "prewatch": "npm run prebuild",
     "watch": "tsc -w",
     "lint": "eslint --ext .ts ./src",
-    "prestart": "yarn build",
-    "start": "electron ./dist/main.js",
-    "dev": "nodemon --watch ./ --exec \"yarn start\" -e ts,js,json --ignore dist",
-    "format": "prettier --write \"./src/**/*.{js,ts}\""
+    "prestart": "npm run build",
+    "start": "electron-forge start",
+    "dev": "nodemon --watch ./ --exec \"npm run start\" -e ts,js,json --ignore dist",
+    "format": "prettier --write \"./src/**/*.{js,ts}\"",
+    "prepackage": "npm run build",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish --from-dry-run"
   },
   "repository": "https://github.com/thejoaov/tray-link",
   "keywords": [
@@ -41,6 +46,13 @@
   "author": "thejoaov",
   "license": "CC0-1.0",
   "devDependencies": {
+    "@electron-forge/cli": "^6.2.1",
+    "@electron-forge/maker-deb": "^6.2.1",
+    "@electron-forge/maker-rpm": "^6.2.1",
+    "@electron-forge/maker-squirrel": "^6.2.1",
+    "@electron-forge/maker-zip": "^6.2.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^6.2.1",
+    "@electron-forge/publisher-github": "^6.2.1",
     "@types/command-exists": "^1.2.0",
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
@@ -59,6 +71,7 @@
   },
   "dependencies": {
     "command-exists": "^1.2.9",
+    "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
     "execa": "^2.0.0-alpha.0",
     "fix-path": "^4.0.0",
@@ -68,8 +81,8 @@
   },
   "lint-staged": {
     "*.{js,ts}": [
-      "eslint --fix",
-      "prettier --write"
+      "npx prettier --write \"./src/**/*.{js,ts}\"",
+      "eslint --ext .ts ./src --fix"
     ]
   }
 }
