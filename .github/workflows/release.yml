@@ -23,7 +23,8 @@ jobs:
         run: npm install
       - name: Build
         run: |
-          npm run package
+          npx tsc
+          npx electron-forge package
           npm run make
           npm run publish
       # - name: Create Release
