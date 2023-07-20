@@ -38,7 +38,7 @@ jobs:
           body: |
             ${{ github.event.head_commit.message }}
             ${{ github.event.head_commit.url }}
-          draft: true
+          draft: false
           prerelease: false
           generate_release_notes: true
   release-linux:
@@ -70,7 +70,7 @@ jobs:
           body: |
             ${{ github.event.head_commit.message }}
             ${{ github.event.head_commit.url }}
-          draft: true
+          draft: false
           prerelease: false
           generate_release_notes: true
   release-mac:
@@ -102,6 +102,6 @@ jobs:
           body: |
             ${{ github.event.head_commit.message }}
             ${{ github.event.head_commit.url }}
-          draft: true
+          draft: false
           prerelease: false
           generate_release_notes: true
