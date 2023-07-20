@@ -10,11 +10,7 @@ export async function onClickAddProjects(): Promise<void> {
 
   if (!result || result.canceled) return
 
-  console.log(result)
-
   const projectName = basename(result.filePaths[0])
-
-  console.log(projectName)
 
   saveProject({
     name: projectName,
