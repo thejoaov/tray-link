@@ -10,13 +10,13 @@ jobs:
   release-windows:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: Release
+    name: Windows
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: Install dependencies
@@ -40,13 +40,13 @@ jobs:
   release-linux:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: Release
+    name: Linux
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: Install dependencies
@@ -70,13 +70,13 @@ jobs:
   release-mac:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: Release
+    name: MacOS
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: Install dependencies
