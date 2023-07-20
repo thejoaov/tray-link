@@ -2,7 +2,7 @@
 <div align="center">
 
 <br>
-  <img src="assets/icon.png" alt="my-projects-tray" width="90">
+  <img src="assets/icon@3x.png" alt="my-projects-tray" width="90">
 <br>
 <br>
 

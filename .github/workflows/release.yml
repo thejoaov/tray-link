@@ -40,6 +40,7 @@ jobs:
             ${{ github.event.head_commit.url }}
           draft: true
           prerelease: false
+          generate_release_notes: true
   release-linux:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -71,6 +72,7 @@ jobs:
             ${{ github.event.head_commit.url }}
           draft: true
           prerelease: false
+          generate_release_notes: true
   release-mac:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,3 +104,4 @@ jobs:
             ${{ github.event.head_commit.url }}
           draft: true
           prerelease: false
+          generate_release_notes: true
