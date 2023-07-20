@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2023 João Victod dos Santos Mendes
+Copyright (c) 2023 João Victor dos Santos Mendes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
