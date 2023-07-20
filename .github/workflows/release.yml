@@ -1,6 +1,7 @@
 # Release using electron-forge
 name: Release
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
