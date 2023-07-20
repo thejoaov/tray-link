@@ -25,7 +25,6 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     {
       type: 'separator',
     },
-    // TODO: Open in VSCode
     {
       label: getTranslation('openCode'),
       click: () => {

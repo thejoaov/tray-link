@@ -11,7 +11,7 @@ export function getConfig(): typeof defaultConfig {
   try {
     configOnDisk = fs.readFileSync(configPath, 'utf-8')
   } catch (error) {
-    // console.log(error);
+    // No need to handle this error
   }
 
   return configOnDisk ? JSON.parse(configOnDisk) : defaultConfig
