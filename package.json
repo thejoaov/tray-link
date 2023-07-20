@@ -1,6 +1,6 @@
 {
   "name": "tray-link",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An app to manage your projects from the system tray",
   "main": "dist/main.js",
   "scripts": {
