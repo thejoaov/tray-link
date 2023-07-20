@@ -20,7 +20,7 @@ jobs:
         run: npm install
       - name: Generate Version
         run: |
-          npm version from-git -m 'chore: release %s'
+          npm version from-git -m 'chore: release %s' --allow-same-version --allow-empty
       - name: Push Version to tags
         uses: ad-m/github-push-action@master
         with:
