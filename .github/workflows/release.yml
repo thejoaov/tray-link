@@ -7,7 +7,37 @@ on:
       - master
       - main
 jobs:
-  release:
+  release-windows:
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    name: Release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: |
+          npx tsc
+          npx electron-forge package --platform=win32
+          npx electron-forge make --platform=win32
+          npx electron-forge publish --platform=win32
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: out/make/*
+          tag_name: ${{ github.ref }}
+          body: |
+            ${{ github.event.head_commit.message }}
+            ${{ github.event.head_commit.url }}
+          draft: true
+          prerelease: false
+  release-linux:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     name: Release
@@ -24,16 +54,46 @@ jobs:
       - name: Build
         run: |
           npx tsc
-          npx electron-forge package
-          npm run make
-          npm run publish
-      # - name: Create Release
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     files: out/make/*
-      #     tag_name: ${{ github.ref }}
-      #     body: |
-      #       ${{ github.event.head_commit.message }}
-      #       ${{ github.event.head_commit.url }}
-      #     draft: false
-      #     prerelease: false
+          npx electron-forge package --platform=linux
+          npx electron-forge make --platform=linux
+          npx electron-forge publish --platform=linux
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: out/make/*
+          tag_name: ${{ github.ref }}
+          body: |
+            ${{ github.event.head_commit.message }}
+            ${{ github.event.head_commit.url }}
+          draft: true
+          prerelease: false
+  release-mac:
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    name: Release
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: |
+          npx tsc
+          npx electron-forge package --platform=darwin
+          npx electron-forge make --platform=darwin
+          npx electron-forge publish --platform=darwin
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: out/make/*
+          tag_name: ${{ github.ref }}
+          body: |
+            ${{ github.event.head_commit.message }}
+            ${{ github.event.head_commit.url }}
+          draft: true
+          prerelease: false
