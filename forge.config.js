@@ -12,7 +12,6 @@ module.exports = {
           owner: 'thejoaov',
           name: 'tray-link',
         },
-        prerelease: true,
       },
     },
   ],

@@ -1,11 +1,13 @@
-# Release using electron-forge
 name: Release
 on:
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows: ['version']
     branches:
-      - master
-      - main
+      - 'master'
+      - 'main'
+    types:
+      - completed
 jobs:
   release-windows:
     env:
@@ -29,6 +31,7 @@ jobs:
           npx electron-forge publish --platform=win32
       - name: Create Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: out/make/*
           tag_name: ${{ github.ref }}
@@ -59,6 +62,7 @@ jobs:
           npx electron-forge publish --platform=linux
       - name: Create Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: out/make/*
           tag_name: ${{ github.ref }}
@@ -89,6 +93,7 @@ jobs:
           npx electron-forge publish --platform=darwin
       - name: Create Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: out/make/*
           tag_name: ${{ github.ref }}
