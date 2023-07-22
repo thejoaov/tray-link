@@ -1,14 +1,14 @@
-import updater from 'update-electron-app'
+// import updater from 'update-electron-app'
 import * as path from 'path'
 import { app, Tray, nativeImage } from 'electron'
 import renderer from './modules/renderer'
 import { setConfig } from './services/config'
 import config from './config'
 
-updater({
-  notifyUser: true,
-  repo: 'thejoaov/tray-link',
-})
+// updater({
+//   notifyUser: true,
+//   repo: 'thejoaov/tray-link',
+// })
 
 export let tray: Tray
 
