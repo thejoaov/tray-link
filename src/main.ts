@@ -7,6 +7,7 @@ import config from './config'
 
 updater({
   notifyUser: true,
+  repo: 'thejoaov/tray-link',
 })
 
 export let tray: Tray
