@@ -22,6 +22,7 @@ module.exports = {
     {
       name: '@electron-forge/publisher-github',
       config: {
+        draft: false,
         repository: {
           owner: 'thejoaov',
           name: 'tray-link',
