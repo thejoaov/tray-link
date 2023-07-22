@@ -1,4 +1,4 @@
-// import 'update-electron-app'
+import updater from 'update-electron-app'
 import * as path from 'path'
 import { app, Tray, nativeImage } from 'electron'
 import renderer from './modules/renderer'
@@ -8,6 +8,7 @@ import config from './config'
 export let tray: Tray
 
 app.whenReady().then(() => {
+  updater()
   setConfig(config)
 
   if (app.dock) {
