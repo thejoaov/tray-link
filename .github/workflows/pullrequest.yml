@@ -1,0 +1,26 @@
+name: Pull Request
+permissions:
+  contents: write
+on:
+  # workflow_dispatch:
+  pull_request:
+    branches:
+      - 'master'
+      - 'main'
+jobs:
+  pull-request:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm Install
+      - name: Lint
+        run: npm run lint
+      # - name: Test
+      #   run: npm run test

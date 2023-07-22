@@ -1,6 +1,8 @@
 import en from './en'
 
 const pt: typeof en = {
+  selectProjectFolder: 'Selecione a pasta do projeto',
+  setDefaultTerminal: 'Definir terminal padrão',
   addProject: 'Adicionar novo projeto...',
   openFolder: 'Abrir pasta',
   openCode: 'Abrir no VSCode',

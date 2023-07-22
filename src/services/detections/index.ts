@@ -81,7 +81,7 @@ export function getTerminalList(): Omit<SettingsItem, 'id'>[] {
   ]
 
   const filteredList = list
-    .filter((item) => terminalsByPlatform.includes(item.name))
+    // .filter((item) => terminalsByPlatform.includes(item.name))
     .map((item) => {
       // if (commandExists.sync(item.command)) {
       const path = execa.commandSync(`which ${item.command}`, {

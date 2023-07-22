@@ -1,4 +1,6 @@
 export default {
+  selectProjectFolder: 'Select project folder',
+  setDefaultTerminal: 'Set default terminal',
   addProject: 'Add new project folder...',
   openFolder: 'Open folder',
   openCode: 'Open with VSCode',

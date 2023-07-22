@@ -2,12 +2,12 @@ import { Menu, Tray } from 'electron'
 import Project from '../../models/Project'
 import getTranslation from '../../i18n'
 import { openEditor, openFolder, openGithubDesktop, openTerminal, openVscode } from './utils'
-import { deleteProject } from '../../services/store'
+import { projectStore, settingsStore } from '../../services/store'
 import renderer from '../renderer'
 import { getEditorList, getTerminalList } from '../../services/detections'
-import { getConfig } from '../../services/config'
 import Platform from '../../utils/platform'
 import commandExists from 'command-exists'
+import SettingsItem from '../../models/SettingsItem'
 
 export default function getContextMenu(tray: Tray, project: Project): Menu {
   const menu = Menu.buildFromTemplate([
@@ -32,11 +32,7 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
       },
     },
     {
-      label:
-        getTranslation('openDefaultTerminal') +
-        ' (' +
-        getTerminalList().find((item) => item.name === getConfig().defaultTerminal)?.name +
-        ')',
+      label: getTranslation('openDefaultTerminal') + ' (' + settingsStore.getDefaultTerminal().name + ')',
       click: () => {
         openTerminal(project.path, null)
       },
@@ -58,7 +54,7 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
       submenu: getTerminalList().map((item) => ({
         label: item.name,
         click: () => {
-          openTerminal(project.path, item)
+          openTerminal(project.path, new SettingsItem(item))
         },
       })),
     },
@@ -75,7 +71,7 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     {
       label: getTranslation('remove'),
       click: () => {
-        deleteProject(project.id)
+        projectStore.delete(project.id)
         renderer(tray)
       },
     },

@@ -2,12 +2,12 @@ import { Menu, MenuItem, Tray } from 'electron'
 import getTranslation from '../../i18n'
 import { onClickAddProjects } from './utils'
 import getContextMenu from '../context-menu'
-import { getAllProjects } from '../../services/store'
+import { projectStore } from '../../services/store'
 import renderer from '../renderer'
 import getSettingsMenu from '../settings'
 
 export default function getMainMenu(tray: Tray): Menu {
-  const projects = getAllProjects()
+  const projects = projectStore.getAll()
 
   const menu = Menu.buildFromTemplate([
     {

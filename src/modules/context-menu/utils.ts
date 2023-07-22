@@ -3,9 +3,8 @@ import Platform from '../../utils/platform'
 import { commandSync } from 'execa'
 import commandExists from 'command-exists'
 import getTranslation from '../../i18n'
-import { getConfig } from '../../services/config'
-import { getEditorList, getTerminalList } from '../../services/detections'
 import SettingsItem from '../../models/SettingsItem'
+import { settingsStore } from '../../services/store'
 
 export async function openFolder(path: string): Promise<void> {
   await shell.openPath(path)
@@ -39,10 +38,8 @@ export function openVscode(path: string): void {
   open()
 }
 
-export function openTerminal(path: string, terminal: Omit<SettingsItem, 'id'>): void {
-  const config = getConfig()
-
-  const openDefault = getTerminalList().find((item) => item.name === config.defaultTerminal)?.command
+export function openTerminal(path: string, terminal?: SettingsItem): void {
+  const openDefault = settingsStore.getDefaultTerminal().command
 
   if (terminal) {
     commandSync(`${terminal.command} ${path}`)
@@ -52,9 +49,7 @@ export function openTerminal(path: string, terminal: Omit<SettingsItem, 'id'>): 
 }
 
 export function openEditor(path: string, editor: Omit<SettingsItem, 'id'>): void {
-  const config = getConfig()
-
-  const openDefault = getEditorList().find((item) => item.name === config.defaultEditor)?.command
+  const openDefault = settingsStore.getDefaultEditor().command
 
   if (editor) {
     commandSync(`${editor.command} ${path}`)
