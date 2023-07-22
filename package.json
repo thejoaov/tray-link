@@ -11,7 +11,7 @@
     "lint": "eslint --ext .ts ./src",
     "prestart": "npm run build",
     "start": "electron-forge start",
-    "dev": "nodemon --watch ./ --exec \"npm run start\" -e ts,js,json --ignore dist",
+    "dev": "nodemon --watch ./ --exec \"npm run start\" -e ts,js,json -i ./dist",
     "format": "prettier --write \"./src/**/*.{js,ts}\"",
     "prepackage": "npm run build",
     "package": "electron-forge package",
