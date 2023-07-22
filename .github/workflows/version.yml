@@ -3,10 +3,10 @@ permissions:
   contents: write
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - main
+  # push:
+  #   branches:
+  #     - master
+  #     - main
 jobs:
   version-patch:
     name: Generate Version
