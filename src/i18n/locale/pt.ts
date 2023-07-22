@@ -12,7 +12,7 @@ const pt: typeof en = {
   hyperMessageText: 'Esta função precisa do Hyper CLI instalado no PATH.',
   githubMessageTitle: 'Github Desktop',
   githubMessageText: 'Esta função precisa do app Github Desktop instalado.',
-  close: 'Fechar VS Tray',
+  close: 'Fechar Tray Link',
   remove: 'Remover',
   version: 'Versão',
   settings: 'Configurações',

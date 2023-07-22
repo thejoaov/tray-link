@@ -10,7 +10,7 @@ export default {
   hyperMessageText: 'This function needs Hyper CLI installed in PATH.',
   githubMessageTitle: 'Github Desktop',
   githubMessageText: 'This function needs Github Desktop installed.',
-  close: 'Close VS Tray',
+  close: 'Close Tray Link',
   remove: 'Remove',
   version: 'Version',
   settings: 'Settings',

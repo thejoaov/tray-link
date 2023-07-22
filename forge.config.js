@@ -2,6 +2,13 @@
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: './assets/icon',
+    name: 'Tray Link',
+    executableName: 'tray-link',
+    appBundleId: 'com.thejoaov.traylink',
+    appCategoryType: 'public.app-category.utilities',
+    overwrite: true,
+    extraResource: ['./assets'],
   },
   rebuildConfig: {},
   publishers: [
@@ -18,19 +25,32 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        setupIcon: './assets/icon.ico',
+      },
     },
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
+      config: {
+        icon: './assets/icon.icns',
+      },
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          icon: './assets/icon.png',
+        },
+      },
     },
     {
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        options: {
+          icon: './assets/icon.png',
+        },
+      },
     },
   ],
   plugins: [

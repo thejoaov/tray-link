@@ -5,10 +5,13 @@ import renderer from './modules/renderer'
 import { setConfig } from './services/config'
 import config from './config'
 
+updater({
+  notifyUser: true,
+})
+
 export let tray: Tray
 
 app.whenReady().then(() => {
-  updater()
   setConfig(config)
 
   if (app.dock) {
