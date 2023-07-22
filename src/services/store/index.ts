@@ -4,6 +4,8 @@ import Project from '../../models/Project'
 import SettingsItem from '../../models/SettingsItem'
 import { STORE_KEYS } from '../../constants/store'
 import { BaseStore } from './types'
+import { getEditorList, getTerminalList } from '../../services/config'
+import { DefaultEditor, DefaultTerminal } from '../../constants/defaults'
 
 export class ProjectStore implements BaseStore {
   getAll(): Project[] {
@@ -84,7 +86,7 @@ export class SettingsStore implements BaseStore {
     return store.get(STORE_KEYS.SETTINGS) as SettingsSchema
   }
 
-  get(key: keyof SettingsSchema): SettingsItem | string {
+  get(key: keyof SettingsSchema): SettingsSchema[keyof SettingsSchema] {
     const settingsData = (store.get(STORE_KEYS.SETTINGS) ?? {}) as SettingsSchema
 
     return settingsData[key]
@@ -106,6 +108,16 @@ export class SettingsStore implements BaseStore {
     const settingsData = (store.get(STORE_KEYS.SETTINGS) ?? {}) as SettingsSchema
 
     return settingsData.defaultEditor
+  }
+
+  resetDefaults(): void {
+    store.set(STORE_KEYS.SETTINGS, {
+      defaultEditor: DefaultEditor,
+      defaultTerminal: DefaultTerminal,
+      editorList: getEditorList(),
+      terminalList: getTerminalList(),
+      locale: 'en-US',
+    } as SettingsSchema)
   }
 }
 export const settingsStore = new SettingsStore()

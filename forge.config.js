@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const execa = require('execa')
+
 /** @type {import('@electron-forge/shared-types').ForgeConfig} */
 module.exports = {
   packagerConfig: {
@@ -7,8 +10,12 @@ module.exports = {
     executableName: 'tray-link',
     appBundleId: 'com.thejoaov.traylink',
     appCategoryType: 'public.app-category.utilities',
-    overwrite: true,
     extraResource: ['./assets'],
+  },
+  hooks: {
+    prePackage: async () => {
+      await execa.command('npm run build')
+    },
   },
   rebuildConfig: {},
   publishers: [

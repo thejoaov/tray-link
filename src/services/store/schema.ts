@@ -13,4 +13,6 @@ export type SettingsSchema = {
   locale: string
   defaultEditor: SettingsItem
   defaultTerminal: SettingsItem
+  editorList: SettingsItem[]
+  terminalList: SettingsItem[]
 }

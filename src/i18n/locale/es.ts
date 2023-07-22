@@ -1,6 +1,7 @@
 import en from './en'
 
 const es: typeof en = {
+  resetDefaults: 'Restaurar padrón',
   selectProjectFolder: 'Seleccione la carpeta del proyecto',
   setDefaultTerminal: 'Definir terminal padrón',
   addProject: 'Agregar un nuevo proyecto...',
@@ -37,6 +38,9 @@ const es: typeof en = {
   openIssue: 'Reportar um problema',
   about: 'Sobre',
   closeAbout: 'Cerrar',
+  resetDefaultsMessage: '¿Está seguro que desea restaurar las configuraciones padrón?',
+  cancel: 'Cancelar',
+  reset: 'Restaurar',
 }
 
 export default es

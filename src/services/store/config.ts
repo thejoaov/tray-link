@@ -1,69 +1,68 @@
 import { app } from 'electron'
 import Store from 'electron-store'
-import { getTerminalList, getEditorList } from '../detections'
 
 const store = new Store({
   defaults: {
     projects: [],
     settings: {
       locale: app.getLocale(),
+      editorList: [],
+      terminalList: [],
+      aditionalCommands: [],
     },
-    editorList: getEditorList(),
-    terminalList: getTerminalList(),
-    aditionalCommands: [],
   },
   schema: {
-    aditionalCommands: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-          },
-          command: {
-            type: 'string',
-          },
-        },
-      },
-    },
-    editorList: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-          },
-          path: {
-            type: 'string',
-          },
-          command: {
-            type: 'string',
-          },
-        },
-      },
-    },
-    terminalList: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-          },
-          path: {
-            type: 'string',
-          },
-          command: {
-            type: 'string',
-          },
-        },
-      },
-    },
     settings: {
       type: 'object',
       properties: {
+        aditionalCommands: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+              },
+              command: {
+                type: 'string',
+              },
+            },
+          },
+        },
+        editorList: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+              },
+              path: {
+                type: 'string',
+              },
+              command: {
+                type: 'string',
+              },
+            },
+          },
+        },
+        terminalList: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+              },
+              path: {
+                type: 'string',
+              },
+              command: {
+                type: 'string',
+              },
+            },
+          },
+        },
         locale: {
           type: 'string',
         },
