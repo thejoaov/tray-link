@@ -1,12 +1,12 @@
-import { Menu, Tray, app, dialog, shell } from 'electron'
+import { Menu, Tray, app, dialog, nativeImage, shell } from 'electron'
 import getTranslation from '../../i18n'
-import { getTerminalList } from '../../services/detections'
 import { settingsStore } from '../../services/store'
 import SettingsItem from '../../models/SettingsItem'
 import renderer from '../renderer'
+import path from 'path'
 
 export default function getSettingsMenu(tray: Tray): Menu {
-  const terminals = getTerminalList()
+  const terminals = settingsStore.get('terminalList') as SettingsItem[]
 
   return Menu.buildFromTemplate([
     {
@@ -48,6 +48,7 @@ export default function getSettingsMenu(tray: Tray): Menu {
             message: getTranslation('defaultTerminalMessage'),
             title: getTranslation('defaultTerminal'),
             buttons: terminals.map((terminal) => terminal.name),
+            icon: nativeImage.createFromPath(path.join(__dirname, '../../../assets/icon@5x.png')),
             noLink: true,
           })
           .then((value) => {
@@ -62,6 +63,23 @@ export default function getSettingsMenu(tray: Tray): Menu {
             )
 
             renderer(tray)
+          })
+      },
+    },
+    {
+      label: getTranslation('resetDefaults'),
+      click: async () => {
+        await dialog
+          .showMessageBox({
+            message: getTranslation('resetDefaultsMessage'),
+            title: getTranslation('resetDefaults'),
+            buttons: [getTranslation('cancel'), getTranslation('reset')],
+          })
+          .then((value) => {
+            if (value.response === 1) {
+              settingsStore.resetDefaults()
+              renderer(tray)
+            }
           })
       },
     },

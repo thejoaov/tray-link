@@ -5,9 +5,9 @@ export default class SettingsItem {
   name: string
   path: string | null = null
   command: string | null = null
-  isDefault = false
+  isDefault: boolean
 
-  constructor({ name, path, command, isDefault }: Omit<SettingsItem, 'id'>) {
+  constructor({ name, path, command, isDefault = false }: Omit<SettingsItem, 'id'>) {
     this.id = uuidv4()
     this.name = name
     this.path = path

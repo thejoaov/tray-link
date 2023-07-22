@@ -1,4 +1,5 @@
 export default {
+  resetDefaults: 'Reset defaults',
   selectProjectFolder: 'Select project folder',
   setDefaultTerminal: 'Set default terminal',
   addProject: 'Add new project folder...',
@@ -35,4 +36,7 @@ export default {
   openIssue: 'Report an issue',
   about: 'About',
   closeAbout: 'Close',
+  resetDefaultsMessage: 'Are you sure you want to reset all settings to defaults?',
+  cancel: 'Cancel',
+  reset: 'Reset',
 }

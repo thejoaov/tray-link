@@ -4,7 +4,6 @@ import getTranslation from '../../i18n'
 import { openEditor, openFolder, openGithubDesktop, openTerminal, openVscode } from './utils'
 import { projectStore, settingsStore } from '../../services/store'
 import renderer from '../renderer'
-import { getEditorList, getTerminalList } from '../../services/detections'
 import Platform from '../../utils/platform'
 import commandExists from 'command-exists'
 import SettingsItem from '../../models/SettingsItem'
@@ -34,7 +33,7 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     {
       label: getTranslation('openDefaultTerminal') + ' (' + settingsStore.getDefaultTerminal().name + ')',
       click: () => {
-        openTerminal(project.path, null)
+        openTerminal(project.path)
       },
     },
     {
@@ -51,7 +50,7 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     { type: 'separator' },
     {
       label: getTranslation('openTerminal'),
-      submenu: getTerminalList().map((item) => ({
+      submenu: (settingsStore.get('terminalList') as SettingsItem[]).map((item) => ({
         label: item.name,
         click: () => {
           openTerminal(project.path, new SettingsItem(item))
@@ -60,7 +59,7 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     },
     {
       label: getTranslation('openEditor'),
-      submenu: getEditorList().map((item) => ({
+      submenu: (settingsStore.get('editorList') as SettingsItem[]).map((item) => ({
         label: item.name,
         click: () => {
           openEditor(project.path, item)

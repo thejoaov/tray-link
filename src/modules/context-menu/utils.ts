@@ -39,13 +39,15 @@ export function openVscode(path: string): void {
 }
 
 export function openTerminal(path: string, terminal?: SettingsItem): void {
-  const openDefault = settingsStore.getDefaultTerminal().command
+  const defaultTerminal = settingsStore.getDefaultTerminal()
 
-  if (terminal) {
-    commandSync(`${terminal.command} ${path}`)
-  } else {
-    commandSync(`${openDefault} ${path}`)
-  }
+  // commandSync(`${terminal.command ?? defaultTerminal.command} ${path}`)
+
+  dialog.showMessageBoxSync({
+    message: 'Terminal',
+    detail: `${terminal.command ?? defaultTerminal.command} ${path}`,
+    type: 'error',
+  })
 }
 
 export function openEditor(path: string, editor: Omit<SettingsItem, 'id'>): void {

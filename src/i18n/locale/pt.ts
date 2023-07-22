@@ -1,6 +1,7 @@
 import en from './en'
 
 const pt: typeof en = {
+  resetDefaults: 'Redefinir padrões',
   selectProjectFolder: 'Selecione a pasta do projeto',
   setDefaultTerminal: 'Definir terminal padrão',
   addProject: 'Adicionar novo projeto...',
@@ -37,6 +38,9 @@ const pt: typeof en = {
   openIssue: 'Reportar um problema',
   about: 'Sobre',
   closeAbout: 'Fechar',
+  resetDefaultsMessage: 'Tem certeza que deseja redefinir as configurações padrões?',
+  cancel: 'Cancelar',
+  reset: 'Redefinir',
 }
 
 export default pt

@@ -15,5 +15,5 @@ export default function getTranslation(key: keyof typeof en): string {
     en: en,
   }
 
-  return locales[locale || 'en'][key]
+  return locales[locale || 'en'][key] ?? key
 }
