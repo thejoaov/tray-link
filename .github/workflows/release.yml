@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: |
           npx electron-forge make --platform=win32
-          npx electron-forge publish --platform=win32
+        # npx electron-forge publish --platform=win32
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -52,7 +52,7 @@ jobs:
       - name: Build
         run: |
           npx electron-forge make --platform=linux
-          npx electron-forge publish --platform=linux
+        # npx electron-forge publish --platform=linux
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -82,7 +82,7 @@ jobs:
       - name: Build
         run: |
           npx electron-forge make --platform=darwin
-          npx electron-forge publish --platform=darwin
+        # npx electron-forge publish --platform=darwin
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
