@@ -3,6 +3,7 @@ import { Settings } from '.'
 import SettingsItem from '../../models/SettingsItem'
 import fs from 'fs'
 import { DefaultTerminal } from '../../constants/defaults'
+import Platform from '../../utils/platform'
 
 export function getFilteredSettingsList(settingsList: Settings[]): SettingsItem[] {
   const filteredList = settingsList
@@ -12,10 +13,17 @@ export function getFilteredSettingsList(settingsList: Settings[]): SettingsItem[
 
       if (item.enableBinaryCheck) {
         path =
-          execa.commandSync(`which ${item.binary}`, {
-            reject: false,
-            detached: true,
-          }).stdout ?? ''
+          execa.commandSync(
+            Platform.select({
+              darwin: `which -a ${item.binary}`,
+              win32: `where.exe ${item.binary}`,
+              linux: `which -a ${item.binary}`,
+            }),
+            {
+              reject: false,
+              detached: true,
+            },
+          ).stdout ?? ''
       } else if (item.enableCommonPathCheck && item.commonFilepaths?.length) {
         path = item.commonFilepaths.find((filepath) => {
           if (fs.existsSync(filepath)) return filepath
@@ -24,10 +32,17 @@ export function getFilteredSettingsList(settingsList: Settings[]): SettingsItem[
 
       if (!path?.length) {
         path =
-          execa.commandSync(`which ${item.binary}`, {
-            reject: false,
-            detached: true,
-          }).stdout ?? ''
+          execa.commandSync(
+            Platform.select({
+              darwin: `which -a ${item.binary}`,
+              win32: `where.exe ${item.binary}`,
+              linux: `which -a ${item.binary}`,
+            }),
+            {
+              reject: false,
+              detached: true,
+            },
+          ).stdout ?? ''
       }
 
       if (item.command?.length) {
