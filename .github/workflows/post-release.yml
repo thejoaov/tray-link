@@ -2,7 +2,6 @@ name: Post release
 on:
   release:
     types: [published]
-    branches: [master]
 
 jobs:
   update-release-changelog:
