@@ -1,8 +1,8 @@
 name: Post release
 on:
+  workflow_dispatch:
   release:
     types: [published]
-    branches: [master]
 
 jobs:
   update-release-changelog:
