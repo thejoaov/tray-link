@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*'
+      - v*
 jobs:
   release-windows:
     env:
@@ -25,7 +25,7 @@ jobs:
         # npx electron-forge publish --platform=win32
       - name: Create Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: out/make/*
           tag_name: ${{ github.ref }}
@@ -55,7 +55,7 @@ jobs:
         # npx electron-forge publish --platform=linux
       - name: Create Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: out/make/*
           tag_name: ${{ github.ref }}
@@ -85,7 +85,7 @@ jobs:
         # npx electron-forge publish --platform=darwin
       - name: Create Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: out/make/*
           tag_name: ${{ github.ref }}
