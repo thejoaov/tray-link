@@ -1,9 +1,10 @@
 name: Release
 on:
-  workflow_dispatch:
   push:
     tags:
-      - v*
+      - 'v*.*.*'
+  workflow_dispatch:
+
 jobs:
   release-windows:
     env:
@@ -27,7 +28,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         # if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: out/make/*
+          files: out/make/**/*.*
           tag_name: ${{ github.ref }}
           body: |
             ${{ github.event.head_commit.message }}
@@ -35,6 +36,7 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+          append_body: true
   release-linux:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +59,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         # if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: out/make/*
+          files: out/make/**/*.*
           tag_name: ${{ github.ref }}
           body: |
             ${{ github.event.head_commit.message }}
@@ -65,6 +67,7 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+          append_body: true
   release-mac:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,7 +90,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         # if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: out/make/*
+          files: out/make/**/*.*
           tag_name: ${{ github.ref }}
           body: |
             ${{ github.event.head_commit.message }}
@@ -95,3 +98,4 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+          append_body: true
