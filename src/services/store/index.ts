@@ -86,26 +86,34 @@ export class SettingsStore implements BaseStore {
     return store.get(STORE_KEYS.SETTINGS) as SettingsSchema
   }
 
-  get(key: keyof SettingsSchema): SettingsSchema[keyof SettingsSchema] {
-    const settingsData = (store.get(STORE_KEYS.SETTINGS) ?? {}) as SettingsSchema
+  get(key: keyof SettingsSchema): SettingsSchema[keyof SettingsSchema] | null {
+    const settingsData = store.get(STORE_KEYS.SETTINGS) as SettingsSchema
+
+    if (!settingsData[key]) {
+      return null
+    }
 
     return settingsData[key]
   }
 
   save(key: keyof SettingsSchema, data: SettingsItem): void {
-    const settingsData = (store.get(STORE_KEYS.SETTINGS) ?? {}) as SettingsSchema
+    const settingsData = store.get(STORE_KEYS.SETTINGS) as SettingsSchema
 
     store.set(STORE_KEYS.SETTINGS, { ...settingsData, [key]: data })
   }
 
   getDefaultTerminal(): SettingsItem {
-    const settingsData = (store.get(STORE_KEYS.SETTINGS) ?? {}) as SettingsSchema
+    const settingsData = store.get(STORE_KEYS.SETTINGS) as SettingsSchema
+
+    if (!settingsData.defaultTerminal.command) {
+      return DefaultTerminal
+    }
 
     return settingsData.defaultTerminal
   }
 
   getDefaultEditor(): SettingsItem {
-    const settingsData = (store.get(STORE_KEYS.SETTINGS) ?? {}) as SettingsSchema
+    const settingsData = store.get(STORE_KEYS.SETTINGS) as SettingsSchema
 
     return settingsData.defaultEditor
   }
@@ -118,6 +126,26 @@ export class SettingsStore implements BaseStore {
       terminalList: getTerminalList(),
       locale: 'en-US',
     } as SettingsSchema)
+  }
+
+  getTerminalList(): SettingsItem[] {
+    const settingsData = store.get(STORE_KEYS.SETTINGS) as SettingsSchema
+
+    if (!settingsData.terminalList) {
+      return getTerminalList().map((terminal) => new SettingsItem(terminal))
+    }
+
+    return settingsData.terminalList
+  }
+
+  getEditorList(): SettingsItem[] {
+    const settingsData = store.get(STORE_KEYS.SETTINGS) as SettingsSchema
+
+    if (!settingsData.editorList) {
+      return getEditorList().map((editor) => new SettingsItem(editor))
+    }
+
+    return settingsData.editorList
   }
 }
 export const settingsStore = new SettingsStore()

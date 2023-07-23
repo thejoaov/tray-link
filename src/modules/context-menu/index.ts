@@ -6,7 +6,6 @@ import { projectStore, settingsStore } from '../../services/store'
 import renderer from '../renderer'
 import Platform from '../../utils/platform'
 import commandExists from 'command-exists'
-import SettingsItem from '../../models/SettingsItem'
 
 export default function getContextMenu(tray: Tray, project: Project): Menu {
   const menu = Menu.buildFromTemplate([
@@ -32,8 +31,8 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     },
     {
       label: getTranslation('openDefaultTerminal') + ' (' + settingsStore.getDefaultTerminal().name + ')',
-      click: () => {
-        openTerminal(project.path)
+      click: async () => {
+        await openTerminal(project.path, settingsStore.getDefaultTerminal())
       },
     },
     {
@@ -50,19 +49,19 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     { type: 'separator' },
     {
       label: getTranslation('openTerminal'),
-      submenu: (settingsStore.get('terminalList') as SettingsItem[]).map((item) => ({
+      submenu: settingsStore.getTerminalList().map((item) => ({
         label: item.name,
-        click: () => {
-          openTerminal(project.path, new SettingsItem(item))
+        click: async () => {
+          await openTerminal(project.path, item)
         },
       })),
     },
     {
       label: getTranslation('openEditor'),
-      submenu: (settingsStore.get('editorList') as SettingsItem[]).map((item) => ({
+      submenu: settingsStore.getEditorList().map((item) => ({
         label: item.name,
-        click: () => {
-          openEditor(project.path, item)
+        click: async () => {
+          await openEditor(project.path, item)
         },
       })),
     },

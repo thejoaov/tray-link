@@ -1,64 +1,152 @@
 import Platform from '../../utils/platform'
 import SettingsItem from '../../models/SettingsItem'
-import execa from 'execa'
 import { DefaultEditor, DefaultTerminal } from '../../constants/defaults'
 import { SettingsSchema } from '../store/schema'
+import fs from 'fs'
+import path from 'path'
+import { getFilteredSettingsList } from './utils'
+import { app } from 'electron'
+
+if (!fs.existsSync(path.join(app.getPath('home'), '.tray-link'))) {
+  fs.mkdirSync(path.join(app.getPath('home'), '.tray-link'))
+
+  if (!fs.existsSync(path.join(app.getPath('home'), '.tray-link', 'logs'))) {
+    fs.mkdirSync(path.join(app.getPath('home'), '.tray-link', 'logs'))
+  }
+}
 
 export type Settings = {
   name: string
-  command: string
+  command: string | null
+  binary: string
+  enableBinaryCheck: boolean
+  enableCommonPathCheck: boolean
+  commonFilepaths: string[] | null
 }
 
 export const terminalList: Settings[] = [
   {
     name: 'Hyper',
     command: 'hyper',
+    binary: null,
+    enableBinaryCheck: false,
+    enableCommonPathCheck: true,
+    commonFilepaths: ['/Applications/Hyper.app'],
   },
   {
     name: 'iTerm',
+    binary: 'iTerm',
+    enableCommonPathCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/iTerm.app'],
+      win32: null, // Not available
+      linux: null, // Not available
+    }),
     command: Platform.select({
       darwin: 'open -a iTerm',
-      win32: null,
+      win32: null, // Not available
       linux: 'iterm2',
+    }),
+    enableBinaryCheck: Platform.select({
+      darwin: false,
+      win32: true,
+      linux: true,
     }),
   },
   {
     name: 'Terminal',
+    binary: 'Terminal',
+    commonFilepaths: [
+      '/Applications/Utilities/Terminal.app',
+      '/System/Applications/Utilities/Terminal.app',
+      '/System/Applications/Terminal.app',
+      '/Applications/Terminal.app',
+    ],
+    enableCommonPathCheck: true, // Nearly pointless, but it is possible to uninstall it
+    enableBinaryCheck: false, // As it is impossible due to the way it is installed
     command: Platform.select({
       darwin: 'open -a Terminal',
-      win32: null,
-      linux: null,
+      win32: null, // Not available
+      linux: null, // Not available
     }),
   },
   {
     name: 'CMD',
+    binary: 'cmd',
+    enableBinaryCheck: true, // Not sure if its possible to uninstall it anyway
+    enableCommonPathCheck: false, // Not sure if its possible to uninstall it anyway
+    commonFilepaths: Platform.select({
+      darwin: null, // Not available
+      win32: ['C:\\Windows\\System32\\cmd.exe'],
+      linux: null, // Not available
+    }),
     command: Platform.select({
-      darwin: null,
+      darwin: null, // Not available
       win32: 'cmd',
-      linux: null,
+      linux: null, // Not available
     }),
   },
   {
     name: 'PowerShell',
+    binary: 'PowerShell.exe',
+    enableBinaryCheck: true,
+    enableCommonPathCheck: false, // Not sure if its possible to uninstall it anyway
+    commonFilepaths: Platform.select({
+      darwin: null, // Not available
+      win32: ['C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'],
+      linux: null, // Not available
+    }),
     command: Platform.select({
-      darwin: null,
-      win32: 'powershell',
+      darwin: 'powershell',
+      win32: 'powershell.exe',
+      linux: 'powershell',
+    }),
+  },
+  {
+    name: 'PowerShell 2',
+    binary: 'PowerShell.exe',
+    enableBinaryCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: null, // Not available
+      win32: ['C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'],
+      linux: null, // Not available
+    }),
+    enableCommonPathCheck: false, // Not sure if its possible to uninstall it anyway
+    command: Platform.select({
+      darwin: 'powershell',
+      win32: 'PowerShell.exe -Version 2',
       linux: 'powershell',
     }),
   },
   {
     name: 'Windows Terminal',
+    binary: 'wt',
+    enableBinaryCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: null, // Not available
+      win32: ['C:\\Windows\\System32\\wt.exe'],
+      linux: null, // Not available
+    }),
+    enableCommonPathCheck: false, // Not needed
     command: Platform.select({
-      darwin: null,
+      darwin: null, // Not available
       win32: 'wt -d',
-      linux: null,
+      linux: null, // Not available
     }),
   },
   {
     name: 'GNOME Terminal',
+    binary: 'gnome-terminal',
+    enableBinaryCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: null, // Not available
+      win32: null, // Not available
+      linux: ['/usr/bin/gnome-terminal'],
+    }),
+    enableCommonPathCheck: false, // Not needed
     command: Platform.select({
-      darwin: null,
-      win32: null,
+      darwin: null, // Not available
+      win32: null, // Not available
       linux: 'gnome-terminal',
     }),
   },
@@ -68,74 +156,167 @@ export const editorList: Settings[] = [
   {
     name: 'Visual Studio Code',
     command: 'code',
+    binary: 'code',
+    enableBinaryCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Visual Studio Code.app'],
+      win32: ['C:\\Program Files\\Microsoft VS Code\\Code.exe'],
+      linux: ['/usr/share/code/code'],
+    }),
+    enableCommonPathCheck: false, // Checking for binary is enough
   },
   {
     name: 'Sublime Text',
     command: 'subl',
+    binary: 'subl',
+    enableBinaryCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Sublime Text.app'],
+      win32: ['C:\\Program Files\\Sublime Text 3\\subl.exe'],
+      linux: ['/usr/bin/subl'],
+    }),
+    enableCommonPathCheck: false, // Checking for binary is enough
   },
   {
     name: 'Atom',
     command: 'atom',
+    binary: 'atom',
+    enableBinaryCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Atom.app'],
+      win32: ['C:\\Users\\%USERNAME%\\AppData\\Local\\atom\\atom.exe'],
+      linux: ['/usr/bin/atom'],
+    }),
+    enableCommonPathCheck: false, // Checking for binary is enough
   },
   {
-    name: 'IntelliJ IDEA',
-    command: 'command',
-  },
-  {
+    binary: null,
     name: 'IntelliJ IDEA CE',
-    command: 'command',
-  },
-  {
-    name: 'WebStorm',
-    command: 'command',
+    enableBinaryCheck: false,
+    command: Platform.select({
+      darwin: 'open -a "IntelliJ IDEA CE"',
+      linux: 'idea.sh',
+      win32: 'idea64.exe',
+    }),
+    enableCommonPathCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/IntelliJ IDEA CE.app'],
+      linux: ['/usr/share/intellij-idea-ce/bin/idea.sh'],
+      win32: [
+        // 2020
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2020.1.4\\bin\\idea64.exe',
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2020.2.4\\bin\\idea64.exe',
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2020.3.4\\bin\\idea64.exe',
+        // 2021
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2021.1.3\\bin\\idea64.exe',
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2021.2.4\\bin\\idea64.exe',
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2021.3.3\\bin\\idea64.exe',
+        // 2022
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2022.1.4\\bin\\idea64.exe',
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2022.2.5\\bin\\idea64.exe',
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2022.3.3\\bin\\idea64.exe',
+        // 2023
+        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2023.1.4\\bin\\idea64.exe',
+      ],
+    }),
   },
   {
     name: 'PyCharm',
-    command: 'command',
-  },
-  {
-    name: 'PhpStorm',
-    command: 'command',
+    binary: null,
+    enableBinaryCheck: false,
+    enableCommonPathCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/PyCharm.app'],
+      linux: ['/usr/share/pycharm/bin/pycharm.sh'],
+      win32: [
+        //2020
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2020.1.5\\bin\\pycharm64.exe',
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2020.2.5\\bin\\pycharm64.exe',
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2020.3.5\\bin\\pycharm64.exe',
+        // 2021
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2021.1.3\\bin\\pycharm64.exe',
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2021.2.4\\bin\\pycharm64.exe',
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2021.3.3\\bin\\pycharm64.exe',
+        // 2022
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2022.1.4\\bin\\pycharm64.exe',
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2022.2.5\\bin\\pycharm64.exe',
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2022.3.3\\bin\\pycharm64.exe',
+        // 2023
+        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2023.1.4\\bin\\pycharm64.exe',
+      ],
+    }),
+    command: Platform.select({
+      darwin: 'open -a PyCharm',
+      linux: null, // TODO: find command
+      win32: null, // TODO: find command
+    }),
   },
   {
     name: 'Android Studio',
-    command: 'command',
+    binary: null,
+    enableBinaryCheck: false,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Android Studio.app'],
+      linux: ['/usr/share/android-studio/bin/studio.sh'],
+      win32: [
+        // 2020
+        'C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe',
+      ],
+    }),
+    enableCommonPathCheck: true,
+    command: Platform.select({
+      darwin: `open -a "Android Studio"`,
+      linux: null, // TODO: find command
+      win32: null, // TODO: find command
+    }),
   },
   {
     name: 'Xcode',
-    command: 'command',
-  },
-  {
-    name: 'Eclipse',
-    command: 'command',
-  },
-  {
-    name: 'Visual Studio',
-    command: 'command',
-  },
-  {
-    name: 'Notepad++',
-    command: 'command',
-  },
-  {
-    name: 'VIM',
-    command: 'command',
-  },
-  {
-    name: 'Emacs',
-    command: 'command',
+    binary: 'xed',
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Xcode.app'],
+      linux: null, // Not available
+      win32: null, // Not available
+    }),
+    enableBinaryCheck: false,
+    enableCommonPathCheck: true,
+    command: Platform.select({
+      darwin: 'xed -b',
+      linux: null, // Not available
+      win32: null, // Not available
+    }),
   },
   {
     name: 'Geany',
-    command: 'command',
+    binary: 'geany',
+    enableBinaryCheck: true,
+    enableCommonPathCheck: false,
+    commonFilepaths: Platform.select({
+      darwin: null, // Not available
+      linux: ['/usr/bin/geany'],
+      win32: null, // Not available
+    }),
+    command: Platform.select({
+      darwin: 'open -a Geany',
+      linux: 'geany',
+      win32: null, // TODO: find command
+    }),
   },
   {
-    name: 'GNU Text Editor',
-    command: 'command',
-  },
-  {
-    name: 'Notepad',
-    command: 'command',
+    name: 'Gedit',
+    binary: 'gedit',
+    enableBinaryCheck: true,
+    enableCommonPathCheck: false,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Gedit.app'],
+      linux: ['/usr/bin/gedit'],
+      win32: null, // Not available
+    }),
+    command: Platform.select({
+      darwin: 'gedit',
+      linux: 'gedit',
+      win32: null, // TODO: find command
+    }),
   },
 ]
 
@@ -153,23 +334,19 @@ export const editorList: Settings[] = [
  * @platform linux
  * - GNOME Terminal
  */
-export function getTerminalList(): Omit<SettingsItem, 'id'>[] {
-  const filteredList = terminalList
-    .map((item) => {
-      const path = execa.commandSync(`which ${item.command}`, {
-        reject: false,
-      })
+export function getTerminalList(): SettingsItem[] {
+  const buildTerminalList = getFilteredSettingsList(terminalList)
 
-      return new SettingsItem({
-        command: item.command,
-        name: item.name,
-        path: path.stdout ?? '',
-        isDefault: item.name === DefaultTerminal.name,
-      })
-    })
-    .filter((item) => item.command)
+  fs.writeFileSync(
+    path.join(app.getPath('home'), '.tray-link', 'logs', 'buildTerminalList.json'),
+    JSON.stringify(buildTerminalList),
+  )
+  fs.writeFileSync(
+    path.join(app.getPath('home'), '.tray-link', 'logs', 'terminalList.json'),
+    JSON.stringify(terminalList),
+  )
 
-  return filteredList
+  return buildTerminalList
 }
 
 /**
@@ -180,39 +357,25 @@ export function getTerminalList(): Omit<SettingsItem, 'id'>[] {
  * - Sublime Text
  * - Atom
  * - IntelliJ IDEA
- * - WebStorm
- * - PyCharm
- * - PhpStorm
  * - Android Studio
- * - Eclipse
- * - VIM
- * - Emacs
  * - Geany
- * - GNU Text Editor
- * @platform windows
- * - Notepad++
- * - Notepad
  * @platform mac
  * - Xcode
  */
-export function getEditorList(): Omit<SettingsItem, 'id'>[] {
-  const filteredList = editorList
-    .map((item) => {
-      const path = execa.commandSync(`which ${item.command}`, {
-        reject: false,
-      })
+export function getEditorList(): SettingsItem[] {
+  const buildEditorList = getFilteredSettingsList(editorList)
 
-      return new SettingsItem({
-        command: item.command,
-        name: item.name,
-        path: path.stdout ?? '',
-        isDefault: item.name === DefaultEditor.name,
-      })
-    })
-    .filter(Boolean)
-    .filter((item) => item.command)
+  fs.writeFileSync(
+    path.join(app.getPath('home'), '.tray-link', 'logs', 'buildEditorList.json'),
+    JSON.stringify(buildEditorList),
+  )
+  fs.writeFileSync(
+    // Debug only
+    path.join(app.getPath('home'), '.tray-link', 'logs', 'editorList.json'),
+    JSON.stringify(editorList),
+  )
 
-  return filteredList
+  return buildEditorList
 }
 
 const defaultConfig = {
