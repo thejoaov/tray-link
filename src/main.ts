@@ -2,6 +2,9 @@
 import * as path from 'path'
 import { app, Tray, nativeImage } from 'electron'
 import renderer from './modules/renderer'
+import fixPath from 'fix-path'
+
+fixPath()
 
 // updater({
 //   notifyUser: true,

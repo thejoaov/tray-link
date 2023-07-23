@@ -1,10 +1,10 @@
 import { dialog, shell } from 'electron'
 import Platform from '../../utils/platform'
-import { commandSync } from 'execa'
+import execa from 'execa'
 import commandExists from 'command-exists'
 import getTranslation from '../../i18n'
 import SettingsItem from '../../models/SettingsItem'
-import { settingsStore } from '../../services/store'
+import { spawn } from 'child_process'
 
 export async function openFolder(path: string): Promise<void> {
   await shell.openPath(path)
@@ -15,11 +15,11 @@ export function openVscode(path: string): void {
 
   const open = Platform.select({
     darwin: () => {
-      isCodeInPath ? commandSync(`code ${path}`) : shell.openExternal('vscode://file' + path)
+      isCodeInPath ? execa.commandSync(`code ${path}`, { detached: true }) : shell.openExternal('vscode://file' + path)
     },
     win32: () => {
       if (isCodeInPath) {
-        commandSync(`code ${path}`)
+        execa.commandSync(`code ${path}`, { detached: true })
       } else {
         dialog.showErrorBox('Error', getTranslation('vscodeNotFound') + path)
         shell.openPath(path)
@@ -27,7 +27,7 @@ export function openVscode(path: string): void {
     },
     linux: () => {
       if (isCodeInPath) {
-        commandSync(`code ${path}`)
+        execa.commandSync(`code ${path}`, { detached: true })
       } else {
         dialog.showErrorBox('Error', getTranslation('vscodeNotFound') + path)
         shell.openPath(path)
@@ -38,25 +38,49 @@ export function openVscode(path: string): void {
   open()
 }
 
-export function openTerminal(path: string, terminal?: SettingsItem): void {
-  const defaultTerminal = settingsStore.getDefaultTerminal()
+export async function openTerminal(path: string, terminal: SettingsItem): Promise<void> {
+  try {
+    await execa.command(`${terminal.command ?? terminal.path} ${path}`, {
+      detached: true,
+      shell: true,
+    })
+  } catch (error) {
+    try {
+      await execa.command(`${terminal.command ?? terminal.path} ${path}`, {
+        detached: true,
+      })
+    } catch (error2) {
+      dialog.showErrorBox(
+        'Error',
+        `${terminal.command ?? terminal.path} ${path}
 
-  // commandSync(`${terminal.command ?? defaultTerminal.command} ${path}`)
-
-  dialog.showMessageBoxSync({
-    message: 'Terminal',
-    detail: `${terminal.command ?? defaultTerminal.command} ${path}`,
-    type: 'error',
-  })
+        ${error2}
+        `,
+      )
+    }
+  }
 }
 
-export function openEditor(path: string, editor: Omit<SettingsItem, 'id'>): void {
-  const openDefault = settingsStore.getDefaultEditor().command
+export async function openEditor(path: string, editor: SettingsItem): Promise<void> {
+  try {
+    await execa.command(`${editor.command ?? editor.path} ${path}`, {
+      detached: true,
+      shell: true,
+    })
+  } catch (error) {
+    try {
+      await execa.command(`${editor.command ?? editor.path} ${path}`, {
+        detached: true,
+      })
+    } catch (error2) {
+      dialog.showErrorBox(
+        'Error',
+        `${editor.command ?? editor.path} ${path}
 
-  if (editor) {
-    commandSync(`${editor.command} ${path}`)
-  } else {
-    commandSync(`${openDefault} ${path}`)
+        ${error2}
+        `,
+      )
+    }
   }
 }
 
@@ -70,6 +94,6 @@ export function openGithubDesktop(path: string): void {
       linux: 'github-desktop',
     })
 
-    commandSync(`${command} ${path}`)
+    execa.commandSync(`${command} ${path}`, { detached: true })
   }
 }

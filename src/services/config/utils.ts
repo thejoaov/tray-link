@@ -1,0 +1,51 @@
+import execa from 'execa'
+import { Settings } from '.'
+import SettingsItem from '../../models/SettingsItem'
+import fs from 'fs'
+import { DefaultTerminal } from '../../constants/defaults'
+
+export function getFilteredSettingsList(settingsList: Settings[]): SettingsItem[] {
+  const filteredList = settingsList
+    .map((item) => {
+      let path = ''
+      let command = item.command ?? ''
+
+      if (item.enableBinaryCheck) {
+        path =
+          execa.commandSync(`which ${item.binary}`, {
+            reject: false,
+            detached: true,
+          }).stdout ?? ''
+      } else if (item.enableCommonPathCheck && item.commonFilepaths?.length) {
+        path = item.commonFilepaths.find((filepath) => {
+          if (fs.existsSync(filepath)) return filepath
+        })
+      }
+
+      if (!path?.length) {
+        path =
+          execa.commandSync(`which ${item.binary}`, {
+            reject: false,
+            detached: true,
+          }).stdout ?? ''
+      }
+
+      if (item.command?.length) {
+        command = item.command
+      } else if (path) {
+        command = path
+      }
+
+      const newItem = new SettingsItem({
+        name: item.name,
+        isDefault: item.name === DefaultTerminal.name,
+        command,
+        path,
+      })
+
+      return newItem
+    })
+    .filter((item) => item.command?.length && item.path?.length)
+
+  return filteredList
+}

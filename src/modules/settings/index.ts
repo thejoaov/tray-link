@@ -4,6 +4,7 @@ import { settingsStore } from '../../services/store'
 import SettingsItem from '../../models/SettingsItem'
 import renderer from '../renderer'
 import path from 'path'
+import { getDevSettings } from './utils'
 
 export default function getSettingsMenu(tray: Tray): Menu {
   const terminals = settingsStore.get('terminalList') as SettingsItem[]
@@ -83,6 +84,7 @@ export default function getSettingsMenu(tray: Tray): Menu {
           })
       },
     },
+    ...getDevSettings(tray),
     { type: 'separator' },
     {
       label: getTranslation('close'),
