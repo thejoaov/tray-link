@@ -157,10 +157,13 @@ export const editorList: Settings[] = [
     name: 'Visual Studio Code',
     command: 'code',
     binary: 'code',
-    enableBinaryCheck: true,
+    enableBinaryCheck: Platform.OS !== 'win32',
     commonFilepaths: Platform.select({
       darwin: ['/Applications/Visual Studio Code.app'],
-      win32: ['C:\\Program Files\\Microsoft VS Code\\Code.exe'],
+      win32: [
+        'C:\\Program Files\\Microsoft VS Code\\Code.exe',
+        'C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe',
+      ],
       linux: ['/usr/share/code/code'],
     }),
     enableCommonPathCheck: false, // Checking for binary is enough
