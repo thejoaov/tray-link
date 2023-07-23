@@ -4,7 +4,6 @@ import execa from 'execa'
 import commandExists from 'command-exists'
 import getTranslation from '../../i18n'
 import SettingsItem from '../../models/SettingsItem'
-import { spawn } from 'child_process'
 
 export async function openFolder(path: string): Promise<void> {
   await shell.openPath(path)
