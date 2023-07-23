@@ -27,16 +27,16 @@ jobs:
       - name: Generate Version
         run: |
           npm version ${{ secrets.VERSION_CONTROL }} -m 'chore: release %s' --allow-same-version --no-commit-hooks
-      - name: Push Version to tags
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
-          force: true
-          tags: true
       - name: Push Version to master
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          branch: master
           force: true
+      - name: Push Version to tags
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
+          force: true
+          tags: true
