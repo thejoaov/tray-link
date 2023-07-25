@@ -18,10 +18,26 @@
     <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/thejoaov/tray-link?include_prereleases&label=latest">
   </a>
 </p>
-<hr>
+
+
+<details><summary>
+
+## Examples
+
+</summary>
+
+
+![](docs/images/print1.jpg)
+![](docs/images/print2.jpg)
+![](docs/videos/video1.mov)
+![](docs/videos/video2.mov)
+
+</details>
+
+
 
 ## Features
-- Open the project's folder;
+- Open the project's folder
 - You can open your project directly on VS Code!
 - Open your projects directly to your favorite terminal!
 - Open the project directly in the Github Desktop application
@@ -31,11 +47,9 @@
 
 Downloads are under Releases section, [check it out!](https://github.com/thejoaov/tray-link/releases)
 
-### Signing Disclaimer
+## Signing Disclaimer
 
 This application is not yet signed. If you are unsure, you can clone, build and run directly from this repository.
-
----
 
 ## Getting started
 
@@ -43,10 +57,6 @@ This application is not yet signed. If you are unsure, you can clone, build and 
 2. `cd tray-link`;
 3. Run `npm install` to install dependencies.
 4. Run `npm run dev`.
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
 ## License
 
