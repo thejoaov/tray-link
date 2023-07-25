@@ -1,24 +1,24 @@
 <h1 align="center">Tray Link</h1>
 <div align="center">
 
-<br>
-  <img src="assets/icon@3x.png" alt="my-projects-tray" width="90">
-<br>
-<br>
+  <br>
+    <img src="assets/icon@3x.png" alt="my-projects-tray" width="90">
+  <br>
+  <br>
 
+  </div>
+
+  <p align="center">System tray application to provide a shortcut for your projects</p>
+
+  <p align="center">
+    <a href="https://github.com/Rocketseat/youtube-challenge-electron-tray/graphs/contributors">
+      <img src="https://img.shields.io/github/contributors/thejoaov/tray-link?color=" alt="Contributors">
+    </a>
+    <a href="https://github.com/thejoaov/tray-link/releases">
+      <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/thejoaov/tray-link?include_prereleases&label=latest">
+    </a>
+  </p>
 </div>
-
-<p align="center">System tray application to provide a shortcut for your projects</p>
-
-<p align="center">
-  <a href="https://github.com/Rocketseat/youtube-challenge-electron-tray/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/thejoaov/tray-link?color=" alt="Contributors">
-  </a>
-  <a href="https://github.com/thejoaov/tray-link/releases">
-    <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/thejoaov/tray-link?include_prereleases&label=latest">
-  </a>
-</p>
-
 
 <details><summary>
 
@@ -29,8 +29,11 @@
 
 ![](docs/images/print1.jpg)
 ![](docs/images/print2.jpg)
-![](docs/videos/video1.mov)
-![](docs/videos/video2.mov)
+
+https://github.com/thejoaov/tray-link/assets/45052080/32886ef8-6638-4338-bfab-cce4a4c3cf72
+
+https://github.com/thejoaov/tray-link/assets/45052080/a311bb5c-de7a-451d-8823-c22afd8097f6
+
 
 </details>
 
