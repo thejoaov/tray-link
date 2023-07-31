@@ -1,6 +1,10 @@
 import en from './en'
 
 const pt: typeof en = {
+  moveUp: 'Mover para cima',
+  moveDown: 'Mover para baixo',
+  moveTop: 'Mover para o topo',
+  moveBottom: 'Mover para o final',
   resetDefaults: 'Redefinir padrões',
   selectProjectFolder: 'Selecione a pasta do projeto',
   setDefaultTerminal: 'Definir terminal padrão',
