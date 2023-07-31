@@ -2,7 +2,12 @@ name: Post release
 on:
   workflow_dispatch:
   release:
-    types: [created]
+    types:
+      - published
+      - created
+      - edited
+      - unpublished
+      - prereleased
 
 jobs:
   update-release-changelog:
