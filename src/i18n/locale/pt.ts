@@ -1,6 +1,8 @@
 import en from './en'
 
 const pt: typeof en = {
+  confirm: 'Confirmar',
+  removeConfirm: 'Tem certeza que deseja remover este projeto?',
   moveUp: 'Mover para cima',
   moveDown: 'Mover para baixo',
   moveTop: 'Mover para o topo',
