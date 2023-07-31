@@ -1,7 +1,17 @@
 import { Menu, Tray } from 'electron'
 import Project from '../../models/Project'
 import getTranslation from '../../i18n'
-import { openEditor, openFolder, openGithubDesktop, openTerminal, openVscode } from './utils'
+import {
+  moveBottom,
+  moveDown,
+  moveTop,
+  moveUp,
+  openEditor,
+  openFolder,
+  openGithubDesktop,
+  openTerminal,
+  openVscode,
+} from './utils'
 import { projectStore, settingsStore } from '../../services/store'
 import renderer from '../renderer'
 import Platform from '../../utils/platform'
@@ -64,6 +74,36 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
           await openEditor(project.path, item)
         },
       })),
+    },
+    { type: 'separator' },
+    {
+      label: getTranslation('moveTop'),
+      click: async () => {
+        await moveTop(project)
+        renderer(tray)
+      },
+    },
+    {
+      label: getTranslation('moveUp'),
+      click: async () => {
+        await moveUp(project)
+        renderer(tray)
+      },
+    },
+    {
+      label: getTranslation('moveDown'),
+      click: async () => {
+        await moveDown(project)
+        renderer(tray)
+      },
+    },
+
+    {
+      label: getTranslation('moveBottom'),
+      click: async () => {
+        await moveBottom(project)
+        renderer(tray)
+      },
     },
     { type: 'separator' },
     {

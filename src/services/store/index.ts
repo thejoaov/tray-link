@@ -8,9 +8,33 @@ import { getEditorList, getTerminalList } from '../../services/config'
 import { DefaultEditor, DefaultTerminal } from '../../constants/defaults'
 
 export class ProjectStore implements BaseStore {
+  resetPosition(): void {
+    const projects = store.get(STORE_KEYS.PROJECTS) as ProjectSchema[]
+
+    const projectsData = projects.map((project, index) => ({
+      ...project,
+      position: index,
+    }))
+
+    store.set(STORE_KEYS.PROJECTS, projectsData)
+    this.organizeByPosition()
+  }
+
+  organizeByPosition(): void {
+    const projectsData = store.get(STORE_KEYS.PROJECTS) as ProjectSchema[]
+    const sortedProjects = projectsData
+      .sort((a, b) => a.position - b.position)
+      .map((project, index) => ({
+        ...project,
+        position: index,
+      }))
+
+    store.set(STORE_KEYS.PROJECTS, sortedProjects)
+  }
+
   getAll(): Project[] {
     const projectsData = store.get(STORE_KEYS.PROJECTS) as ProjectSchema[]
-
+    this.organizeByPosition()
     return (projectsData ?? []) as Project[]
   }
 
@@ -23,6 +47,7 @@ export class ProjectStore implements BaseStore {
     const projectsData = (store.get(STORE_KEYS.PROJECTS) ?? []) as ProjectSchema[]
 
     store.set(STORE_KEYS.PROJECTS, [...projectsData, project])
+    this.organizeByPosition()
   }
 
   get(id: string): Project {
@@ -34,6 +59,7 @@ export class ProjectStore implements BaseStore {
       throw new Error('Project not found')
     }
 
+    this.organizeByPosition()
     return project as Project
   }
 
@@ -62,6 +88,8 @@ export class ProjectStore implements BaseStore {
 
     store.set(STORE_KEYS.PROJECTS, updatedProjectsData)
 
+    this.organizeByPosition()
+
     return updatedProject as Project
   }
 
@@ -77,6 +105,12 @@ export class ProjectStore implements BaseStore {
     const updatedProjectsData = projectsData.filter((project: Project) => project.id !== id)
 
     store.set(STORE_KEYS.PROJECTS, updatedProjectsData)
+    this.organizeByPosition()
+  }
+
+  set(data: Project[]): void {
+    store.set(STORE_KEYS.PROJECTS, data)
+    this.organizeByPosition()
   }
 }
 export const projectStore = new ProjectStore()

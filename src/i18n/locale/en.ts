@@ -1,4 +1,8 @@
 export default {
+  moveUp: 'Move up',
+  moveDown: 'Move down',
+  moveTop: 'Move to top',
+  moveBottom: 'Move to bottom',
   resetDefaults: 'Reset defaults',
   selectProjectFolder: 'Select project folder',
   setDefaultTerminal: 'Set default terminal',

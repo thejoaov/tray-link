@@ -1,6 +1,10 @@
 import en from './en'
 
 const es: typeof en = {
+  moveUp: 'Mover arriba',
+  moveDown: 'Mover abajo',
+  moveTop: 'Mover al inicio',
+  moveBottom: 'Mover al final',
   resetDefaults: 'Restaurar padrón',
   selectProjectFolder: 'Seleccione la carpeta del proyecto',
   setDefaultTerminal: 'Definir terminal padrón',

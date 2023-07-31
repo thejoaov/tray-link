@@ -1,12 +1,19 @@
 import { MenuItemConstructorOptions, Tray, dialog } from 'electron'
 import { getEditorList, getTerminalList } from '../../services/config'
 import execa from 'execa'
+import { projectStore } from '../../services/store'
 
 export const getDevSettings = (tray: Tray): MenuItemConstructorOptions[] => {
   const menu: MenuItemConstructorOptions[] = [
     {
       label: 'Dev',
       submenu: [
+        {
+          label: 'Reset projects positions',
+          click: () => {
+            projectStore.resetPosition()
+          },
+        },
         {
           label: 'EditorList',
           submenu: getEditorList().map((item) => ({
