@@ -1,4 +1,4 @@
-import { Menu, Tray } from 'electron'
+import { Menu, Tray, dialog } from 'electron'
 import Project from '../../models/Project'
 import getTranslation from '../../i18n'
 import {
@@ -109,8 +109,25 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
     {
       label: getTranslation('remove'),
       click: () => {
-        projectStore.delete(project.id)
-        renderer(tray)
+        dialog
+          .showMessageBox({
+            type: 'warning',
+            title: getTranslation('remove'),
+            message: getTranslation('removeConfirm'),
+            buttons: [getTranslation('cancel'), getTranslation('confirm')],
+            defaultId: 0,
+            cancelId: 0,
+            noLink: true,
+          })
+          .then((res) => {
+            if (res.response === 1) {
+              projectStore.delete(project.id)
+              renderer(tray)
+            }
+          })
+          .catch((err) => {
+            console.error(err)
+          })
       },
     },
   ])

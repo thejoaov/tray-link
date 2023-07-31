@@ -1,4 +1,6 @@
 export default {
+  confirm: 'Confirm',
+  removeConfirm: 'Are you sure you want to remove this project?',
   moveUp: 'Move up',
   moveDown: 'Move down',
   moveTop: 'Move to top',
