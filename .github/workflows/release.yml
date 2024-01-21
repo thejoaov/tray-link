@@ -50,7 +50,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     name: MacOS
-    runs-on: ARM64
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
