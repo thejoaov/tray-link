@@ -1,5 +1,6 @@
 node_modules
 !dist/assets
 dist
+.DS_Store
 
 out/
