@@ -26,8 +26,8 @@ jobs:
         run: npm install
       - name: Build
         run: |
-          npx electron-forge make --platform=win32
           npx electron-forge publish --platform=win32
+
   release-linux:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,9 +44,9 @@ jobs:
         run: npm install
       - name: Build
         run: |
-          npx electron-forge make --platform=linux
           npx electron-forge publish --platform=linux
-  release-mac:
+
+  release-mac-arm64:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     name: MacOS
@@ -62,5 +62,22 @@ jobs:
         run: npm install
       - name: Build
         run: |
-          npx electron-forge make --platform=darwin --arch=universal
-          npx electron-forge publish --platform=darwin --arch=universal
+          npx electron-forge publish --platform=darwin --arch=arm64
+
+  release-mac-x64:
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    name: MacOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.14.0
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: |
+          npx electron-forge publish --platform=darwin --arch=x64
