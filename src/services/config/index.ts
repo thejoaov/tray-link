@@ -169,6 +169,22 @@ export const editorList: Settings[] = [
     enableCommonPathCheck: false, // Checking for binary is enough
   },
   {
+    name: 'Zed',
+    binary: 'zed',
+    enableBinaryCheck: true,
+    enableCommonPathCheck: false,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Zed.app'],
+      linux: ['/usr/bin/zed'],
+      win32: null, // Not available
+    }),
+    command: Platform.select({
+      darwin: 'zed',
+      linux: 'zed',
+      win32: null, // Not available
+    }),
+  },
+  {
     name: 'Sublime Text',
     command: 'subl',
     binary: 'subl',
