@@ -32,11 +32,11 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
-          force: true
+          force_with_lease: true
       - name: Push Version to tags
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
-          force: true
+          force_with_lease: true
           tags: true
