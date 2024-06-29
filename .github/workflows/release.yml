@@ -62,4 +62,4 @@ jobs:
         run: npm install
       - name: Build
         run: |
-          npx electron-forge publish --platform=darwin --arch=arm64 --arch=x64
+          npx electron-forge publish --platform=darwin --arch=universal
