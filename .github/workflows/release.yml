@@ -62,5 +62,5 @@ jobs:
         run: npm install
       - name: Build
         run: |
-          npx electron-forge make --platform=darwin
-          npx electron-forge publish --platform=darwin
+          npx electron-forge make --platform=darwin --arch=universal
+          npx electron-forge publish --platform=darwin --arch=universal
