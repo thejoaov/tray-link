@@ -16,6 +16,7 @@ enum EDITORS {
   NOTEPAD_PLUS_PLUS = 'Notepad++',
   NOTEPAD = 'Notepad',
   XCODE = 'Xcode',
+  ZED = 'Zed',
 }
 
 enum TERMINALS {
