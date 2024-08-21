@@ -271,6 +271,22 @@ export const editorList: Settings[] = [
     }),
   },
   {
+    name: 'PyCharm',
+    binary: 'pycharm',
+    enableBinaryCheck: true,
+    enableCommonPathCheck: true,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/PyCharm.app'],
+      linux: ['/usr/share/pycharm/bin/pycharm.sh'],
+      win32: ['C:\\Program Files\\JetBrains\\PyCharm\\bin\\pycharm64.exe'],
+    }),
+    command: Platform.select({
+      darwin: 'pycharm',
+      linux: null, // TODO: find command
+      win32: null, // TODO: find command
+    }),
+  },
+  {
     name: 'Android Studio',
     binary: null,
     enableBinaryCheck: false,

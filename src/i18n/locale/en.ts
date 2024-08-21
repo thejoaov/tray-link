@@ -5,7 +5,7 @@ export default {
   moveDown: 'Move down',
   moveTop: 'Move to top',
   moveBottom: 'Move to bottom',
-  resetDefaults: 'Reset defaults',
+  resetDefaults: 'Reload terminals and editors',
   selectProjectFolder: 'Select project folder',
   setDefaultTerminal: 'Set default terminal',
   addProject: 'Add new project folder...',
@@ -42,7 +42,8 @@ export default {
   openIssue: 'Report an issue',
   about: 'About',
   closeAbout: 'Close',
-  resetDefaultsMessage: 'Are you sure you want to reset all settings to defaults?',
+  resetDefaultsMessage:
+    'This action will reload the terminal and editors list that are installed on your machine. Do you want to continue?',
   cancel: 'Cancel',
   reset: 'Reset',
 }
