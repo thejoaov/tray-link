@@ -7,7 +7,7 @@ const pt: typeof en = {
   moveDown: 'Mover para baixo',
   moveTop: 'Mover para o topo',
   moveBottom: 'Mover para o final',
-  resetDefaults: 'Redefinir padrões',
+  resetDefaults: 'Recarregar terminais e editores',
   selectProjectFolder: 'Selecione a pasta do projeto',
   setDefaultTerminal: 'Definir terminal padrão',
   addProject: 'Adicionar novo projeto...',
@@ -44,7 +44,8 @@ const pt: typeof en = {
   openIssue: 'Reportar um problema',
   about: 'Sobre',
   closeAbout: 'Fechar',
-  resetDefaultsMessage: 'Tem certeza que deseja redefinir as configurações padrões?',
+  resetDefaultsMessage:
+    'Esta ação recarregará a lista de terminais e editores que estão instalados em sua máquina. Deseja continuar?',
   cancel: 'Cancelar',
   reset: 'Redefinir',
 }

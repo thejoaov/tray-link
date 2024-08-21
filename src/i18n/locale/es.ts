@@ -7,7 +7,7 @@ const es: typeof en = {
   moveDown: 'Mover abajo',
   moveTop: 'Mover al inicio',
   moveBottom: 'Mover al final',
-  resetDefaults: 'Restaurar padrón',
+  resetDefaults: 'Restaurar terminales y editores',
   selectProjectFolder: 'Seleccione la carpeta del proyecto',
   setDefaultTerminal: 'Definir terminal padrón',
   addProject: 'Agregar un nuevo proyecto...',
@@ -44,7 +44,8 @@ const es: typeof en = {
   openIssue: 'Reportar um problema',
   about: 'Sobre',
   closeAbout: 'Cerrar',
-  resetDefaultsMessage: '¿Está seguro que desea restaurar las configuraciones padrón?',
+  resetDefaultsMessage:
+    'Esta acción recargará la lista de terminales y editores que están instalados en su máquina. ¿Desea continuar?',
   cancel: 'Cancelar',
   reset: 'Restaurar',
 }
