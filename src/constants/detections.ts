@@ -17,6 +17,7 @@ enum EDITORS {
   NOTEPAD = 'Notepad',
   XCODE = 'Xcode',
   ZED = 'Zed',
+  CURSOR = 'Cursor',
 }
 
 enum TERMINALS {
