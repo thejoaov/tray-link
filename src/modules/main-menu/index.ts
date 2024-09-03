@@ -8,7 +8,7 @@ import { onClickAddProjects } from './utils.js'
 
 export default function getMainMenu(tray: Tray): Menu {
   const projects = projectStore.getAll()
-  settingsStore.resetDefaults()
+  settingsStore.reloadEditorTerminalList()
 
   const menu = Menu.buildFromTemplate([
     {

@@ -7,7 +7,11 @@ const pt: typeof en = {
   moveDown: '⬇️ Mover para baixo',
   moveTop: 'Mover para o início',
   moveBottom: 'Mover para o final',
-  resetDefaults: 'Recarregar terminais e editores',
+  resetDefaults: 'Restaurar padrões',
+  reloadList: 'Recarregar lista de editores e terminais',
+  reload: 'Recarregar',
+  reloadListMessage:
+    'Esta ação recarregará a lista de terminais e editores que estão instalados em sua máquina. Deseja continuar?',
   selectProjectFolder: 'Selecione a pasta do projeto',
   setDefaultTerminal: 'Definir terminal padrão',
   addProject: 'Adicionar novo projeto...',

@@ -158,6 +158,15 @@ export class SettingsStore implements BaseStore {
       defaultTerminal: DefaultTerminal,
       editorList: getEditorList(),
       terminalList: getTerminalList(),
+    } as SettingsSchema)
+  }
+
+  reloadEditorTerminalList(): void {
+    const settingsData = store.get(STORE_KEYS.SETTINGS) as SettingsSchema
+    store.set(STORE_KEYS.SETTINGS, {
+      ...settingsData,
+      editorList: getEditorList(),
+      terminalList: getTerminalList(),
       locale: 'en-US',
     } as SettingsSchema)
   }
