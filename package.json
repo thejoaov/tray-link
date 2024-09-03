@@ -10,12 +10,12 @@
     "build": "tsc",
     "prewatch": "npm run prebuild",
     "watch": "tsc -w",
-    "lint": "eslint --ext .ts ./src",
+    "lint": "biome lint ./src",
     "prestart": "npm run build",
     "start": "electron-forge start",
     "predev": "npm run build",
     "dev": "cross-env NODE_ENV=development nodemon --watch ./ --exec \"npm run start\" -e ts,js,json -i ./dist",
-    "format": "prettier --write \"./src/**/*.{js,ts}\"",
+    "format": "biome format --write \"./src/**/*.{js,ts}\"",
     "prepackage": "npm run build",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -49,6 +49,7 @@
   "author": "thejoaov",
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
     "@electron-forge/cli": "^6.2.1",
     "@electron-forge/maker-deb": "^6.2.1",
     "@electron-forge/maker-rpm": "^6.2.1",
@@ -59,19 +60,11 @@
     "@types/command-exists": "^1.2.0",
     "@types/node": "^22.5.2",
     "@types/uuid": "^9.0.2",
-    "@typescript-eslint/eslint-plugin": "^6.1.0",
-    "@typescript-eslint/parser": "^6.1.0",
     "cross-env": "^7.0.3",
     "electron": "^24.3.0",
-    "eslint": "^8.45.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^5.0.0",
     "git-commit-msg-linter": "^5.0.8",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.3",
     "nodemon": "^3.0.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.3"
   },
@@ -85,11 +78,5 @@
     "tsconfig-paths": "^4.2.0",
     "update-electron-app": "^2.0.1",
     "uuid": "^9.0.0"
-  },
-  "lint-staged": {
-    "*.{js,ts}": [
-      "npx prettier --write \"./src/**/*.{js,ts}\"",
-      "eslint --ext .ts ./src --fix"
-    ]
   }
 }
