@@ -185,6 +185,22 @@ export const editorList: Settings[] = [
     }),
   },
   {
+    name: 'Cursor',
+    binary: 'cursor',
+    enableBinaryCheck: true,
+    enableCommonPathCheck: false,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Cursor.app'],
+      linux: ['/usr/bin/cursor'],
+      win32: null, // Not available
+    }),
+    command: Platform.select({
+      darwin: 'cursor',
+      linux: 'cursor',
+      win32: null, // Not available
+    }),
+  },
+  {
     name: 'Sublime Text',
     command: 'subl',
     binary: 'subl',
