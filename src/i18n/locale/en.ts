@@ -5,7 +5,11 @@ export default {
   moveDown: '▼ Move down',
   moveTop: '△ Move to the start',
   moveBottom: '▽ Move to the end',
-  resetDefaults: 'Reload terminals and editors',
+  resetDefaults: 'Restore defaults',
+  reloadList: 'Reload editor and terminal list',
+  reload: 'Reload',
+  reloadListMessage:
+    'This action will reload the terminal and editors list that are installed on your machine. Do you want to continue?',
   selectProjectFolder: 'Select project folder',
   setDefaultTerminal: 'Set default terminal',
   addProject: '+ Add new project...',

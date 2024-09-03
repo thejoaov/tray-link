@@ -95,6 +95,24 @@ export default function getSettingsMenu(tray: Tray): Menu {
           })
       },
     },
+    { type: 'separator' },
+    {
+      label: getTranslation('reloadList'),
+      click: async () => {
+        await dialog
+          .showMessageBox({
+            message: getTranslation('reloadListMessage'),
+            title: getTranslation('reloadList'),
+            buttons: [getTranslation('cancel'), getTranslation('reset')],
+          })
+          .then((value) => {
+            if (value.response === 1) {
+              settingsStore.reloadEditorTerminalList()
+              renderer(tray)
+            }
+          })
+      },
+    },
     {
       label: getTranslation('resetDefaults'),
       click: async () => {
