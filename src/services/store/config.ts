@@ -1,7 +1,11 @@
 import { app } from 'electron'
 import Store from 'electron-store'
+import { ProjectSchema, SettingsSchema } from './schema.js'
 
-const store = new Store({
+const store = new Store<{
+  projects: ProjectSchema[]
+  settings: SettingsSchema
+}>({
   defaults: {
     projects: [],
     settings: {
@@ -9,6 +13,8 @@ const store = new Store({
       editorList: [],
       terminalList: [],
       aditionalCommands: [],
+      defaultEditor: null,
+      defaultTerminal: null,
     },
   },
   schema: {

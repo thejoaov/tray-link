@@ -1,11 +1,11 @@
-import store from './config'
-import { ProjectSchema, SettingsSchema } from './schema'
-import Project from '../../models/Project'
-import SettingsItem from '../../models/SettingsItem'
-import { STORE_KEYS } from '../../constants/store'
-import { BaseStore } from './types'
-import { getEditorList, getTerminalList } from '../../services/config'
-import { DefaultEditor, DefaultTerminal } from '../../constants/defaults'
+import { DefaultEditor, DefaultTerminal } from '../../constants/defaults.js'
+import { STORE_KEYS } from '../../constants/store.js'
+import Project from '../../models/Project.js'
+import SettingsItem from '../../models/SettingsItem.js'
+import { getEditorList, getTerminalList } from '../../services/config/index.js'
+import store from './config.js'
+import { ProjectSchema, SettingsSchema } from './schema.js'
+import { BaseStore } from './types.js'
 
 export class ProjectStore implements BaseStore {
   resetPosition(): void {

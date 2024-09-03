@@ -1,0 +1,38 @@
+name: 'setup'
+description: 'Common setup steps for Actions'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: true
+    default: 20.17.0
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: pnpm/action-setup@v4
+      name: Install pnpm
+      with:
+        version: 9.6.0
+        run_install: false
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Cache pnpm store
+      uses: actions/cache@v4
+      with:
+        path: ~/.pnpm-store
+        key: pnpm-store-${{ inputs.node-version }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-store-${{ inputs.node-version }}-
+
+    - name: Cache pnpm dependencies
+      shell: bash
+      run: pnpm fetch --store-dir ~/.pnpm-store
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile --store-dir ~/.pnpm-store

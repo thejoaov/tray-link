@@ -1,4 +1,4 @@
-import SettingsItem from '../../models/SettingsItem'
+import SettingsItem from '../../models/SettingsItem.js'
 
 export type ProjectSchema = {
   id: string
@@ -15,4 +15,5 @@ export type SettingsSchema = {
   defaultTerminal: SettingsItem
   editorList: SettingsItem[]
   terminalList: SettingsItem[]
+  aditionalCommands: string[]
 }

@@ -1,11 +1,11 @@
-import { dialog, shell } from 'electron'
-import Platform from '../../utils/platform'
-import execa from 'execa'
 import commandExists from 'command-exists'
-import getTranslation from '../../i18n'
-import SettingsItem from '../../models/SettingsItem'
-import Project from '../../models/Project'
-import { projectStore } from '../../services/store'
+import { dialog, shell } from 'electron'
+import execa from 'execa'
+import getTranslation from '../../i18n/index.js'
+import Project from '../../models/Project.js'
+import SettingsItem from '../../models/SettingsItem.js'
+import { projectStore } from '../../services/store/index.js'
+import Platform from '../../utils/platform.js'
 
 export async function moveTop(project: Project): Promise<void> {
   const allProjects = projectStore.getAll()
@@ -130,7 +130,7 @@ export async function openTerminal(path: string, terminal: SettingsItem): Promis
       detached: true,
       shell: true,
     })
-  } catch (error) {
+  } catch (_error) {
     try {
       await execa.command(`${terminal.command ?? terminal.path} ${path}`, {
         detached: true,
@@ -153,7 +153,7 @@ export async function openEditor(path: string, editor: SettingsItem): Promise<vo
       detached: true,
       shell: true,
     })
-  } catch (error) {
+  } catch (_error) {
     try {
       await execa.command(`${editor.command ?? editor.path} ${path}`, {
         detached: true,

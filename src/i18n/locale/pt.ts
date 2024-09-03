@@ -1,4 +1,4 @@
-import en from './en'
+import en from './en.js'
 
 const pt: typeof en = {
   confirm: 'Confirmar',

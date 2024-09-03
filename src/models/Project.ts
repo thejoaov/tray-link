@@ -1,5 +1,5 @@
-import { ProjectSchema } from '../services/store/schema'
 import { v4 as uuidv4 } from 'uuid'
+import { ProjectSchema } from '../services/store/schema.js'
 
 export default class Project implements ProjectSchema {
   id: string
