@@ -1,7 +1,7 @@
-import { dialog } from 'electron'
 import { basename } from 'path'
-import { projectStore } from '../../services/store/index.js'
+import { dialog } from 'electron'
 import getTranslation from '../../i18n/index.js'
+import { projectStore } from '../../services/store/index.js'
 
 export async function onClickAddProjects(): Promise<void> {
   const result = await dialog.showOpenDialog({

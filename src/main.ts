@@ -1,8 +1,8 @@
 // import updater from 'update-electron-app'
 import * as path from 'path'
-import { app, Tray, nativeImage } from 'electron'
-import renderer from './modules/renderer/index.js'
+import { Tray, app, nativeImage } from 'electron'
 import fixPath from 'fix-path'
+import renderer from './modules/renderer/index.js'
 
 fixPath()
 

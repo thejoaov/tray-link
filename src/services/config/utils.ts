@@ -1,9 +1,9 @@
-import execa from 'execa'
-import { Settings } from './index.js'
-import SettingsItem from '../../models/SettingsItem.js'
 import fs from 'fs'
+import execa from 'execa'
 import { DefaultTerminal } from '../../constants/defaults.js'
+import SettingsItem from '../../models/SettingsItem.js'
 import Platform from '../../utils/platform.js'
+import { Settings } from './index.js'
 
 export function getFilteredSettingsList(settingsList: Settings[]): SettingsItem[] {
   const filteredList = settingsList

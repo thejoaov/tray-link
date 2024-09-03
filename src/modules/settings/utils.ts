@@ -1,9 +1,9 @@
 import { MenuItemConstructorOptions, Tray, dialog } from 'electron'
-import { getEditorList, getTerminalList } from '../../services/config/index.js'
 import execa from 'execa'
+import { getEditorList, getTerminalList } from '../../services/config/index.js'
 import { projectStore } from '../../services/store/index.js'
 
-export const getDevSettings = (tray: Tray): MenuItemConstructorOptions[] => {
+export const getDevSettings = (_tray: Tray): MenuItemConstructorOptions[] => {
   const menu: MenuItemConstructorOptions[] = [
     {
       label: 'Dev',

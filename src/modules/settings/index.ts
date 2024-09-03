@@ -1,9 +1,9 @@
+import path from 'path'
 import { Menu, Tray, app, dialog, nativeImage, shell } from 'electron'
 import getTranslation from '../../i18n/index.js'
-import { settingsStore } from '../../services/store/index.js'
 import SettingsItem from '../../models/SettingsItem.js'
+import { settingsStore } from '../../services/store/index.js'
 import renderer from '../renderer/index.js'
-import path from 'path'
 import { getDevSettings } from './utils.js'
 
 export default function getSettingsMenu(tray: Tray): Menu {

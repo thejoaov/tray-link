@@ -1,8 +1,8 @@
 import { app } from 'electron'
 
+import en from './locale/en.js'
 import es from './locale/es.js'
 import pt from './locale/pt.js'
-import en from './locale/en.js'
 
 export default function getTranslation(key: keyof typeof en): string {
   const locale = app.getLocale()
