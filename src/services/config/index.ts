@@ -192,12 +192,12 @@ export const editorList: Settings[] = [
     commonFilepaths: Platform.select({
       darwin: ['/Applications/Cursor.app'],
       linux: ['/usr/bin/cursor'],
-      win32: null, // Not available
+      win32: ['C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Cursor\\Cursor.exe'],
     }),
     command: Platform.select({
       darwin: 'cursor',
       linux: 'cursor',
-      win32: null, // Not available
+      win32: 'cursor.exe',
     }),
   },
   {
@@ -256,12 +256,12 @@ export const editorList: Settings[] = [
     }),
   },
   {
-    name: 'PyCharm',
+    name: 'PyCharm CE',
     binary: null,
     enableBinaryCheck: false,
     enableCommonPathCheck: true,
     commonFilepaths: Platform.select({
-      darwin: ['/Applications/PyCharm.app'],
+      darwin: ['/Applications/PyCharm CE.app'],
       linux: ['/usr/share/pycharm/bin/pycharm.sh'],
       win32: [
         //2020
@@ -281,7 +281,7 @@ export const editorList: Settings[] = [
       ],
     }),
     command: Platform.select({
-      darwin: 'open -a PyCharm',
+      darwin: 'open -a PyCharm CE',
       linux: null, // TODO: find command
       win32: null, // TODO: find command
     }),

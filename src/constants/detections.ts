@@ -6,6 +6,7 @@ enum EDITORS {
   INTELLIJ_IDEA = 'IntelliJ IDEA',
   WEBSTORM = 'WebStorm',
   PYCHARM = 'PyCharm',
+  PYCHARM_CE = 'PyCharm CE',
   PHPSTORM = 'PhpStorm',
   ANDROID_STUDIO = 'Android Studio',
   ECLIPSE = 'Eclipse',

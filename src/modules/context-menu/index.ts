@@ -34,13 +34,13 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
       type: 'separator',
     },
     {
-      label: getTranslation('openCode'),
-      click: () => {
-        openVscode(project.path)
+      label: getTranslation('openDefaultEditor') + settingsStore.getDefaultEditor().name,
+      click: async () => {
+        await openTerminal(project.path, settingsStore.getDefaultEditor())
       },
     },
     {
-      label: getTranslation('openDefaultTerminal') + ' (' + settingsStore.getDefaultTerminal().name + ')',
+      label: getTranslation('openDefaultTerminal') + settingsStore.getDefaultTerminal().name,
       click: async () => {
         await openTerminal(project.path, settingsStore.getDefaultTerminal())
       },
@@ -76,13 +76,7 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
       })),
     },
     { type: 'separator' },
-    {
-      label: getTranslation('moveTop'),
-      click: async () => {
-        await moveTop(project)
-        renderer(tray)
-      },
-    },
+
     {
       label: getTranslation('moveUp'),
       click: async () => {
@@ -97,7 +91,13 @@ export default function getContextMenu(tray: Tray, project: Project): Menu {
         renderer(tray)
       },
     },
-
+    {
+      label: getTranslation('moveTop'),
+      click: async () => {
+        await moveTop(project)
+        renderer(tray)
+      },
+    },
     {
       label: getTranslation('moveBottom'),
       click: async () => {
