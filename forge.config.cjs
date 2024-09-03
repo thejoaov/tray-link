@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const execa = require('execa')
 
 /** @type {import('@electron-forge/shared-types').ForgeConfig} */
