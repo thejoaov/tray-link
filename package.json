@@ -3,24 +3,22 @@
   "version": "1.1.27",
   "packageManager": "pnpm@9.6.0",
   "description": "An app to manage your projects from the system tray",
-  "main": "dist/main.js",
+  "main": "dist/index.cjs",
   "type": "module",
   "scripts": {
-    "prebuild": "rimraf dist",
-    "build": "tsc",
-    "prewatch": "npm run prebuild",
-    "watch": "tsc -w",
     "lint": "biome lint ./src",
+    "format": "biome format --write \"./src/**/*.{js,ts}\"",
+    "build": "tsup --minify",
+    "watch": "tsup --watch",
     "prestart": "npm run build",
     "start": "electron-forge start",
-    "predev": "npm run build",
+    "predev": "tsup",
     "dev": "cross-env NODE_ENV=development nodemon --watch ./ --exec \"npm run start\" -e ts,js,json -i ./dist",
-    "format": "biome format --write \"./src/**/*.{js,ts}\"",
-    "postinstall": "lefthook install",
     "prepackage": "npm run build",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish --from-dry-run"
+    "publish": "electron-forge publish --from-dry-run",
+    "postinstall": "lefthook install"
   },
   "repository": "https://github.com/thejoaov/tray-link",
   "keywords": [
@@ -68,6 +66,7 @@
     "nodemon": "^3.0.1",
     "npm-run-all": "^4.1.5",
     "ts-node": "^10.9.1",
+    "tsup": "^8.2.4",
     "typescript": "^4.8.3"
   },
   "dependencies": {

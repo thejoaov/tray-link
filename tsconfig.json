@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
+    "module": "node16",
+    "moduleResolution": "node16",
+    "moduleDetection": "force",
     "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
