@@ -1,10 +1,10 @@
 import { Menu, Tray, app, dialog, nativeImage, shell } from 'electron'
-import getTranslation from '../../i18n'
-import { settingsStore } from '../../services/store'
-import SettingsItem from '../../models/SettingsItem'
-import renderer from '../renderer'
+import getTranslation from '../../i18n/index.js'
+import { settingsStore } from '../../services/store/index.js'
+import SettingsItem from '../../models/SettingsItem.js'
+import renderer from '../renderer/index.js'
 import path from 'path'
-import { getDevSettings } from './utils'
+import { getDevSettings } from './utils.js'
 
 export default function getSettingsMenu(tray: Tray): Menu {
   const terminals = settingsStore.get('terminalList') as SettingsItem[]

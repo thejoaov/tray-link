@@ -1,8 +1,10 @@
 {
   "name": "tray-link",
   "version": "1.1.24",
+  "packageManager": "pnpm@9.6.0",
   "description": "An app to manage your projects from the system tray",
   "main": "dist/main.js",
+  "type": "module",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
@@ -55,6 +57,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^6.2.1",
     "@electron-forge/publisher-github": "^6.2.1",
     "@types/command-exists": "^1.2.0",
+    "@types/node": "^22.5.2",
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
     "@typescript-eslint/parser": "^6.1.0",
@@ -75,7 +78,7 @@
   "dependencies": {
     "command-exists": "^1.2.9",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-store": "^8.1.0",
+    "electron-store": "^8.2.0",
     "execa": "^2.0.0-alpha.0",
     "fix-path": "^3.0.0",
     "rimraf": "^5.0.1",

@@ -1,11 +1,11 @@
 import { dialog, shell } from 'electron'
-import Platform from '../../utils/platform'
+import Platform from '../../utils/platform.js'
 import execa from 'execa'
 import commandExists from 'command-exists'
-import getTranslation from '../../i18n'
-import SettingsItem from '../../models/SettingsItem'
-import Project from '../../models/Project'
-import { projectStore } from '../../services/store'
+import getTranslation from '../../i18n/index.js'
+import SettingsItem from '../../models/SettingsItem.js'
+import Project from '../../models/Project.js'
+import { projectStore } from '../../services/store/index.js'
 
 export async function moveTop(project: Project): Promise<void> {
   const allProjects = projectStore.getAll()

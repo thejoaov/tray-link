@@ -1,6 +1,6 @@
-import SettingsItem from '../models/SettingsItem'
-import Platform from '../utils/platform'
-import { SUPPORTED } from './detections'
+import SettingsItem from '../models/SettingsItem.js'
+import Platform from '../utils/platform.js'
+import { SUPPORTED } from './detections.js'
 
 export const DefaultTerminal = new SettingsItem({
   name: Platform.select({

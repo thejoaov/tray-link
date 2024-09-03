@@ -26,7 +26,6 @@
 
 </summary>
 
-
 ![](docs/images/print1.jpg)
 ![](docs/images/print2.jpg)
 
@@ -34,12 +33,10 @@ https://github.com/thejoaov/tray-link/assets/45052080/32886ef8-6638-4338-bfab-cc
 
 https://github.com/thejoaov/tray-link/assets/45052080/a311bb5c-de7a-451d-8823-c22afd8097f6
 
-
 </details>
 
-
-
 ## Features
+
 - Open the project's folder
 - You can open your project directly on VS Code!
 - Open your projects directly to your favorite terminal!
@@ -58,7 +55,7 @@ This application is not yet signed. If you are unsure, you can clone, build and 
 
 1. Clone this repository;
 2. `cd tray-link`;
-3. Run `npm install` to install dependencies.
+3. Run `pnpm install` to install dependencies.
 4. Run `npm run dev`.
 
 ## License

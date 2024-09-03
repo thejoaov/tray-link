@@ -1,6 +1,6 @@
 import { Menu, Tray, dialog } from 'electron'
-import Project from '../../models/Project'
-import getTranslation from '../../i18n'
+import Project from '../../models/Project.js'
+import getTranslation from '../../i18n/index.js'
 import {
   moveBottom,
   moveDown,
@@ -11,10 +11,10 @@ import {
   openGithubDesktop,
   openTerminal,
   openVscode,
-} from './utils'
-import { projectStore, settingsStore } from '../../services/store'
-import renderer from '../renderer'
-import Platform from '../../utils/platform'
+} from './utils.js'
+import { projectStore, settingsStore } from '../../services/store/index.js'
+import renderer from '../renderer/index.js'
+import Platform from '../../utils/platform.js'
 import commandExists from 'command-exists'
 
 export default function getContextMenu(tray: Tray, project: Project): Menu {

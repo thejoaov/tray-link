@@ -1,10 +1,10 @@
 import { Menu, MenuItem, Tray } from 'electron'
-import getTranslation from '../../i18n'
-import { onClickAddProjects } from './utils'
-import getContextMenu from '../context-menu'
-import { projectStore } from '../../services/store'
-import renderer from '../renderer'
-import getSettingsMenu from '../settings'
+import getTranslation from '../../i18n/index.js'
+import { onClickAddProjects } from './utils.js'
+import getContextMenu from '../context-menu/index.js'
+import { projectStore } from '../../services/store/index.js'
+import renderer from '../renderer/index.js'
+import getSettingsMenu from '../settings/index.js'
 
 export default function getMainMenu(tray: Tray): Menu {
   const projects = projectStore.getAll()

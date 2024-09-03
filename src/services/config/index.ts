@@ -1,10 +1,10 @@
-import Platform from '../../utils/platform'
-import SettingsItem from '../../models/SettingsItem'
-import { DefaultEditor, DefaultTerminal } from '../../constants/defaults'
-import { SettingsSchema } from '../store/schema'
+import Platform from '../../utils/platform.js'
+import SettingsItem from '../../models/SettingsItem.js'
+import { DefaultEditor, DefaultTerminal } from '../../constants/defaults.js'
+import { SettingsSchema } from '../store/schema.js'
 import fs from 'fs'
 import path from 'path'
-import { getFilteredSettingsList } from './utils'
+import { getFilteredSettingsList } from './utils.js'
 import { app } from 'electron'
 
 if (!fs.existsSync(path.join(app.getPath('home'), '.tray-link'))) {

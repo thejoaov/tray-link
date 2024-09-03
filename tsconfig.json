@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "target": "ESNext",
-    "moduleResolution": "node",
     "strictPropertyInitialization": false,
     "strictBindCallApply": false,
     "strictFunctionTypes": false,
