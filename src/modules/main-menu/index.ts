@@ -1,6 +1,6 @@
 import { Menu, MenuItem, Tray } from 'electron'
 import getTranslation from '../../i18n/index.js'
-import { projectStore } from '../../services/store/index.js'
+import { projectStore, settingsStore } from '../../services/store/index.js'
 import getContextMenu from '../context-menu/index.js'
 import renderer from '../renderer/index.js'
 import getSettingsMenu from '../settings/index.js'
@@ -8,6 +8,7 @@ import { onClickAddProjects } from './utils.js'
 
 export default function getMainMenu(tray: Tray): Menu {
   const projects = projectStore.getAll()
+  settingsStore.resetDefaults()
 
   const menu = Menu.buildFromTemplate([
     {
@@ -20,9 +21,9 @@ export default function getMainMenu(tray: Tray): Menu {
     {
       type: 'separator',
     },
-    ...projects.map((project) => {
+    ...projects.map((project, index) => {
       const menuItem = new MenuItem({
-        label: project.name,
+        label: `${index + 1} - ${project.name}`,
         submenu: getContextMenu(tray, project),
       })
 

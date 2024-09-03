@@ -1,5 +1,6 @@
 import path from 'path'
 import { Menu, Tray, app, dialog, nativeImage, shell } from 'electron'
+import { STORE_KEYS } from '../../constants/store.js'
 import getTranslation from '../../i18n/index.js'
 import SettingsItem from '../../models/SettingsItem.js'
 import { settingsStore } from '../../services/store/index.js'
@@ -7,7 +8,8 @@ import renderer from '../renderer/index.js'
 import { getDevSettings } from './utils.js'
 
 export default function getSettingsMenu(tray: Tray): Menu {
-  const terminals = settingsStore.get('terminalList') as SettingsItem[]
+  const terminals = settingsStore.get(STORE_KEYS.TERMINAL_LIST) as SettingsItem[]
+  const editors = settingsStore.get(STORE_KEYS.EDITOR_LIST) as SettingsItem[]
 
   return Menu.buildFromTemplate([
     {
@@ -31,7 +33,7 @@ export default function getSettingsMenu(tray: Tray): Menu {
             }
 
             if (value.response === 1) {
-              shell.openExternal('https://github.com/thejoaov/tray-link/releases')
+              shell.openExternal('https://github.com/thejoaov/tray-link/releases/latest')
             }
 
             if (value.response === 2) {
@@ -56,9 +58,35 @@ export default function getSettingsMenu(tray: Tray): Menu {
             const terminal = terminals[value.response]
 
             settingsStore.save(
-              'defaultTerminal',
+              STORE_KEYS.DEFAULT_TERMINAL,
               new SettingsItem({
                 ...terminal,
+                isDefault: true,
+              }),
+            )
+
+            renderer(tray)
+          })
+      },
+    },
+    {
+      label: getTranslation('setDefaultEditor'),
+      click: () => {
+        dialog
+          .showMessageBox({
+            message: getTranslation('defaultEditorMessage'),
+            title: getTranslation('defaultEditor'),
+            buttons: editors.map((editor) => editor.name),
+            icon: nativeImage.createFromPath(path.join(__dirname, '../../../assets/icon@5x.png')),
+            noLink: true,
+          })
+          .then((value) => {
+            const editor = editors[value.response]
+
+            settingsStore.save(
+              STORE_KEYS.DEFAULT_EDITOR,
+              new SettingsItem({
+                ...editor,
                 isDefault: true,
               }),
             )
