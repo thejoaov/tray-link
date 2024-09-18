@@ -1,6 +1,8 @@
+import { ProjectSchema, SettingsSchema } from './schema.js'
+
 import { app } from 'electron'
 import Store from 'electron-store'
-import { ProjectSchema, SettingsSchema } from './schema.js'
+import SettingsItem from '../../models/SettingsItem.js'
 
 const store = new Store<{
   projects: ProjectSchema[]
@@ -13,8 +15,8 @@ const store = new Store<{
       editorList: [],
       terminalList: [],
       aditionalCommands: [],
-      defaultEditor: null,
-      defaultTerminal: null,
+      defaultEditor: {} as SettingsItem,
+      defaultTerminal: {} as SettingsItem,
     },
   },
   schema: {
