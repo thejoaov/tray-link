@@ -1,4 +1,4 @@
-import { MenuItemConstructorOptions, Tray, dialog } from 'electron'
+import { dialog, MenuItemConstructorOptions, Tray } from 'electron'
 import execa from 'execa'
 import { getEditorList, getTerminalList } from '../../services/config/index.js'
 import { projectStore } from '../../services/store/index.js'

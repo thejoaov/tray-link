@@ -1,5 +1,5 @@
+import { app, dialog, Menu, nativeImage, shell, Tray } from 'electron'
 import path from 'path'
-import { Menu, Tray, app, dialog, nativeImage, shell } from 'electron'
 import { STORE_KEYS } from '../../constants/store.js'
 import getTranslation from '../../i18n/index.js'
 import SettingsItem from '../../models/SettingsItem.js'

@@ -1,8 +1,7 @@
-import { ProjectSchema, SettingsSchema } from './schema.js'
-
 import { app } from 'electron'
 import Store from 'electron-store'
 import SettingsItem from '../../models/SettingsItem.js'
+import { ProjectSchema, SettingsSchema } from './schema.js'
 
 const store = new Store<{
   projects: ProjectSchema[]

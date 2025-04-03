@@ -1,5 +1,5 @@
-import { basename } from 'path'
 import { dialog } from 'electron'
+import { basename } from 'path'
 import getTranslation from '../../i18n/index.js'
 import { projectStore } from '../../services/store/index.js'
 
