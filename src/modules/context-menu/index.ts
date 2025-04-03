@@ -1,5 +1,5 @@
 import commandExists from 'command-exists'
-import { Menu, Tray, dialog } from 'electron'
+import { dialog, Menu, Tray } from 'electron'
 import getTranslation from '../../i18n/index.js'
 import Project from '../../models/Project.js'
 import { projectStore, settingsStore } from '../../services/store/index.js'

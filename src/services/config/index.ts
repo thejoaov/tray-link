@@ -1,6 +1,6 @@
+import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import { app } from 'electron'
 import { DefaultEditor, DefaultTerminal } from '../../constants/defaults.js'
 import SettingsItem from '../../models/SettingsItem.js'
 import Platform from '../../utils/platform.js'
@@ -198,6 +198,22 @@ export const editorList: Settings[] = [
       darwin: 'cursor',
       linux: 'cursor',
       win32: 'cursor.exe',
+    }),
+  },
+  {
+    name: 'Windsurf',
+    binary: 'windsurf',
+    enableBinaryCheck: true,
+    enableCommonPathCheck: false,
+    commonFilepaths: Platform.select({
+      darwin: ['/Applications/Windsurf.app'],
+      linux: ['/usr/bin/windsurf'],
+      win32: ['C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Windsurf\\Windsurf.exe'],
+    }),
+    command: Platform.select({
+      darwin: 'windsurf',
+      linux: 'windsurf',
+      win32: 'windsurf.exe',
     }),
   },
   {

@@ -19,6 +19,7 @@ enum EDITORS {
   XCODE = 'Xcode',
   ZED = 'Zed',
   CURSOR = 'Cursor',
+  WINDSURF = 'WindSurf',
 }
 
 enum TERMINALS {

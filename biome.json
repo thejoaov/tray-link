@@ -1,7 +1,12 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "defaultBranch": "main",
+    "useIgnoreFile": true
+  },
   "formatter": {
-    "ignore": ["node_modules", "dist", "build"],
     "enabled": true,
     "formatWithErrors": false,
     "indentStyle": "space",
@@ -10,16 +15,29 @@
     "lineWidth": 120,
     "attributePosition": "auto"
   },
-  "organizeImports": { "enabled": true },
+  "files": {
+    "includes": [
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.json",
+      "!**/*.test.*",
+      "!node_modules",
+      "!dist/**",
+      "!build/**",
+      "!coverage/**"
+    ],
+    "ignoreUnknown": true,
+    "maxSize": 1000000
+  },
   "linter": {
-    "ignore": ["node_modules", "dist", "build"],
     "enabled": true,
     "rules": {
       "recommended": false,
       "complexity": {
         "noBannedTypes": "error",
         "noExtraBooleanCast": "error",
-        "noMultipleSpacesInRegularExpressionLiterals": "error",
         "noUselessCatch": "error",
         "noUselessThisAlias": "error",
         "noUselessTypeConstraint": "error",
@@ -99,39 +117,5 @@
       "quoteStyle": "single",
       "attributePosition": "auto"
     }
-  },
-  "overrides": [
-    {
-      "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noConstAssign": "off",
-            "noGlobalObjectCalls": "off",
-            "noInvalidConstructorSuper": "off",
-            "noNewSymbol": "off",
-            "noSetterReturn": "off",
-            "noUndeclaredVariables": "off",
-            "noUnreachable": "off",
-            "noUnreachableSuper": "off"
-          },
-          "style": {
-            "noArguments": "error",
-            "noVar": "error",
-            "useConst": "error"
-          },
-          "suspicious": {
-            "noDuplicateClassMembers": "off",
-            "noDuplicateObjectKeys": "off",
-            "noDuplicateParameters": "off",
-            "noFunctionAssign": "off",
-            "noImportAssign": "off",
-            "noRedeclare": "off",
-            "noUnsafeNegation": "off",
-            "useGetterReturn": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }

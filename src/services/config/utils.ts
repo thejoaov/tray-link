@@ -1,5 +1,5 @@
-import fs from 'fs'
 import execa from 'execa'
+import fs from 'fs'
 import { DefaultTerminal } from '../../constants/defaults.js'
 import SettingsItem from '../../models/SettingsItem.js'
 import Platform from '../../utils/platform.js'
