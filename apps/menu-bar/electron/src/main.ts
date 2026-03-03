@@ -40,7 +40,7 @@ const createMainWindow = () => {
     webPreferences: {
       devTools: true,
       webSecurity: false,
-      preload: path.join(__dirname, './preload'),
+      preload: path.join(__dirname, './preload.js'),
     },
     skipTaskbar: true,
   })
@@ -48,6 +48,7 @@ const createMainWindow = () => {
   const development = !app.isPackaged
   if (development) {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
+
     mainWindow.loadURL('http://localhost:8081')
   } else {
     mainWindow.loadURL(`file://${path.join(__dirname, `./renderer/dist/index.html`)}`)

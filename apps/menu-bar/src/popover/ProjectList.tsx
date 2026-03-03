@@ -171,7 +171,7 @@ export const ProjectList = () => {
               <Text style={styles.metaButtonText}>{editMode ? t('done') : t('reorder')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleAddProject} style={styles.addButton}>
-              <Ionicons name="add" size={16} />
+              <Ionicons name="add" size={16} color="var(--text-color)" />
             </TouchableOpacity>
           </View>
         }
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 6,
-    backgroundColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   headerActions: {
     flexDirection: 'row',
@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
   metaButtonText: {
     fontSize: 10,
     fontWeight: '700',
+    color: 'var(--text-color)',
   },
   emptyContainer: {
     padding: 16,

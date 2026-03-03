@@ -1,21 +1,17 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'path';
+import { app, BrowserWindow } from 'electron'
+import path from 'path'
 
-import {
-  WindowOptions,
-  WindowsManagerType,
-  WindowStyleMask,
-} from '../../../src/modules/WindowManager/types';
+import { WindowOptions, WindowStyleMask, WindowsManagerType } from '../../../src/modules/WindowManager/types'
 
-const _windowsMap: { [key: string]: BrowserWindow } = {};
+const _windowsMap: { [key: string]: BrowserWindow } = {}
 
 const openWindow = async (moduleName: string, options: WindowOptions) => {
-  let window: BrowserWindow;
+  let window: BrowserWindow
 
   if (_windowsMap[moduleName]) {
-    window = _windowsMap[moduleName];
+    window = _windowsMap[moduleName]
   } else {
-    const windowStyle = options?.windowStyle || {};
+    const windowStyle = options?.windowStyle || {}
 
     window = new BrowserWindow({
       width: windowStyle.width ?? 300,
@@ -26,43 +22,42 @@ const openWindow = async (moduleName: string, options: WindowOptions) => {
       webPreferences: {
         devTools: true,
         webSecurity: false,
-        preload: path.join(__dirname, './preload'),
+        preload: path.join(__dirname, './preload.js'),
       },
-    });
-    window.menuBarVisible = false;
+    })
+    window.menuBarVisible = false
 
     window.on('page-title-updated', function (e) {
-      e.preventDefault();
-    });
+      e.preventDefault()
+    })
     window.on('close', function (_) {
-      delete _windowsMap[moduleName];
-    });
-    _windowsMap[moduleName] = window;
+      delete _windowsMap[moduleName]
+    })
+    _windowsMap[moduleName] = window
 
-    const development = !app.isPackaged;
+    const development = !app.isPackaged
     if (development) {
-      await window.loadURL(`http://localhost:8081?moduleName=${moduleName}`);
+      window.webContents.openDevTools({ mode: 'detach' })
+      await window.loadURL(`http://localhost:8081?moduleName=${moduleName}`)
     } else {
-      await window.loadURL(
-        `file://${path.join(__dirname, `./renderer/dist/index.html?moduleName=${moduleName}`)}`
-      );
+      await window.loadURL(`file://${path.join(__dirname, `./renderer/dist/index.html?moduleName=${moduleName}`)}`)
     }
   }
 
-  window.webContents.send('windowFocused', moduleName);
-  window.show();
-};
+  window.webContents.send('windowFocused', moduleName)
+  window.show()
+}
 
 const WindowManager: WindowsManagerType & { name: string } = {
   name: 'WindowManager',
   openWindow,
   closeWindow: (moduleName: string) => {
-    const window = _windowsMap[moduleName];
+    const window = _windowsMap[moduleName]
     if (window) {
-      window.close();
-      delete _windowsMap[moduleName];
+      window.close()
+      delete _windowsMap[moduleName]
     }
   },
-};
+}
 
-export default WindowManager;
+export default WindowManager
