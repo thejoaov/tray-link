@@ -68,6 +68,8 @@ jobs:
           -scheme TrayLink-macOS
           -configuration Release
           -derivedDataPath ./macos/build
+          ARCHS=arm64
+          ONLY_ACTIVE_ARCH=YES
           CODE_SIGNING_ALLOWED=NO
           CODE_SIGNING_REQUIRED=NO
           CODE_SIGN_IDENTITY=
@@ -192,7 +194,7 @@ jobs:
                 ]
               }' > ai_payload.json
 
-            curl -sS "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${GEMINI_API_KEY}" \
+            curl -sS "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}" \
               -H "Content-Type: application/json" \
               -d @ai_payload.json > ai_response.json
 
