@@ -15,7 +15,7 @@ export const WindowsNavigator = {
         console.error('Error opening window via native module', e)
       }
     } else {
-      const { requireElectronModule } = require('rn-electron-modules')
+      const { requireElectronModule } = require('@tray-link/rn-electron-modules')
       const WindowManager = requireElectronModule('WindowManager')
       WindowManager.openWindow(windowName)
     }
@@ -30,7 +30,7 @@ export const WindowsNavigator = {
         console.error('Error closing window via native module', e)
       }
     } else {
-      const { requireElectronModule } = require('rn-electron-modules')
+      const { requireElectronModule } = require('@tray-link/rn-electron-modules')
       const WindowManager = requireElectronModule('WindowManager')
       WindowManager.closeWindow(windowName)
     }

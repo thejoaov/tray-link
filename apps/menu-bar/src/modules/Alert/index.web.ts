@@ -1,5 +1,5 @@
+import { requireElectronModule } from '@tray-link/rn-electron-modules'
 import { AlertButton, Alert as RNAlert } from 'react-native'
-import { requireElectronModule } from 'rn-electron-modules'
 
 const ElectronAlert = requireElectronModule<{
   alert(title: string, message?: string, buttons?: AlertButton[]): void

@@ -1,34 +1,34 @@
-import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { Project } from "common-types";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from '@expo/vector-icons'
+import { Project } from '@tray-link/common-types'
+import React from 'react'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
-import { Text } from "../components/Text";
+import { Text } from '../components/Text'
 
 type Props = {
-  index: number;
-  project: Project;
-  onOpenEditor: () => void;
-  onOpenTerminal: () => void;
-  onOpenFinder: () => void;
-  onRemove: () => void;
-  onToggleContextMenu: () => void;
-  contextMenuOpen?: boolean;
-  editorOptions: Array<{ label: string; command: string }>;
-  terminalOptions: Array<{ label: string; command: string }>;
-  onOpenWithEditor: (command: string) => void;
-  onOpenWithTerminal: (command: string) => void;
+  index: number
+  project: Project
+  onOpenEditor: () => void
+  onOpenTerminal: () => void
+  onOpenFinder: () => void
+  onRemove: () => void
+  onToggleContextMenu: () => void
+  contextMenuOpen?: boolean
+  editorOptions: Array<{ label: string; command: string }>
+  terminalOptions: Array<{ label: string; command: string }>
+  onOpenWithEditor: (command: string) => void
+  onOpenWithTerminal: (command: string) => void
   labels: {
-    moreActions: string;
-    openWithEditor: string;
-    openWithTerminal: string;
-  };
-  editMode?: boolean;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
-  canMoveUp?: boolean;
-  canMoveDown?: boolean;
-};
+    moreActions: string
+    openWithEditor: string
+    openWithTerminal: string
+  }
+  editMode?: boolean
+  onMoveUp?: () => void
+  onMoveDown?: () => void
+  canMoveUp?: boolean
+  canMoveDown?: boolean
+}
 
 export const ProjectItem = ({
   index,
@@ -68,25 +68,13 @@ export const ProjectItem = ({
         </Text>
       </View>
       <View style={styles.actions}>
-        <TouchableOpacity
-          accessibilityLabel="Open in editor"
-          style={styles.button}
-          onPress={onOpenEditor}
-        >
+        <TouchableOpacity accessibilityLabel="Open in editor" style={styles.button} onPress={onOpenEditor}>
           <Ionicons name="code-slash-outline" size={14} />
         </TouchableOpacity>
-        <TouchableOpacity
-          accessibilityLabel="Open in terminal"
-          style={styles.button}
-          onPress={onOpenTerminal}
-        >
+        <TouchableOpacity accessibilityLabel="Open in terminal" style={styles.button} onPress={onOpenTerminal}>
           <Ionicons name="terminal-outline" size={14} />
         </TouchableOpacity>
-        <TouchableOpacity
-          accessibilityLabel="Open in finder"
-          style={styles.button}
-          onPress={onOpenFinder}
-        >
+        <TouchableOpacity accessibilityLabel="Open in finder" style={styles.button} onPress={onOpenFinder}>
           <Ionicons name="folder-open-outline" size={14} />
         </TouchableOpacity>
         {editMode ? (
@@ -109,18 +97,10 @@ export const ProjectItem = ({
             </TouchableOpacity>
           </>
         ) : null}
-        <TouchableOpacity
-          accessibilityLabel="Remove project"
-          style={styles.button}
-          onPress={onRemove}
-        >
+        <TouchableOpacity accessibilityLabel="Remove project" style={styles.button} onPress={onRemove}>
           <Ionicons name="trash-outline" size={14} />
         </TouchableOpacity>
-        <TouchableOpacity
-          accessibilityLabel={labels.moreActions}
-          style={styles.button}
-          onPress={onToggleContextMenu}
-        >
+        <TouchableOpacity accessibilityLabel={labels.moreActions} style={styles.button} onPress={onToggleContextMenu}>
           <Ionicons name="ellipsis-horizontal" size={14} />
         </TouchableOpacity>
       </View>
@@ -155,8 +135,8 @@ export const ProjectItem = ({
         </View>
       ) : null}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -166,24 +146,24 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   nameRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
     marginBottom: 2,
   },
   name: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   migratedChip: {
     borderRadius: 999,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    backgroundColor: "rgba(0,0,0,0.08)",
+    backgroundColor: 'rgba(0,0,0,0.08)',
   },
   migratedChipText: {
     fontSize: 9,
-    fontWeight: "600",
+    fontWeight: '600',
     opacity: 0.7,
   },
   path: {
@@ -191,43 +171,43 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   actions: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 8,
   },
   button: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: "rgba(0,0,0,0.05)",
+    backgroundColor: 'rgba(0,0,0,0.05)',
     borderRadius: 4,
   },
   contextMenu: {
     marginTop: 10,
     borderRadius: 8,
     padding: 8,
-    backgroundColor: "rgba(0,0,0,0.06)",
+    backgroundColor: 'rgba(0,0,0,0.06)',
     gap: 6,
   },
   contextTitle: {
     fontSize: 11,
-    fontWeight: "700",
+    fontWeight: '700',
     opacity: 0.75,
   },
   contextActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
   },
   contextActionButton: {
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: "rgba(0,0,0,0.08)",
+    backgroundColor: 'rgba(0,0,0,0.08)',
   },
   contextActionText: {
     fontSize: 11,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   disabled: {
     opacity: 0.45,
   },
-});
+})

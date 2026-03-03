@@ -10,11 +10,11 @@
   "scripts": {
     "build": "tsc",
     "watch": "yarn build --watch --preserveWatchOutput",
-    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "electron": "33.2.0",
+    "electron-store": "^11.0.2",
     "typescript": "^5.5.4"
   }
 }

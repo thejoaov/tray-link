@@ -1,4 +1,4 @@
-import { requireElectronModule } from 'rn-electron-modules'
+import { requireElectronModule } from '@tray-link/rn-electron-modules'
 
 import { ElectronMainMenuBarModule, ElectronPreloadMenuBarModule } from './types'
 

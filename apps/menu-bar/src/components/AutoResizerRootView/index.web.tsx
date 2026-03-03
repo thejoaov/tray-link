@@ -1,5 +1,5 @@
+import { requireElectronModule } from '@tray-link/rn-electron-modules'
 import React, { useEffect, useRef } from 'react'
-import { requireElectronModule } from 'rn-electron-modules'
 
 export const AutoResizerRootViewManager = requireElectronModule<{
   setPopoverSize: (width: number, height: number) => void

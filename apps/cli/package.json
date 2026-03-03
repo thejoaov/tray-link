@@ -15,10 +15,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "commander": "^10.0.1",
     "@tray-link/common-types": "workspace:*",
-    "electron-store": "^11.0.2",
     "@tray-link/tray-shared": "workspace:*",
+    "commander": "^10.0.1",
+    "electron-store": "^11.0.2",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

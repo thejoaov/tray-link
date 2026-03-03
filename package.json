@@ -6,7 +6,8 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "apps/menu-bar/electron"
+    "apps/menu-bar/electron",
+    "apps/menu-bar/modules/*"
   ],
   "scripts": {
     "cli": "cd apps/cli && bun run cli",

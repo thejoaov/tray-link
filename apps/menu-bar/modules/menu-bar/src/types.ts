@@ -1,6 +1,6 @@
+import { ElectronModule } from '@tray-link/rn-electron-modules'
 import type { IpcMainInvokeEvent } from 'electron'
 import { EmitterSubscription } from 'react-native'
-import { ElectronModule } from 'rn-electron-modules'
 
 export interface NativeMenuBarModule {
   readonly appVersion: string

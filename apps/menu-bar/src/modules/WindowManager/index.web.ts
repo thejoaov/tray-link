@@ -1,5 +1,5 @@
+import { requireElectronModule } from '@tray-link/rn-electron-modules'
 import { AppRegistry } from 'react-native'
-import { requireElectronModule } from 'rn-electron-modules'
 import { withFluentProvider } from '../../providers/FluentProvider'
 import { withThemeProvider } from '../../utils/useExpoTheme'
 import { WindowsConfig, WindowsManagerType } from './types'
