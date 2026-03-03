@@ -8,26 +8,66 @@ on:
         required: false
         default: true
         type: boolean
+      build-linux:
+        description: "Build Linux (Electron)"
+        required: false
+        default: true
+        type: boolean
+      build-windows:
+        description: "Build Windows (Electron)"
+        required: false
+        default: true
+        type: boolean
+      build-macos-electron:
+        description: "Build macOS (Electron)"
+        required: false
+        default: true
+        type: boolean
+      build-macos-native:
+        description: "Build macOS (Native)"
+        required: false
+        default: true
+        type: boolean
 
 jobs:
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has-builds: ${{ steps.set-matrix.outputs.has-builds }}
+    steps:
+      - name: Build matrix from inputs
+        id: set-matrix
+        run: |
+          matrix='{"include":[]}'
+
+          if [ "${{ inputs.build-linux }}" = "true" ]; then
+            matrix=$(echo "$matrix" | jq '.include += [{"os":"ubuntu-latest","artifact":"linux-artifact","build_target":"electron"}]')
+          fi
+
+          if [ "${{ inputs.build-windows }}" = "true" ]; then
+            matrix=$(echo "$matrix" | jq '.include += [{"os":"windows-latest","artifact":"windows-artifact","build_target":"electron"}]')
+          fi
+
+          if [ "${{ inputs.build-macos-electron }}" = "true" ]; then
+            matrix=$(echo "$matrix" | jq '.include += [{"os":"macos-latest","artifact":"macos-artifact","build_target":"electron"}]')
+          fi
+
+          if [ "${{ inputs.build-macos-native }}" = "true" ]; then
+            matrix=$(echo "$matrix" | jq '.include += [{"os":"macos-latest","artifact":"macos-native-artifact","build_target":"native-macos"}]')
+          fi
+
+          count=$(echo "$matrix" | jq '.include | length')
+          echo "matrix=$(echo "$matrix" | jq -c .)" >> "$GITHUB_OUTPUT"
+          echo "has-builds=$([ "$count" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: prepare-matrix
+    if: needs.prepare-matrix.outputs.has-builds == 'true'
     continue-on-error: true
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            artifact: linux-artifact
-            build_target: electron
-          - os: windows-latest
-            artifact: windows-artifact
-            build_target: electron
-          - os: macos-latest
-            artifact: macos-artifact
-            build_target: electron
-          - os: macos-latest
-            artifact: macos-native-artifact
-            build_target: native-macos
+      matrix: ${{ fromJSON(needs.prepare-matrix.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

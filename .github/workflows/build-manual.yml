@@ -2,8 +2,34 @@ name: Build (Manual)
 
 on:
   workflow_dispatch:
+    inputs:
+      build-linux:
+        description: "Build Linux (Electron)"
+        required: false
+        default: true
+        type: boolean
+      build-windows:
+        description: "Build Windows (Electron)"
+        required: false
+        default: true
+        type: boolean
+      build-macos-electron:
+        description: "Build macOS (Electron)"
+        required: false
+        default: true
+        type: boolean
+      build-macos-native:
+        description: "Build macOS (Native)"
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build:
     uses: ./.github/workflows/build.yml
+    with:
+      build-linux: ${{ inputs.build-linux }}
+      build-windows: ${{ inputs.build-windows }}
+      build-macos-electron: ${{ inputs.build-macos-electron }}
+      build-macos-native: ${{ inputs.build-macos-native }}
     secrets: inherit
