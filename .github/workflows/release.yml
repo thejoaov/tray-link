@@ -54,6 +54,11 @@ jobs:
         run: bun run make
         working-directory: apps/menu-bar/electron
 
+      - name: Install Pods (React Native iOS)
+        if: matrix.build_target == 'native-macos'
+        run: bunx pod-install
+        working-directory: apps/menu-bar
+
       - name: Build native macOS app (React Native macOS)
         if: matrix.build_target == 'native-macos'
         run: >
