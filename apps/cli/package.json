@@ -1,5 +1,5 @@
 {
-  "name": "tray-link-cli",
+  "name": "@tray-link/cli",
   "private": true,
   "version": "2.0.0",
   "description": "The command-line tool used by Tray Link",
@@ -16,9 +16,9 @@
   },
   "dependencies": {
     "commander": "^10.0.1",
-    "common-types": "workspace:*",
+    "@tray-link/common-types": "workspace:*",
     "electron-store": "^11.0.2",
-    "tray-shared": "workspace:*",
+    "@tray-link/tray-shared": "workspace:*",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
