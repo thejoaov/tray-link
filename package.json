@@ -5,7 +5,8 @@
   "packageManager": "bun@1.0.0",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "apps/menu-bar/electron"
   ],
   "scripts": {
     "cli": "cd apps/cli && bun run cli",
