@@ -22,11 +22,10 @@
       "**/*.ts",
       "**/*.tsx",
       "**/*.json",
-      "!**/*.test.*",
-      "!node_modules",
-      "!dist/**",
-      "!build/**",
-      "!coverage/**"
+      "**/!node_modules/**",
+      "**/!dist/**",
+      "**/!build/**",
+      "**/!coverage/**"
     ],
     "ignoreUnknown": true,
     "maxSize": 1000000
@@ -40,8 +39,7 @@
         "noExtraBooleanCast": "error",
         "noUselessCatch": "error",
         "noUselessThisAlias": "error",
-        "noUselessTypeConstraint": "error",
-        "noWith": "error"
+        "noUselessTypeConstraint": "error"
       },
       "correctness": {
         "noConstAssign": "error",
@@ -51,7 +49,6 @@
         "noGlobalObjectCalls": "error",
         "noInnerDeclarations": "error",
         "noInvalidConstructorSuper": "error",
-        "noNewSymbol": "error",
         "noNonoctalDecimalEscape": "error",
         "noPrecisionLoss": "error",
         "noSelfAssign": "error",
@@ -64,7 +61,6 @@
         "noUnsafeOptionalChaining": "error",
         "noUnusedLabels": "error",
         "noUnusedVariables": "error",
-        "useArrayLiterals": "off",
         "useIsNan": "error",
         "useValidForDirection": "error",
         "useYield": "error"
@@ -100,8 +96,7 @@
         "noShadowRestrictedNames": "error",
         "noUnsafeDeclarationMerging": "error",
         "noUnsafeNegation": "error",
-        "useGetterReturn": "error",
-        "useValidTypeof": "error"
+        "useGetterReturn": "error"
       }
     }
   },

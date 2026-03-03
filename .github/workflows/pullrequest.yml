@@ -1,33 +1,46 @@
-name: Pull Request
-permissions:
-  contents: write
+name: Lint, Typecheck and Build
+
 on:
-  # workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pullrequest.yml'
+      - 'apps/**'
+      - 'packages/**'
+      - 'tooling/**'
+      - 'turbo.json'
+      - 'package.json'
+      - 'bun.lock'
   pull_request:
-    branches:
-      - 'main'
+    branches: [main]
+    paths:
+      - '.github/workflows/pullrequest.yml'
+      - 'apps/**'
+      - 'packages/**'
+      - 'tooling/**'
+      - 'turbo.json'
+      - 'package.json'
+      - 'bun.lock'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lint:
+  lint-typecheck-build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup
         uses: ./tooling/github/setup
 
-      - name: Run linting
-        run: npm run lint
+      - name: Lint
+        run: bun run lint
 
-  build:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Typecheck
+        run: bun run typecheck
 
-      - name: Setup
-        uses: ./tooling/github/setup
-
-      - name: Run build packages
-        run: npm run build
+      - name: Build
+        run: bun run build

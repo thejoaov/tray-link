@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Background rounded square -->
+  <rect x="64" y="64" width="896" height="896" rx="180" fill="#0f172a" />
+
+  <!-- Top tray/menu bar -->
+  <rect x="176" y="176" width="672" height="64" rx="12" fill="#1e3a5f" />
+
+  <!-- Tray indicator dots -->
+  <circle cx="232" cy="208" r="16" fill="#22d3ee" />
+  <circle cx="288" cy="208" r="16" fill="#22d3ee" fill-opacity="0.6" />
+  <circle cx="344" cy="208" r="16" fill="#22d3ee" fill-opacity="0.3" />
+
+  <!-- Chain link symbol - interlocking links at 45° -->
+  <g transform="translate(512, 560) rotate(-45)" fill="none" stroke-width="52">
+    <!-- First link (cyan) -->
+    <rect x="-260" y="-64" width="280" height="128" rx="64" stroke="#22d3ee" />
+    <!-- Second link (teal) - interlocked -->
+    <rect x="-20" y="-64" width="280" height="128" rx="64" stroke="#14b8a6" />
+  </g>
+</svg>

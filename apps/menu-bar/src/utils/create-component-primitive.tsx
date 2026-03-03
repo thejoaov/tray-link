@@ -1,0 +1,133 @@
+import { ComponentType, createElement, PropsWithChildren, Ref } from 'react'
+import { type ImageStyle, StyleSheet, type TextStyle, type ViewStyle } from 'react-native'
+
+import { useTheme } from '../providers/ThemeProvider'
+
+type StyleType = ViewStyle | TextStyle | ImageStyle
+
+type Options = {
+  base?: StyleType
+  variants?: VariantMap<StyleType>
+}
+
+type VariantMap<T> = { [key: string]: { [key: string]: T } }
+
+type Nested<Type> = {
+  [Property in keyof Type]?: keyof Type[Property]
+}
+
+type SelectorMap<Variants> = Partial<{
+  [K in keyof Variants]?: {
+    [T in keyof Variants[K]]?: StyleType
+  }
+}>
+
+type Selectors<Variants> = {
+  light?: SelectorMap<Variants>
+  dark?: SelectorMap<Variants>
+}
+
+type SelectorProps = {
+  light?: StyleType
+  dark?: StyleType
+}
+
+export function create<T extends object, O extends Options>(
+  component: ComponentType<T>,
+  config: O & { selectors?: Selectors<O['variants']>; props?: T },
+) {
+  config.selectors = config.selectors ?? {}
+  config.variants = config.variants ?? {}
+
+  return function CreatedComponent(
+    props: PropsWithChildren<T> &
+      Nested<(typeof config)['variants']> & {
+        selectors?: SelectorProps
+        ref?: Ref<T>
+      },
+  ) {
+    const theme = useTheme()
+
+    const variantFreeProps: Record<string, unknown> = { ...props }
+
+    const variantStyles = stylesForVariants(props, config.variants)
+    const selectorStyles = stylesForSelectors(props, config.selectors, {
+      theme,
+    })
+    const selectorPropsStyles = stylesForSelectorProps(
+      variantFreeProps.selectors as Record<string, StyleType> | undefined,
+      { theme },
+    )
+    const propStyle = (variantFreeProps.style as StyleType | StyleType[] | undefined) ?? {}
+
+    // @ts-ignore
+    // there could be a conflict between the primitive prop and the variant name
+    // for example - variant name "width" and prop "width"
+    // in these cases, favor the variant because it is under the users control (e.g they can update the conflicting name)
+    Object.keys(config.variants).forEach((variant) => {
+      delete variantFreeProps[variant]
+    })
+
+    return createElement(component, {
+      ...config.props,
+      ...variantFreeProps,
+      style: StyleSheet.flatten([config.base, variantStyles, selectorStyles, selectorPropsStyles, propStyle]),
+    } as T)
+  }
+}
+
+function stylesForVariants(props: Record<string, unknown>, variants: Record<string, Record<string, StyleType>> = {}) {
+  const styles: StyleType[] = []
+
+  for (const key in props) {
+    if (variants[key]) {
+      const value = props[key]
+
+      const styleValue = variants[key][String(value)]
+      if (styleValue) {
+        styles.push(styleValue)
+      }
+    }
+  }
+
+  return StyleSheet.flatten(styles)
+}
+
+function stylesForSelectors(
+  props: Record<string, unknown>,
+  selectors: Record<string, Record<string, unknown>> = {},
+  state: { theme?: string } = {},
+) {
+  const styles: StyleType[] = []
+
+  if (state.theme != null) {
+    if (selectors[state.theme] != null) {
+      const selector = selectors[state.theme]
+      const { base, ...variants } = selector as { base?: StyleType } & Record<string, Record<string, StyleType>>
+      const variantStyles = stylesForVariants(props, variants)
+
+      if (base != null) {
+        styles.push(base)
+      }
+
+      if (variantStyles != null) {
+        styles.push(variantStyles as StyleType)
+      }
+    }
+  }
+
+  return StyleSheet.flatten(styles)
+}
+
+function stylesForSelectorProps(selectors: Record<string, StyleType> = {}, state: { theme?: string } = {}) {
+  const styles: StyleType[] = []
+
+  if (state.theme != null) {
+    if (selectors[state.theme] != null) {
+      const selectorStyles = selectors[state.theme]
+      styles.push(selectorStyles)
+    }
+  }
+
+  return StyleSheet.flatten(styles)
+}

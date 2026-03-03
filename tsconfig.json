@@ -4,20 +4,18 @@
     "moduleResolution": "node16",
     "moduleDetection": "force",
     "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
+    "skipLibCheck": true,
     "strictPropertyInitialization": false,
     "strictBindCallApply": false,
     "strictFunctionTypes": false,
     "alwaysStrict": false,
     "esModuleInterop": true,
-    "strict": false,
-    "paths": {
-      "*": ["node_modules/*"],
-      "../../": ["src/*"]
-    }
+    "strict": false
   },
-  "include": ["src/**/*"]
+  "include": ["src"]
 }

@@ -1,0 +1,12 @@
+{
+  "name": "shell-utils",
+  "version": "2.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "expo-modules-core": "*"
+  }
+}

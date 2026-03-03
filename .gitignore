@@ -4,3 +4,6 @@ dist
 .DS_Store
 
 out/
+build/
+.turbo
+tsconfig.tsbuildinfo

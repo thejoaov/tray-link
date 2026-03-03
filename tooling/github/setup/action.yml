@@ -1,38 +1,41 @@
-name: 'setup'
-description: 'Common setup steps for Actions'
+name: "setup"
+description: "Common setup steps for Actions"
 
 inputs:
   node-version:
-    description: 'Node.js version to use'
+    description: "Node.js version to use"
     required: true
-    default: 20.17.0
+    default: "22"
+  bun-version:
+    description: "Bun version to use"
+    required: true
+    default: "1.2.3"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
-    - uses: pnpm/action-setup@v4
-      name: Install pnpm
-      with:
-        version: 10.7.0
-        run_install: false
-
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
 
-    - name: Cache pnpm store
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.bun-version }}
+
+    - name: Cache Bun dependencies
       uses: actions/cache@v4
       with:
-        path: ~/.pnpm-store
-        key: pnpm-store-${{ inputs.node-version }}-${{ hashFiles('pnpm-lock.yaml') }}
+        path: |
+          ~/.bun/install/cache
+          node_modules
+          apps/*/node_modules
+          packages/*/node_modules
+        key: bun-${{ runner.os }}-${{ inputs.bun-version }}-${{ hashFiles('bun.lock') }}
         restore-keys: |
-          pnpm-store-${{ inputs.node-version }}-
-
-    - name: Cache pnpm dependencies
-      shell: bash
-      run: pnpm fetch --store-dir ~/.pnpm-store
+          bun-${{ runner.os }}-${{ inputs.bun-version }}-
 
     - name: Install dependencies
       shell: bash
-      run: pnpm install --frozen-lockfile --store-dir ~/.pnpm-store
+      run: bun install --frozen-lockfile

@@ -1,0 +1,61 @@
+require 'pathname'
+
+require 'json'
+podfile_properties = JSON.parse(File.read('./Podfile.properties.json')) rescue {}
+showDevWindow = podfile_properties['showDevWindow'] == 'true'
+showDockIcon = podfile_properties['showDockIcon'] == 'true'
+other_cflags = "$(inherited) "+ (showDevWindow ? " -D"+"SHOW_DEV_WINDOW" : "") + (showDockIcon ? " -D"+"SHOW_DOCK_ICON" : "")
+
+require File.join(File.dirname(`node --print "require.resolve('react-native-macos/package.json')"`), "scripts/react_native_pods")
+require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
+
+relative_rn_macos_path = ''
+
+# Delete the codegen build folder
+FileUtils.remove_dir("./build", true)
+
+# Disable the new architecture until we bump to SDK 55
+ENV['RCT_NEW_ARCH_ENABLED'] = '0'
+
+prepare_react_native_project!
+
+target 'TrayLink-macOS' do
+  platform :macos, '14.0'
+  use_expo_modules!
+  config_command = [
+    'npx',
+    'expo-modules-autolinking',
+    'react-native-config',
+    '--json',
+    '--platform',
+    'ios'
+  ]
+  config = use_native_modules!(config_command)
+
+  relative_rn_macos_path = "#{config[:reactNativePath]}-macos"
+  use_react_native!(
+    :path => relative_rn_macos_path,
+    # to enable hermes on macOS, change `false` to `true` and then install pods
+    :hermes_enabled => true
+  )
+
+  # Pods specifically for macOS target
+  pod 'Swifter', '~> 1.5.0'
+end
+
+use_frameworks! :linkage => :static
+
+post_install do |installer|
+  react_native_post_install(installer, relative_rn_macos_path)
+
+  project = installer.generated_aggregate_targets.first.user_project
+  project.targets.each do |target|
+    if target.name == 'TrayLink-macOS'
+      target.build_configurations.each do |config|
+        config.build_settings['OTHER_CFLAGS'] = other_cflags
+      end
+    end
+  end
+
+  project.save
+end

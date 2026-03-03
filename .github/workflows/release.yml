@@ -1,20 +1,26 @@
-name: Release
+name: Build
 on:
-  push:
-    tags: ['*']
-  workflow_run:
-    workflows: ['Version']
-    branches: ['main']
-    types:
-      - completed
   workflow_dispatch:
+  push:
+    tags:
+      - 'tray-link-v*'
+      - 'v*'
 
 jobs:
-  release-windows:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: linux-artifact
+          - os: windows-latest
+            artifact: windows-artifact
+          - os: macos-latest
+            artifact: macos-artifact
+    runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: Windows
-    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,38 +28,19 @@ jobs:
       - name: Setup
         uses: ./tooling/github/setup
 
-      - name: Build
-        run: |
-          npx electron-forge publish --platform=win32
+      - name: Build workspace packages
+        run: bun run build
 
-  release-linux:
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: Linux
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Export menu-bar web bundle
+        run: bun run export:web
+        working-directory: apps/menu-bar
 
-      - name: Setup
-        uses: ./tooling/github/setup
+      - name: Build electron app
+        run: bun run make
+        working-directory: apps/menu-bar/electron
 
-      - name: Build
-        run: |
-          npx electron-forge publish --platform=linux
-
-  release-mac:
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    name: MacOS
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup
-        uses: ./tooling/github/setup
-
-      - name: Build
-        run: |
-          npx electron-forge publish --platform=darwin --arch=universal
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: apps/menu-bar/electron/out

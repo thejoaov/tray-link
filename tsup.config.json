@@ -1,9 +1,0 @@
-{
-  "$schema": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
-  "clean": true,
-  "entry": ["src/index.ts"],
-  "format": ["cjs"],
-  "tsconfig": "./tsconfig.json",
-  "external": ["electron"],
-  "bundle": true
-}
