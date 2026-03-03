@@ -1,0 +1,112 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      upload-artifacts:
+        description: "Whether to upload build artifacts"
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  build:
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: linux-artifact
+            build_target: electron
+          - os: windows-latest
+            artifact: windows-artifact
+            build_target: electron
+          - os: macos-latest
+            artifact: macos-artifact
+            build_target: electron
+          - os: macos-latest
+            artifact: macos-native-artifact
+            build_target: native-macos
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./tooling/github/setup
+
+      - name: Build workspace packages
+        run: bun run build
+
+      - name: Export menu-bar web bundle
+        if: matrix.build_target == 'electron'
+        run: bun run export:web
+        working-directory: apps/menu-bar
+
+      - name: Install electron node modules
+        if: matrix.build_target == 'electron'
+        run: bun install --frozen-lockfile
+        working-directory: apps/menu-bar/electron
+
+      - name: Build electron app
+        if: matrix.build_target == 'electron'
+        run: bun run make
+        working-directory: apps/menu-bar/electron
+
+      - name: Apply patches (macOS native)
+        if: matrix.build_target == 'native-macos'
+        run: bunx patch-package
+
+      - name: Install Pods (React Native iOS)
+        if: matrix.build_target == 'native-macos'
+        run: bunx pod-install
+        working-directory: apps/menu-bar
+
+      - name: Build native macOS app (React Native macOS)
+        if: matrix.build_target == 'native-macos'
+        run: >
+          xcodebuild
+          -workspace ./macos/TrayLink.xcworkspace
+          -scheme TrayLink-macOS
+          -configuration Release
+          -derivedDataPath ./macos/build
+          ARCHS=arm64
+          ONLY_ACTIVE_ARCH=YES
+          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO
+          CODE_SIGN_IDENTITY=
+        working-directory: apps/menu-bar
+
+      - name: Package native macOS app for Homebrew
+        if: matrix.build_target == 'native-macos'
+        run: |
+          set -euo pipefail
+
+          APP_DIR="./macos/build/Build/Products/Release"
+          APP_NAME="Tray Link.app"
+          ZIP_NAME="Tray-Link-macOS-universal.zip"
+
+          if [ ! -d "${APP_DIR}/${APP_NAME}" ]; then
+            echo "Missing app bundle at ${APP_DIR}/${APP_NAME}"
+            exit 1
+          fi
+
+          rm -f "${APP_DIR}/${ZIP_NAME}"
+          ditto -c -k --sequesterRsrc --keepParent "${APP_DIR}/${APP_NAME}" "${APP_DIR}/${ZIP_NAME}"
+        working-directory: apps/menu-bar
+
+      - name: Upload build artifact
+        if: inputs.upload-artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.build_target == 'native-macos' && 'apps/menu-bar/macos/build/Build/Products/Release/Tray-Link-macOS-universal.zip' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.deb' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.rpm' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.exe' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.nupkg' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.zip' || '' }}
