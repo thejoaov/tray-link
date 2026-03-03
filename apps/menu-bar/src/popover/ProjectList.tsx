@@ -246,9 +246,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     marginBottom: 4,
+    color: 'var(--text-color)',
   },
   emptySubtext: {
     fontSize: 12,
     opacity: 0.7,
+    color: 'var(--text-color)',
   },
 })

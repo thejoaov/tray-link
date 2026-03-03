@@ -1,7 +1,7 @@
 {
   "name": "@tray-link/cli",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.15",
   "description": "The command-line tool used by Tray Link",
   "license": "MIT",
   "files": [

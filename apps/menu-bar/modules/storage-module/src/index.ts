@@ -1,6 +1,6 @@
-import { NativeModules } from 'react-native'
+import { Platform } from 'react-native'
 
-const isElectron = false // TODO: Implement electron detection
+const isElectron = Platform.OS === 'web'
 
 type StorageModuleType = {
   setItem: (key: string, value: string) => Promise<boolean>
@@ -28,26 +28,21 @@ if (isElectron) {
 }
 
 export function setItem(key: string, value: string): Promise<boolean> {
-  if (isElectron) return StorageModule.setItem(key, value)
-  return Promise.resolve(false)
+  return StorageModule.setItem(key, value)
 }
 
 export function getItem(key: string): Promise<string | null> {
-  if (isElectron) return StorageModule.getItem(key)
-  return Promise.resolve(null)
+  return StorageModule.getItem(key)
 }
 
 export function removeItem(key: string): Promise<boolean> {
-  if (isElectron) return StorageModule.removeItem(key)
-  return Promise.resolve(false)
+  return StorageModule.removeItem(key)
 }
 
 export function getAllKeys(): Promise<string[]> {
-  if (isElectron) return StorageModule.getAllKeys()
-  return Promise.resolve([])
+  return StorageModule.getAllKeys()
 }
 
 export function clear(): Promise<boolean> {
-  if (isElectron) return StorageModule.clear()
-  return Promise.resolve(false)
+  return StorageModule.clear()
 }

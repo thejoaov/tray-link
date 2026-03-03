@@ -35,8 +35,14 @@ jobs:
           git config --global user.email ""
 
       - name: Generate Version
+        run: bash ./scripts/version.sh ${{ inputs.version_control || inputs.version || secrets.VERSION_CONTROL }}
+
+      - name: Commit and tag
         run: |
-          npm version ${{ inputs.version_control || inputs.version || secrets.VERSION_CONTROL }} -m 'chore: release %s' --allow-same-version --no-commit-hooks
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          git add -A
+          git commit -m "chore: release ${NEW_VERSION}" --no-verify
+          git tag "v${NEW_VERSION}"
 
       - name: Push Version to main
         uses: ad-m/github-push-action@master

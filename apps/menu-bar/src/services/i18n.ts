@@ -1,11 +1,11 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import { EmitterSubscription } from 'react-native';
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import { EmitterSubscription } from 'react-native'
 
-import { UserPreferences, defaultUserPreferences, getUserPreferences } from '../modules/Storage';
-import { loadPreferences, subscribePreferencesChange } from './preferences';
+import { defaultUserPreferences, getUserPreferences, UserPreferences } from '../modules/Storage'
+import { loadPreferences, subscribePreferencesChange } from './preferences'
 
-type Locale = NonNullable<UserPreferences['locale']>;
+type Locale = NonNullable<UserPreferences['locale']>
 
 type TranslationKey =
   | 'settings'
@@ -50,7 +50,7 @@ type TranslationKey =
   | 'migrationPreviewNone'
   | 'invalidEditor'
   | 'invalidTerminal'
-  | 'invalidValues';
+  | 'invalidValues'
 
 export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -188,21 +188,21 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     invalidTerminal: 'Terminal inválido',
     invalidValues: 'Valores inválidos',
   },
-};
+}
 
 export const resolveLocale = (): Locale => {
-  const locale = getUserPreferences()?.locale ?? defaultUserPreferences.locale;
+  const locale = getUserPreferences()?.locale ?? defaultUserPreferences.locale
   if (locale === 'pt' || locale === 'es') {
-    return locale;
+    return locale
   }
-  return 'en';
-};
+  return 'en'
+}
 
 const resources = {
   en: { translation: dictionaries.en },
   pt: { translation: dictionaries.pt },
   es: { translation: dictionaries.es },
-};
+}
 
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
@@ -213,22 +213,22 @@ if (!i18n.isInitialized) {
     interpolation: {
       escapeValue: false,
     },
-  });
+  })
 }
 
 export const syncI18nLanguageFromPreferences = () => {
-  const locale = loadPreferences().locale;
-  const nextLanguage = locale === 'pt' || locale === 'es' ? locale : 'en';
+  const locale = loadPreferences().locale
+  const nextLanguage = locale === 'pt' || locale === 'es' ? locale : 'en'
   if (i18n.language !== nextLanguage) {
-    i18n.changeLanguage(nextLanguage);
+    i18n.changeLanguage(nextLanguage)
   }
-};
+}
 
 export const subscribeLanguageSync = (): EmitterSubscription => {
   return subscribePreferencesChange(() => {
-    syncI18nLanguageFromPreferences();
-  });
-};
+    syncI18nLanguageFromPreferences()
+  })
+}
 
-export type { TranslationKey };
-export { i18n };
+export type { TranslationKey }
+export { i18n }

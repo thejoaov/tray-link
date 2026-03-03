@@ -1,109 +1,98 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Picker } from "@react-native-picker/picker";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from '@expo/vector-icons'
+import { Picker } from '@react-native-picker/picker'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 
-import { Checkbox, Divider, Row, Text, View } from "../components";
-import { Linking } from "../modules/Linking";
-import { UserPreferences } from "../modules/Storage";
-import { WindowsNavigator } from "./index";
-import {
-  getLegacyMigrationPreview,
-  hasLegacyMigrationCompleted,
-  runLegacyMigration,
-} from "../services/legacyMigration";
+import { Checkbox, Divider, Row, Text, View } from '../components'
+import { Linking } from '../modules/Linking'
+import { UserPreferences } from '../modules/Storage'
+import { getLegacyMigrationPreview, hasLegacyMigrationCompleted, runLegacyMigration } from '../services/legacyMigration'
 import {
   getEditorOptions,
   getTerminalOptions,
+  initializeToolOptions,
   loadPreferences,
   persistPreferences,
   reloadToolOptions,
   subscribePreferencesChange,
-} from "../services/preferences";
+} from '../services/preferences'
+import { WindowsNavigator } from './index'
 
 const LOCALE_OPTIONS = [
-  { label: "🇺🇸 English", value: "en" },
-  { label: "🇧🇷 Portuguese", value: "pt" },
-  { label: "🇪🇸 Spanish", value: "es" },
-] as const;
+  { label: '🇺🇸 English', value: 'en' },
+  { label: '🇧🇷 Portuguese', value: 'pt' },
+  { label: '🇪🇸 Spanish', value: 'es' },
+] as const
 
-const REPOSITORY_URL = "https://github.com/thejoaov/tray-link";
-const RELEASES_URL = "https://github.com/thejoaov/tray-link/releases";
-const CREATOR_URL = "https://github.com/thejoaov";
+const REPOSITORY_URL = 'https://github.com/thejoaov/tray-link'
+const RELEASES_URL = 'https://github.com/thejoaov/tray-link/releases'
+const CREATOR_URL = 'https://github.com/thejoaov'
 
 export const Settings = () => {
-  const { t } = useTranslation();
-  const [preferences, setPreferences] = useState<UserPreferences>(() =>
-    loadPreferences(),
-  );
-  const [reloadingTools, setReloadingTools] = useState(false);
-  const [migratingLegacyData, setMigratingLegacyData] = useState(false);
-  const [legacyMigrationDone, setLegacyMigrationDone] = useState(() =>
-    hasLegacyMigrationCompleted(),
-  );
-  const [legacyProjectsPreviewCount, setLegacyProjectsPreviewCount] =
-    useState(0);
+  const { t } = useTranslation()
+  const [preferences, setPreferences] = useState<UserPreferences>(() => loadPreferences())
+  const [reloadingTools, setReloadingTools] = useState(false)
+  const [toolsVersion, setToolsVersion] = useState(0)
+  const [migratingLegacyData, setMigratingLegacyData] = useState(false)
+  const [legacyMigrationDone, setLegacyMigrationDone] = useState(() => hasLegacyMigrationCompleted())
+  const [legacyProjectsPreviewCount, setLegacyProjectsPreviewCount] = useState(0)
 
   const editorOptions = useMemo(
     () => getEditorOptions(preferences.customEditors),
-    [preferences.customEditors],
-  );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [preferences.customEditors, toolsVersion],
+  )
 
   const terminalOptions = useMemo(
     () => getTerminalOptions(preferences.customTerminals),
-    [preferences.customTerminals],
-  );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [preferences.customTerminals, toolsVersion],
+  )
 
-  const updatePreference = <K extends keyof UserPreferences>(
-    key: K,
-    value: UserPreferences[K],
-  ) => {
-    const next = { ...preferences, [key]: value };
-    setPreferences(next);
-    persistPreferences(next);
-  };
+  const updatePreference = <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
+    const next = { ...preferences, [key]: value }
+    setPreferences(next)
+    persistPreferences(next)
+  }
 
   useEffect(() => {
     const subscription = subscribePreferencesChange(() => {
-      setPreferences(loadPreferences());
-    });
+      setPreferences(loadPreferences())
+      setToolsVersion((v) => v + 1)
+    })
+
+    // Discover tools on mount (needed because Settings runs in a separate BrowserWindow)
+    initializeToolOptions().then(() => {
+      setToolsVersion((v) => v + 1)
+    })
 
     return () => {
-      subscription.remove();
-    };
-  }, []);
+      subscription.remove()
+    }
+  }, [])
 
   useEffect(() => {
     getLegacyMigrationPreview()
       .then((preview) => {
-        setLegacyProjectsPreviewCount(preview?.projectsCount ?? 0);
+        setLegacyProjectsPreviewCount(preview?.projectsCount ?? 0)
       })
       .catch(() => {
-        setLegacyProjectsPreviewCount(0);
-      });
-  }, [legacyMigrationDone]);
+        setLegacyProjectsPreviewCount(0)
+      })
+  }, [legacyMigrationDone])
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>
-        {t("preferences") || "Preferences"}
-      </Text>
+      <Text style={styles.sectionTitle}>{t('settings')}</Text>
 
       <View border="light" rounded="medium" style={styles.box}>
         <Row align="center" justify="between" style={styles.boxItem}>
-          <Text style={styles.itemLabel}>{t("language")}</Text>
+          <Text style={styles.itemLabel}>{t('language')}</Text>
           <View border="light" rounded="small" style={styles.pickerWrap}>
-            <Picker
-              selectedValue={preferences.locale}
-              onValueChange={(value) => updatePreference("locale", value)}
-            >
+            <Picker selectedValue={preferences.locale} onValueChange={(value) => updatePreference('locale', value)}>
               {LOCALE_OPTIONS.map((option) => (
-                <Picker.Item
-                  key={option.value}
-                  label={option.label}
-                  value={option.value}
-                />
+                <Picker.Item key={option.value} label={option.label} value={option.value} />
               ))}
             </Picker>
           </View>
@@ -112,28 +101,22 @@ export const Settings = () => {
         <Divider />
 
         <Row align="center" justify="between" style={styles.boxItem}>
-          <Text style={styles.itemLabel}>{t("defaultEditor")}</Text>
+          <Text style={styles.itemLabel}>{t('defaultEditor')}</Text>
           <Row align="center" style={styles.controlRow}>
             <View border="light" rounded="small" style={styles.pickerWrap}>
               <Picker
                 selectedValue={preferences.defaultEditor}
-                onValueChange={(value) =>
-                  updatePreference("defaultEditor", value)
-                }
+                onValueChange={(value) => updatePreference('defaultEditor', value)}
               >
-                <Picker.Item label={t("systemDefault")} value={null} />
+                <Picker.Item label={t('systemDefault')} value={null} />
                 {editorOptions.map((option) => (
-                  <Picker.Item
-                    key={option.command}
-                    label={option.label}
-                    value={option.command}
-                  />
+                  <Picker.Item key={option.command} label={option.label} value={option.command} />
                 ))}
               </Picker>
             </View>
             <TouchableOpacity
-              accessibilityLabel={t("addCustomEditor")}
-              onPress={() => WindowsNavigator.open("CustomEditorWindow")}
+              accessibilityLabel={t('addCustomEditor')}
+              onPress={() => WindowsNavigator.open('CustomEditorWindow')}
               style={styles.iconButton}
             >
               <Ionicons name="add" size={16} />
@@ -144,28 +127,22 @@ export const Settings = () => {
         <Divider />
 
         <Row align="center" justify="between" style={styles.boxItem}>
-          <Text style={styles.itemLabel}>{t("defaultTerminal")}</Text>
+          <Text style={styles.itemLabel}>{t('defaultTerminal')}</Text>
           <Row align="center" style={styles.controlRow}>
             <View border="light" rounded="small" style={styles.pickerWrap}>
               <Picker
                 selectedValue={preferences.defaultTerminal}
-                onValueChange={(value) =>
-                  updatePreference("defaultTerminal", value)
-                }
+                onValueChange={(value) => updatePreference('defaultTerminal', value)}
               >
-                <Picker.Item label={t("systemDefault")} value={null} />
+                <Picker.Item label={t('systemDefault')} value={null} />
                 {terminalOptions.map((option) => (
-                  <Picker.Item
-                    key={option.command}
-                    label={option.label}
-                    value={option.command}
-                  />
+                  <Picker.Item key={option.command} label={option.label} value={option.command} />
                 ))}
               </Picker>
             </View>
             <TouchableOpacity
-              accessibilityLabel={t("addCustomTerminal")}
-              onPress={() => WindowsNavigator.open("CustomTerminalWindow")}
+              accessibilityLabel={t('addCustomTerminal')}
+              onPress={() => WindowsNavigator.open('CustomTerminalWindow')}
               style={styles.iconButton}
             >
               <Ionicons name="add" size={16} />
@@ -178,40 +155,34 @@ export const Settings = () => {
         <Row align="center" justify="start" style={styles.boxItem}>
           <Checkbox
             value={preferences.removeFromDiskByDefault}
-            onValueChange={(value) =>
-              updatePreference("removeFromDiskByDefault", value)
-            }
-            label={t("deleteFilesFromDiskByDefault")}
+            onValueChange={(value) => updatePreference('removeFromDiskByDefault', value)}
+            label={t('deleteFilesFromDiskByDefault')}
           />
         </Row>
       </View>
 
-      <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>
-        {t("advanced") || "Advanced"}
-      </Text>
+      <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('advanced') || 'Advanced'}</Text>
 
       <View border="light" rounded="medium" style={styles.box}>
         <Row align="center" justify="between" style={styles.boxItem}>
           <View style={styles.itemTextContainer}>
-            <Text style={styles.itemLabel}>
-              {t("reloadToolList") || "Reload tool list"}
-            </Text>
+            <Text style={styles.itemLabel}>{t('reloadToolList') || 'Reload tool list'}</Text>
           </View>
           <TouchableOpacity
-            accessibilityLabel={t("reloadToolList")}
+            accessibilityLabel={t('reloadToolList')}
             disabled={reloadingTools}
             onPress={async () => {
-              setReloadingTools(true);
+              setReloadingTools(true)
               try {
-                await reloadToolOptions();
+                await reloadToolOptions()
               } finally {
-                setReloadingTools(false);
+                setReloadingTools(false)
               }
             }}
             style={[styles.button, reloadingTools && styles.buttonDisabled]}
           >
             <Ionicons name="refresh" size={14} />
-            <Text style={styles.buttonText}>{t("reload")}</Text>
+            <Text style={styles.buttonText}>{t('reload')}</Text>
           </TouchableOpacity>
         </Row>
 
@@ -219,38 +190,34 @@ export const Settings = () => {
 
         <Row align="center" justify="between" style={styles.boxItem}>
           <View style={styles.itemTextContainer}>
-            <Text style={styles.itemLabel}>{t("migrateLegacyData")}</Text>
+            <Text style={styles.itemLabel}>{t('migrateLegacyData')}</Text>
             <Text style={styles.itemDescription}>
               {legacyProjectsPreviewCount > 0
-                ? t("migrationPreviewFound", {
+                ? t('migrationPreviewFound', {
                     projects: String(legacyProjectsPreviewCount),
                   })
-                : t("migrationPreviewNone")}
+                : t('migrationPreviewNone')}
             </Text>
           </View>
           <TouchableOpacity
-            accessibilityLabel={t("migrateLegacyData")}
+            accessibilityLabel={t('migrateLegacyData')}
             disabled={legacyMigrationDone || migratingLegacyData}
             onPress={async () => {
-              setMigratingLegacyData(true);
+              setMigratingLegacyData(true)
               try {
-                const migrated = await runLegacyMigration();
+                const migrated = await runLegacyMigration()
                 if (migrated || hasLegacyMigrationCompleted()) {
-                  setLegacyMigrationDone(true);
-                  setLegacyProjectsPreviewCount(0);
+                  setLegacyMigrationDone(true)
+                  setLegacyProjectsPreviewCount(0)
                 }
               } finally {
-                setMigratingLegacyData(false);
+                setMigratingLegacyData(false)
               }
             }}
-            style={[
-              styles.button,
-              (legacyMigrationDone || migratingLegacyData) &&
-                styles.buttonDisabled,
-            ]}
+            style={[styles.button, (legacyMigrationDone || migratingLegacyData) && styles.buttonDisabled]}
           >
             <Ionicons name="download-outline" size={14} />
-            <Text style={styles.buttonText}>{t("migrate") || "Migrate"}</Text>
+            <Text style={styles.buttonText}>{t('migrate') || 'Migrate'}</Text>
           </TouchableOpacity>
         </Row>
       </View>
@@ -262,10 +229,7 @@ export const Settings = () => {
         >
           <Text style={styles.footerLink}>github.com/thejoaov/tray-link</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          accessibilityLabel="Open creator GitHub profile"
-          onPress={() => Linking.openURL(CREATOR_URL)}
-        >
+        <TouchableOpacity accessibilityLabel="Open creator GitHub profile" onPress={() => Linking.openURL(CREATOR_URL)}>
           <Text style={styles.footerSubtle}>Created by @thejoaov</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -278,8 +242,8 @@ export const Settings = () => {
         </TouchableOpacity>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -289,7 +253,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 8,
     marginLeft: 4,
   },
@@ -297,8 +261,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   box: {
-    overflow: "hidden",
-    backgroundColor: "rgba(150, 150, 150, 0.05)",
+    overflow: 'hidden',
+    backgroundColor: 'rgba(150, 150, 150, 0.05)',
   },
   boxItem: {
     paddingHorizontal: 16,
@@ -307,11 +271,11 @@ const styles = StyleSheet.create({
   itemTextContainer: {
     flex: 1,
     paddingRight: 16,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   itemLabel: {
     fontSize: 13,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   itemDescription: {
     fontSize: 11,
@@ -322,45 +286,45 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pickerWrap: {
-    overflow: "hidden",
+    overflow: 'hidden',
     width: 160,
     height: 28,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   iconButton: {
     width: 28,
     height: 28,
     borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(150, 150, 150, 0.1)",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(150, 150, 150, 0.1)',
   },
   button: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
     borderRadius: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: "rgba(150, 150, 150, 0.1)",
+    backgroundColor: 'rgba(150, 150, 150, 0.1)',
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   buttonText: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   footer: {
-    marginTop: "auto",
+    marginTop: 'auto',
     paddingTop: 14,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 4,
   },
   footerLink: {
     fontSize: 12,
-    fontWeight: "600",
-    textDecorationLine: "underline",
+    fontWeight: '600',
+    textDecorationLine: 'underline',
     opacity: 0.9,
   },
   footerSubtle: {
@@ -369,16 +333,16 @@ const styles = StyleSheet.create({
   },
   releaseButton: {
     marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 7,
-    backgroundColor: "rgba(150, 150, 150, 0.1)",
+    backgroundColor: 'rgba(150, 150, 150, 0.1)',
   },
   releaseButtonText: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
   },
-});
+})

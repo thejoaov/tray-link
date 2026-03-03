@@ -69,13 +69,13 @@ export const ProjectItem = ({
       </View>
       <View style={styles.actions}>
         <TouchableOpacity accessibilityLabel="Open in editor" style={styles.button} onPress={onOpenEditor}>
-          <Ionicons name="code-slash-outline" size={14} />
+          <Ionicons name="code-slash-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
         <TouchableOpacity accessibilityLabel="Open in terminal" style={styles.button} onPress={onOpenTerminal}>
-          <Ionicons name="terminal-outline" size={14} />
+          <Ionicons name="terminal-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
         <TouchableOpacity accessibilityLabel="Open in finder" style={styles.button} onPress={onOpenFinder}>
-          <Ionicons name="folder-open-outline" size={14} />
+          <Ionicons name="folder-open-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
         {editMode ? (
           <>
@@ -85,7 +85,7 @@ export const ProjectItem = ({
               style={[styles.button, !canMoveUp && styles.disabled]}
               onPress={onMoveUp}
             >
-              <Ionicons name="arrow-up" size={14} />
+              <Ionicons name="arrow-up" size={14} color="var(--text-color)" />
             </TouchableOpacity>
             <TouchableOpacity
               accessibilityLabel="Move project down"
@@ -93,15 +93,15 @@ export const ProjectItem = ({
               style={[styles.button, !canMoveDown && styles.disabled]}
               onPress={onMoveDown}
             >
-              <Ionicons name="arrow-down" size={14} />
+              <Ionicons name="arrow-down" size={14} color="var(--text-color)" />
             </TouchableOpacity>
           </>
         ) : null}
         <TouchableOpacity accessibilityLabel="Remove project" style={styles.button} onPress={onRemove}>
-          <Ionicons name="trash-outline" size={14} />
+          <Ionicons name="trash-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
         <TouchableOpacity accessibilityLabel={labels.moreActions} style={styles.button} onPress={onToggleContextMenu}>
-          <Ionicons name="ellipsis-horizontal" size={14} />
+          <Ionicons name="ellipsis-horizontal" size={14} color="var(--text-color)" />
         </TouchableOpacity>
       </View>
 
@@ -154,21 +154,24 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 14,
     fontWeight: '600',
+    color: 'var(--text-color)',
   },
   migratedChip: {
     borderRadius: 999,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   migratedChipText: {
     fontSize: 9,
     fontWeight: '600',
     opacity: 0.7,
+    color: 'var(--text-color)',
   },
   path: {
     fontSize: 11,
     opacity: 0.6,
+    color: 'var(--text-color)',
   },
   actions: {
     flexDirection: 'row',
@@ -177,20 +180,21 @@ const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 4,
   },
   contextMenu: {
     marginTop: 10,
     borderRadius: 8,
     padding: 8,
-    backgroundColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     gap: 6,
   },
   contextTitle: {
     fontSize: 11,
     fontWeight: '700',
     opacity: 0.75,
+    color: 'var(--text-color)',
   },
   contextActions: {
     flexDirection: 'row',
@@ -201,11 +205,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   contextActionText: {
     fontSize: 11,
     fontWeight: '500',
+    color: 'var(--text-color)',
   },
   disabled: {
     opacity: 0.45,

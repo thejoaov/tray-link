@@ -1,6 +1,6 @@
 {
   "name": "storage-module",
-  "version": "2.0.0",
+  "version": "2.0.15",
   "private": true,
   "main": "src/index.ts",
   "scripts": {

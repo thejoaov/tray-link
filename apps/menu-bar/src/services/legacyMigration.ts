@@ -119,20 +119,23 @@ export const runLegacyMigration = async (): Promise<boolean> => {
 
   let projectsMigrated = false
   const existingProjects = await projectStore.getProjects()
-  if (!existingProjects.length) {
-    const normalizedProjects = normalizeLegacyProjects(root.projects || [])
-    if (normalizedProjects.length) {
-      await projectStore.saveProjects(normalizedProjects)
+  const normalizedProjects = normalizeLegacyProjects(root.projects || [])
+  if (normalizedProjects.length) {
+    // Merge: skip legacy projects whose path already exists
+    const existingPaths = new Set(existingProjects.map((p) => p.path))
+    const newProjects = normalizedProjects.filter((p) => !existingPaths.has(p.path))
+    if (newProjects.length) {
+      const merged = [
+        ...existingProjects,
+        ...newProjects.map((p, i) => ({ ...p, position: existingProjects.length + i })),
+      ]
+      await projectStore.saveProjects(merged)
       projectsMigrated = true
     }
   }
 
-  if (preferencesMigrated || projectsMigrated) {
-    storage.set(LEGACY_MIGRATION_DONE_KEY, true)
-    return true
-  }
-
-  return false
+  storage.set(LEGACY_MIGRATION_DONE_KEY, true)
+  return preferencesMigrated || projectsMigrated
 }
 
 export const getLegacyMigrationPreview = async (): Promise<LegacyMigrationPreview | null> => {

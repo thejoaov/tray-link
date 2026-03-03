@@ -1,6 +1,6 @@
-import { NativeModules } from 'react-native'
+import { Platform } from 'react-native'
 
-const isElectron = false // TODO: Implement electron detection
+const isElectron = Platform.OS === 'web'
 
 type ShellUtilsModuleType = {
   openInEditor: (path: string, editorCommand: string) => Promise<boolean>
@@ -20,8 +20,21 @@ if (isElectron) {
   }
   ShellUtilsModule = requireElectronModule<ShellUtilsModuleType>('ShellUtils')
 } else {
-  const { requireNativeModule } = require('expo-modules-core')
-  ShellUtilsModule = requireNativeModule('ShellUtils') as ShellUtilsModuleType
+  try {
+    const { requireNativeModule } = require('expo-modules-core')
+    ShellUtilsModule = requireNativeModule('ShellUtils') as ShellUtilsModuleType
+  } catch {
+    // Fallback no-op for environments where native modules are unavailable
+    ShellUtilsModule = {
+      openInEditor: async () => false,
+      openInTerminal: async () => false,
+      openInFinder: async () => false,
+      which: async () => null,
+      fileExists: async () => false,
+      loadLegacyTrayLinkData: async () => null,
+      removeFromDisk: async () => false,
+    }
+  }
 }
 
 export function openInEditor(path: string, editorCommand: string): Promise<boolean> {

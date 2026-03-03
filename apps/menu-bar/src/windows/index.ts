@@ -2,6 +2,7 @@ import React, { ComponentType } from 'react'
 import { AppRegistry, Platform } from 'react-native'
 import { FluentProvider } from '../providers/FluentProvider'
 import { ThemeProvider } from '../providers/ThemeProvider'
+import { i18n } from '../services/i18n'
 import { CustomEditorWindow } from './CustomEditorWindow'
 import { CustomTerminalWindow } from './CustomTerminalWindow'
 import { RemoveProjectWindow } from './RemoveProjectWindow'
@@ -11,22 +12,22 @@ export const WindowsList = [
   {
     name: 'Settings',
     component: Settings,
-    options: { title: 'Settings', width: 400, height: 500, resizable: false },
+    options: { title: 'Settings', width: 400, height: 580, resizable: false },
   },
   {
     name: 'CustomEditorWindow',
     component: CustomEditorWindow,
-    options: { title: 'Custom Editor', width: 420, height: 360, resizable: false },
+    options: { title: i18n.t('addCustomEditor'), width: 420, height: 360, resizable: false },
   },
   {
     name: 'CustomTerminalWindow',
     component: CustomTerminalWindow,
-    options: { title: 'Custom Terminal', width: 420, height: 360, resizable: false },
+    options: { title: i18n.t('addCustomTerminal'), width: 420, height: 360, resizable: false },
   },
   {
     name: 'RemoveProjectWindow',
     component: RemoveProjectWindow,
-    options: { title: 'Remove Project', width: 420, height: 260, resizable: false },
+    options: { title: i18n.t('removeProjectTitle'), width: 420, height: 260, resizable: false },
   },
 ]
 
@@ -36,7 +37,7 @@ function wrapWithProviders(Component: ComponentType) {
   return function WrappedWindow() {
     return React.createElement(
       ThemeProvider,
-      { themePreference: 'no-preference' },
+      { themePreference: 'no-preference', children: undefined },
       React.createElement(FluentProvider, null, React.createElement(Component)),
     )
   }
@@ -50,7 +51,7 @@ export const WindowsNavigator = {
         const WindowNavigator = requireNativeModule('WindowNavigator')
         WindowNavigator.openWindow(windowName, {})
       } catch (e) {
-        console.error('Error opening window via native module', e)
+        console.error(e)
       }
     } else {
       const { requireElectronModule } = require('@tray-link/rn-electron-modules')
@@ -77,7 +78,7 @@ export const WindowsNavigator = {
         const WindowNavigator = requireNativeModule('WindowNavigator')
         WindowNavigator.closeWindow(windowName)
       } catch (e) {
-        console.error('Error closing window via native module', e)
+        console.error(e)
       }
     } else {
       const { requireElectronModule } = require('@tray-link/rn-electron-modules')
