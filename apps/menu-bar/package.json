@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "start": "expo start",
+    "dev": "expo start --web",
+    "dev:macos": "expo start",
     "test": "jest",
     "typecheck": "tsc",
+    "premacos": "bunx pod-install --project-directory=macos",
     "macos": "bash ./macos/scripts/build.sh",
     "export:web": "expo export --platform web --output-dir electron/dist",
     "update-cli": "cp ../cli/dist/tlink-arm64 ../cli/tlink-arm64 && cp ../cli/dist/tlink-x64 ../cli/tlink-x64"

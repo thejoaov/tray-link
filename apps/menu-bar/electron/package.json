@@ -7,7 +7,9 @@
   "private": true,
   "main": ".vite/build/main.js",
   "scripts": {
+    "prestart": "node scripts/prestart.js",
     "start": "electron-forge start",
+    "dev": "node scripts/prestart.js && electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "typecheck": "tsc --noEmit"

@@ -11,13 +11,12 @@
   ],
   "scripts": {
     "cli": "cd apps/cli && bun run cli",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=@tray-link/menu-bar --filter=@tray-link/electron",
+    "dev:macos": "turbo run dev:macos --filter=@tray-link/menu-bar",
     "build": "turbo run build",
     "lint": "biome lint .",
     "typecheck": "turbo run typecheck",
-    "start:metro": "cd apps/menu-bar && bun start",
     "macos": "cd apps/menu-bar && bun run macos",
-    "electron:dev": "cd apps/menu-bar && bun run export:web && cd electron && bun start",
     "electron:package": "cd apps/menu-bar && bun run export:web && cd electron && bun run make",
     "postinstall": "patch-package && lefthook install"
   },
