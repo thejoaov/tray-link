@@ -35,6 +35,10 @@ jobs:
         run: bun run export:web
         working-directory: apps/menu-bar
 
+      - name: Install electron node modules
+        run: bun install --frozen-lockfile
+        working-directory: apps/menu-bar/electron
+
       - name: Build electron app
         run: bun run make
         working-directory: apps/menu-bar/electron
