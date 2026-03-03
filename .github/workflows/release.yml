@@ -16,10 +16,16 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact: linux-artifact
+            build_target: electron
           - os: windows-latest
             artifact: windows-artifact
+            build_target: electron
           - os: macos-latest
             artifact: macos-artifact
+            build_target: electron
+          - os: macos-latest
+            artifact: macos-native-artifact
+            build_target: native-macos
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,33 +40,62 @@ jobs:
         run: bun run build
 
       - name: Export menu-bar web bundle
+        if: matrix.build_target == 'electron'
         run: bun run export:web
         working-directory: apps/menu-bar
 
       - name: Install electron node modules
+        if: matrix.build_target == 'electron'
         run: bun install --frozen-lockfile
         working-directory: apps/menu-bar/electron
 
       - name: Build electron app
+        if: matrix.build_target == 'electron'
         run: bun run make
         working-directory: apps/menu-bar/electron
+
+      - name: Build native macOS app (React Native macOS)
+        if: matrix.build_target == 'native-macos'
+        run: >
+          xcodebuild
+          -workspace ./macos/TrayLink.xcworkspace
+          -scheme TrayLink-macOS
+          -configuration Release
+          -derivedDataPath ./macos/build
+        working-directory: apps/menu-bar
+
+      - name: Package native macOS app for Homebrew
+        if: matrix.build_target == 'native-macos'
+        run: |
+          set -euo pipefail
+
+          APP_DIR="./macos/build/Build/Products/Release"
+          APP_NAME="Tray Link.app"
+          ZIP_NAME="Tray-Link-macOS-universal.zip"
+
+          if [ ! -d "${APP_DIR}/${APP_NAME}" ]; then
+            echo "Missing app bundle at ${APP_DIR}/${APP_NAME}"
+            exit 1
+          fi
+
+          rm -f "${APP_DIR}/${ZIP_NAME}"
+          ditto -c -k --sequesterRsrc --keepParent "${APP_DIR}/${APP_NAME}" "${APP_DIR}/${ZIP_NAME}"
+        working-directory: apps/menu-bar
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: apps/menu-bar/electron/out
+          path: ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out' || 'apps/menu-bar/macos/build/Build/Products/Release/Tray-Link-macOS-universal.zip' }}
 
   create-release:
     name: Create GitHub release
     runs-on: ubuntu-latest
     needs:
       - build
-    if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
     env:
-      CURRENT_TAG: ${{ github.ref_name }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
     steps:
       - name: Checkout
@@ -74,19 +109,28 @@ jobs:
           path: release-artifacts
           merge-multiple: true
 
-      - name: Resolve previous tag and commit range
+      - name: Resolve tags and commit range
         id: git_range
         run: |
           set -euo pipefail
 
-          previous_tag=$(git tag --sort=-creatordate | grep -v "^${CURRENT_TAG}$" | head -n1 || true)
+          current_tag=$(git tag --sort=-creatordate | head -n1 || true)
+
+          if [ -z "${current_tag}" ]; then
+            echo "No git tags found in repository."
+            exit 1
+          fi
+
+          previous_tag=$(git tag --sort=-creatordate | grep -v "^${current_tag}$" | head -n1 || true)
+
+          echo "current_tag=${current_tag}" >> "$GITHUB_OUTPUT"
 
           if [ -n "${previous_tag}" ]; then
             echo "previous_tag=${previous_tag}" >> "$GITHUB_OUTPUT"
-            echo "range=${previous_tag}..${CURRENT_TAG}" >> "$GITHUB_OUTPUT"
+            echo "range=${previous_tag}..${current_tag}" >> "$GITHUB_OUTPUT"
           else
             echo "previous_tag=" >> "$GITHUB_OUTPUT"
-            echo "range=${CURRENT_TAG}" >> "$GITHUB_OUTPUT"
+            echo "range=${current_tag}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build release changelog input
@@ -97,7 +141,7 @@ jobs:
           if [ -n "${{ steps.git_range.outputs.previous_tag }}" ]; then
             git log --pretty='- %s (%h)' "${{ steps.git_range.outputs.range }}" > commits.md
           else
-            git log --pretty='- %s (%h)' -n 30 "${CURRENT_TAG}" > commits.md
+            git log --pretty='- %s (%h)' -n 30 "${{ steps.git_range.outputs.current_tag }}" > commits.md
           fi
 
           if [ ! -s commits.md ]; then
@@ -117,7 +161,7 @@ jobs:
             commits_payload=$(cat commits.md)
 
             jq -n \
-              --arg current_tag "${CURRENT_TAG}" \
+              --arg current_tag "${{ steps.git_range.outputs.current_tag }}" \
               --arg previous_tag "${previous_tag}" \
               --arg commits "${commits_payload}" \
               '{
@@ -142,13 +186,13 @@ jobs:
 
           if [ ! -s release_notes.md ]; then
             {
-              echo "# 🎁 Release notes (${CURRENT_TAG})"
+              echo "# 🎁 Release notes (${{ steps.git_range.outputs.current_tag }})"
               echo
               echo "## Changes"
               cat commits.md
               echo
               echo "## Metadata"
-              echo "- Current tag: ${CURRENT_TAG}"
+              echo "- Current tag: ${{ steps.git_range.outputs.current_tag }}"
               echo "- Previous tag: ${previous_tag}"
             } > release_notes.md
           fi
@@ -156,7 +200,7 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ steps.git_range.outputs.current_tag }}
           body_path: release_notes.md
           files: |
             release-artifacts/**/*
