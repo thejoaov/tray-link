@@ -3,8 +3,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'tray-link-v*'
-      - 'v*'
+      - '*'
 
 jobs:
   build:
