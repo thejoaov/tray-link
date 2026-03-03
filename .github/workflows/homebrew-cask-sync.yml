@@ -1,14 +1,15 @@
 name: Sync Homebrew Cask
 
 on:
-  release:
-    types:
-      - published
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build and Release"]
+    types: [completed]
 
 jobs:
   update-homebrew-cask:
     runs-on: ubuntu-latest
-    if: github.event.release.prerelease == false
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     permissions:
       contents: write
     env:
@@ -16,11 +17,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve latest git tag
+        id: latest_tag
+        run: |
+          set -euo pipefail
+
+          git fetch --tags --force
+          latest_tag=$(git tag --sort=-v:refname | head -n1)
+
+          if [ -z "${latest_tag}" ]; then
+            echo "Could not resolve latest git tag."
+            exit 1
+          fi
+
+          echo "release_tag=${latest_tag}" >> "$GITHUB_OUTPUT"
 
       - name: Resolve macOS zip asset
         id: release_asset
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ steps.latest_tag.outputs.release_tag }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
@@ -61,7 +79,7 @@ jobs:
       - name: Resolve release version
         id: release_version
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ steps.latest_tag.outputs.release_tag }}
         run: |
           set -euo pipefail
 

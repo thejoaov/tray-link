@@ -225,9 +225,8 @@ jobs:
             -name '*.rpm' -o \
             -name '*.exe' -o \
             -name '*.nupkg' -o \
-            -name '*.zip' \
-            -name '*.app' \
-            -name '*.app' \
+            -name '*.zip' -o \
+            -name '*.app' -o \
             -name '*.pkg' \
           \) -print0)
 
