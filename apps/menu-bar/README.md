@@ -17,23 +17,23 @@
 At the root of the repo run:
 
 ```bash
-yarn
+bun install
 ```
 
 Then inside `apps/cli` run the following command to generate the standalone executable used by the `menu-bar`:
 
 ```bash
-yarn archive
+bun archive
 ```
 
 Inside `apps/menu-bar` run the following command to update the local cli file:
 
 ```bash
-yarn update-cli
+bun update-cli
 ```
 
 Finally, run the following command to start the app:
 
 ```bash
-yarn macos
+bun macos
 ```

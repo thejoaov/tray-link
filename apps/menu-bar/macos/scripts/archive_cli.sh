@@ -5,8 +5,7 @@ export PROJECT_ROOT="$PODS_ROOT/../../"
 export CLI_PROJECT="$PROJECT_ROOT/../cli/"
 
 cd $CLI_PROJECT
-yarn archive
-yarn codesign
+bun archive
 
 cd $PROJECT_ROOT
-yarn update-cli
+bun update-cli

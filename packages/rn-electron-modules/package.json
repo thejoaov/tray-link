@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "watch": "yarn build --watch --preserveWatchOutput",
+    "watch": "bun run build --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

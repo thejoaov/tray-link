@@ -11,14 +11,14 @@ It provides commands to manage device emulators, download builds, launch apps/up
 > If you’re working locally, install dependencies and build the CLI:
 
 ```bash
-yarn install
-yarn build
+bun install
+bun build
 ```
 
 Then invoke with:
 
 ```bash
-yarn cli <command> [options]
+bun cli <command> [options]
 
 # or, if you’ve set up an alias for the Tray Link CLI so you can try it in projects all around your computer. Open your **.zshrc** or other config file and add:
 

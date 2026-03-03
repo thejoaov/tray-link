@@ -68,6 +68,9 @@ jobs:
           -scheme TrayLink-macOS
           -configuration Release
           -derivedDataPath ./macos/build
+          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO
+          CODE_SIGN_IDENTITY=
         working-directory: apps/menu-bar
 
       - name: Package native macOS app for Homebrew
@@ -92,7 +95,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out' || 'apps/menu-bar/macos/build/Build/Products/Release/Tray-Link-macOS-universal.zip' }}
+          path: |
+            ${{ matrix.build_target == 'native-macos' && 'apps/menu-bar/macos/build/Build/Products/Release/Tray-Link-macOS-universal.zip' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.deb' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.rpm' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.exe' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.nupkg' || '' }}
+            ${{ matrix.build_target == 'electron' && 'apps/menu-bar/electron/out/make/**/*.zip' || '' }}
 
   create-release:
     name: Create GitHub release
@@ -183,7 +192,7 @@ jobs:
                 ]
               }' > ai_payload.json
 
-            curl -sS "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+            curl -sS "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${GEMINI_API_KEY}" \
               -H "Content-Type: application/json" \
               -d @ai_payload.json > ai_response.json
 
@@ -203,10 +212,34 @@ jobs:
             } > release_notes.md
           fi
 
+      - name: Prepare final release assets
+        run: |
+          set -euo pipefail
+
+          mkdir -p final-assets
+
+          while IFS= read -r -d '' file; do
+            cp "$file" final-assets/
+          done < <(find release-artifacts -type f \( \
+            -name '*.deb' -o \
+            -name '*.rpm' -o \
+            -name '*.exe' -o \
+            -name '*.nupkg' -o \
+            -name '*.zip' \
+            -name '*.app' \
+            -name '*.app' \
+            -name '*.pkg' \
+          \) -print0)
+
+          if [ -z "$(find final-assets -type f -print -quit)" ]; then
+            echo "No distributable assets found in release-artifacts."
+            exit 1
+          fi
+
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.git_range.outputs.current_tag }}
           body_path: release_notes.md
           files: |
-            release-artifacts/**/*
+            final-assets/*

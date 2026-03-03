@@ -10,7 +10,7 @@
   "scripts": {
     "cli": "node ./dist/index.js",
     "build": "tsc",
-    "archive": "yarn build && pkg dist/index.js --config pkg.config.json -o dist/tlink",
+    "archive": "bun run build && pkg dist/index.js --config pkg.config.json -o dist/tlink",
     "watch": "tsc --watch --preserveWatchOutput",
     "typecheck": "tsc"
   },
