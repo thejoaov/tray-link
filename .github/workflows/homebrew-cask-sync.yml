@@ -1,0 +1,108 @@
+name: Sync Homebrew Cask
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  update-homebrew-cask:
+    runs-on: ubuntu-latest
+    if: github.event.release.prerelease == false
+    permissions:
+      contents: write
+    env:
+      CASK_NAME: tray-link
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve macOS zip asset
+        id: release_asset
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          release_json=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${{ github.repository }}/releases/tags/${RELEASE_TAG}")
+
+          asset_name=$(echo "$release_json" | jq -r '
+            .assets[]
+            | select(.name | test("(?i)mac|darwin"))
+            | select(.name | test("\\.zip$"))
+            | .name
+          ' | head -n1)
+
+          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
+            echo "Could not find a macOS .zip asset in release ${RELEASE_TAG}."
+            echo "Attach a macOS zip binary to the release first."
+            exit 1
+          fi
+
+          asset_url=$(echo "$release_json" | jq -r --arg name "$asset_name" '
+            .assets[]
+            | select(.name == $name)
+            | .browser_download_url
+          ')
+
+          echo "asset_name=${asset_name}" >> "$GITHUB_OUTPUT"
+          echo "asset_url=${asset_url}" >> "$GITHUB_OUTPUT"
+
+      - name: Download asset and calculate SHA256
+        id: checksum
+        run: |
+          set -euo pipefail
+          curl -L "${{ steps.release_asset.outputs.asset_url }}" -o release.zip
+          echo "sha256=$(shasum -a 256 release.zip | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve release version
+        id: release_version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          version="${RELEASE_TAG#tray-link-v}"
+          version="${version#v}"
+
+          if [ -z "$version" ] || [ "$version" = "$RELEASE_TAG" ]; then
+            echo "Could not parse version from tag: $RELEASE_TAG"
+            exit 1
+          fi
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Update Cask file
+        run: |
+          set -euo pipefail
+
+          version="${{ steps.release_version.outputs.version }}"
+          cask_file="Casks/${CASK_NAME}.rb"
+
+          if [ ! -f "$cask_file" ]; then
+            echo "Missing cask file: $cask_file"
+            exit 1
+          fi
+
+          perl -0pi -e "s/version\s+\"[^\"]+\"/version \"${version}\"/" "$cask_file"
+          perl -0pi -e "s#sha256\s+\"[^\"]+\"#sha256 \"${{ steps.checksum.outputs.sha256 }}\"#" "$cask_file"
+          perl -0pi -e "s#url\s+\"[^\"]+\"#url \"${{ steps.release_asset.outputs.asset_url }}\"#" "$cask_file"
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "Casks/${CASK_NAME}.rb"
+
+          if git diff --cached --quiet; then
+            echo "No cask changes to commit"
+            exit 0
+          fi
+
+          git commit -m "chore(cask): ${CASK_NAME} ${{ steps.release_version.outputs.version }}"
+          git push

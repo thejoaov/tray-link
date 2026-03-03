@@ -2,7 +2,14 @@
 
 ## Installation instructions
 
-- Download the latest release from [menu-bar/releases](https://github.com/expo/eas-menu-bar/releases?q=expo-menu-bar)
+- Install with Homebrew (macOS):
+
+  ```bash
+  brew tap thejoaov/tray-link
+  brew install --cask tray-link
+  ```
+
+- Or download the latest release from [tray-link/releases](https://github.com/thejoaov/tray-link/releases)
 - Unzip the file and drag Tray Link to the Applications folder.
 
 ## How to run locally

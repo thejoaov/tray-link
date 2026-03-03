@@ -76,6 +76,25 @@ With it, you can:
 
 Prebuilt binaries are available in [Releases](https://github.com/thejoaov/tray-link/releases).
 
+### Install with Homebrew (macOS)
+
+```bash
+brew tap thejoaov/tray-link
+brew install --cask tray-link
+```
+
+To update later:
+
+```bash
+brew upgrade --cask tray-link
+```
+
+### Homebrew maintainers
+
+- Cask file: `Casks/tray-link.rb`
+- Release sync workflow: `.github/workflows/homebrew-cask-sync.yml`
+- This repository acts as its own Homebrew tap (`brew tap thejoaov/tray-link`)
+
 ## Signing disclaimer
 
 This application is not signed yet. If you prefer, clone the repository and run/build it locally.
