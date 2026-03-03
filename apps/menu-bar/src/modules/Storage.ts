@@ -1,10 +1,10 @@
-import { Platform } from 'react-native';
-import { MMKV } from 'react-native-mmkv';
-import { Settings } from 'common-types';
+import { Settings } from '@tray-link/common-types'
+import { Platform } from 'react-native'
+import { MMKV } from 'react-native-mmkv'
 
-export const userPreferencesStorageKey = 'user-preferences';
+export const userPreferencesStorageKey = 'user-preferences'
 
-export type UserPreferences = Settings;
+export type UserPreferences = Settings
 
 export const defaultUserPreferences: UserPreferences = {
   launchOnLogin: false,
@@ -14,22 +14,22 @@ export const defaultUserPreferences: UserPreferences = {
   removeFromDiskByDefault: false,
   customEditors: [],
   customTerminals: [],
-};
+}
 
 export const getUserPreferences = () => {
-  const stringValue = storage.getString(userPreferencesStorageKey);
-  const value = (stringValue ? JSON.parse(stringValue) : {}) as UserPreferences;
-  return { ...defaultUserPreferences, ...value };
-};
+  const stringValue = storage.getString(userPreferencesStorageKey)
+  const value = (stringValue ? JSON.parse(stringValue) : {}) as UserPreferences
+  return { ...defaultUserPreferences, ...value }
+}
 
 export const saveUserPreferences = (preferences: UserPreferences) => {
-  storage.set(userPreferencesStorageKey, JSON.stringify(preferences));
-};
+  storage.set(userPreferencesStorageKey, JSON.stringify(preferences))
+}
 
 export const resetStorage = () => {
-  storage.clearAll();
-};
+  storage.clearAll()
+}
 
 export const storage = new MMKV({
-  id: 'tray-link-settings'
-});
+  id: 'tray-link-settings',
+})

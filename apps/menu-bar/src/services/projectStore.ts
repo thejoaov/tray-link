@@ -1,4 +1,4 @@
-import { Project } from 'common-types'
+import { Project } from '@tray-link/common-types'
 import { Platform } from 'react-native'
 import { MMKV } from 'react-native-mmkv'
 

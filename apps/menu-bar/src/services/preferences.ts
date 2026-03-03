@@ -1,27 +1,21 @@
-import { CustomTool } from 'common-types';
-import { EmitterSubscription } from 'react-native';
-
-import {
-  UserPreferences,
-  defaultUserPreferences,
-  getUserPreferences,
-  saveUserPreferences,
-} from '../modules/Storage';
-import { DeviceEventEmitter } from '../modules/DeviceEventEmitter';
-import { fileExists, which } from '../../modules/shell-utils/src';
+import { CustomTool } from '@tray-link/common-types'
+import { EmitterSubscription } from 'react-native'
+import { fileExists, which } from '../../modules/shell-utils/src'
+import { DeviceEventEmitter } from '../modules/DeviceEventEmitter'
+import { defaultUserPreferences, getUserPreferences, saveUserPreferences, UserPreferences } from '../modules/Storage'
 
 export type ToolOption = {
-  label: string;
-  command: string;
-};
+  label: string
+  command: string
+}
 
 type DiscoverableTool = {
-  label: string;
-  command: string;
-  binary?: string;
-  commonFilepaths?: string[];
-  alwaysAvailable?: boolean;
-};
+  label: string
+  command: string
+  binary?: string
+  commonFilepaths?: string[]
+  alwaysAvailable?: boolean
+}
 
 const EDITOR_CANDIDATES: DiscoverableTool[] = [
   {
@@ -84,11 +78,7 @@ const EDITOR_CANDIDATES: DiscoverableTool[] = [
     label: 'Sublime Text',
     command: 'subl',
     binary: 'subl',
-    commonFilepaths: [
-      '/Applications/Sublime Text.app',
-      '/usr/bin/subl',
-      'C:\\Program Files\\Sublime Text 3\\subl.exe',
-    ],
+    commonFilepaths: ['/Applications/Sublime Text.app', '/usr/bin/subl', 'C:\\Program Files\\Sublime Text 3\\subl.exe'],
   },
   {
     label: 'Atom',
@@ -155,17 +145,14 @@ const EDITOR_CANDIDATES: DiscoverableTool[] = [
     binary: 'gedit',
     commonFilepaths: ['/Applications/Gedit.app', '/usr/bin/gedit'],
   },
-];
+]
 
 const TERMINAL_CANDIDATES: DiscoverableTool[] = [
   {
     label: 'Terminal',
     command: 'open -a Terminal',
     alwaysAvailable: true,
-    commonFilepaths: [
-      '/Applications/Utilities/Terminal.app',
-      '/System/Applications/Utilities/Terminal.app',
-    ],
+    commonFilepaths: ['/Applications/Utilities/Terminal.app', '/System/Applications/Utilities/Terminal.app'],
   },
   {
     label: 'iTerm',
@@ -208,95 +195,90 @@ const TERMINAL_CANDIDATES: DiscoverableTool[] = [
     command: 'gnome-terminal',
     binary: 'gnome-terminal',
   },
-];
+]
 
-export const PREFERENCES_CHANGED_EVENT = 'preferencesChanged';
+export const PREFERENCES_CHANGED_EVENT = 'preferencesChanged'
 
-let discoveredEditorOptions: ToolOption[] = [];
-let discoveredTerminalOptions: ToolOption[] = [];
+let discoveredEditorOptions: ToolOption[] = []
+let discoveredTerminalOptions: ToolOption[] = []
 
 export const loadPreferences = (): UserPreferences => {
-  return { ...defaultUserPreferences, ...getUserPreferences() };
-};
+  return { ...defaultUserPreferences, ...getUserPreferences() }
+}
 
 export const persistPreferences = (next: UserPreferences) => {
-  saveUserPreferences(next);
-  DeviceEventEmitter.emit(PREFERENCES_CHANGED_EVENT);
-};
+  saveUserPreferences(next)
+  DeviceEventEmitter.emit(PREFERENCES_CHANGED_EVENT)
+}
 
-export const subscribePreferencesChange = (
-  listener: () => void,
-): EmitterSubscription => {
-  return DeviceEventEmitter.addListener(PREFERENCES_CHANGED_EVENT, listener);
-};
+export const subscribePreferencesChange = (listener: () => void): EmitterSubscription => {
+  return DeviceEventEmitter.addListener(PREFERENCES_CHANGED_EVENT, listener)
+}
 
 const isToolInstalled = async (tool: DiscoverableTool): Promise<boolean> => {
   if (tool.alwaysAvailable) {
-    return true;
+    return true
   }
 
   if (tool.binary) {
-    const binaryPath = await which(tool.binary);
+    const binaryPath = await which(tool.binary)
     if (binaryPath) {
-      return true;
+      return true
     }
   }
 
   if (tool.commonFilepaths?.length) {
     for (const filepath of tool.commonFilepaths) {
       if (await fileExists(filepath)) {
-        return true;
+        return true
       }
     }
   }
 
-  return false;
-};
+  return false
+}
 
 const discoverTools = async (candidates: DiscoverableTool[]): Promise<ToolOption[]> => {
-  const discovered: ToolOption[] = [];
+  const discovered: ToolOption[] = []
 
   for (const tool of candidates) {
-    const installed = await isToolInstalled(tool);
+    const installed = await isToolInstalled(tool)
     if (installed) {
-      discovered.push({ label: tool.label, command: tool.command });
+      discovered.push({ label: tool.label, command: tool.command })
     }
   }
 
-  return discovered;
-};
+  return discovered
+}
 
 export const reloadToolOptions = async () => {
-  const [editors, terminals] = await Promise.all([
-    discoverTools(EDITOR_CANDIDATES),
-    discoverTools(TERMINAL_CANDIDATES),
-  ]);
+  const [editors, terminals] = await Promise.all([discoverTools(EDITOR_CANDIDATES), discoverTools(TERMINAL_CANDIDATES)])
 
-  discoveredEditorOptions = dedupeOptions(editors);
-  discoveredTerminalOptions = dedupeOptions(terminals);
-  DeviceEventEmitter.emit(PREFERENCES_CHANGED_EVENT);
-};
+  discoveredEditorOptions = dedupeOptions(editors)
+  discoveredTerminalOptions = dedupeOptions(terminals)
+  DeviceEventEmitter.emit(PREFERENCES_CHANGED_EVENT)
+}
 
 export const initializeToolOptions = async () => {
   if (discoveredEditorOptions.length || discoveredTerminalOptions.length) {
-    return;
+    return
   }
 
-  await reloadToolOptions();
-};
+  await reloadToolOptions()
+}
 
 export const getEditorOptions = (customEditors: CustomTool[] = []): ToolOption[] => {
-  const custom = customEditors.map(item => ({ label: item.name, command: item.command }));
-  return dedupeOptions([...discoveredEditorOptions, ...custom]);
-};
+  const custom = customEditors.map((item) => ({ label: item.name, command: item.command }))
+  return dedupeOptions([...discoveredEditorOptions, ...custom])
+}
 
 export const getTerminalOptions = (customTerminals: CustomTool[] = []): ToolOption[] => {
-  const custom = customTerminals.map(item => ({ label: item.name, command: item.command }));
-  return dedupeOptions([...discoveredTerminalOptions, ...custom]);
-};
+  const custom = customTerminals.map((item) => ({ label: item.name, command: item.command }))
+  return dedupeOptions([...discoveredTerminalOptions, ...custom])
+}
 
 const dedupeOptions = (options: ToolOption[]) => {
-  const map = new Map<string, ToolOption>();
-  options.forEach(option => map.set(option.command, option));
-  return [...map.values()];
-};
+  const map = new Map<string, ToolOption>()
+  options.forEach((option) => map.set(option.command, option))
+  return [...map.values()]
+}
