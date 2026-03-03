@@ -79,7 +79,7 @@ Prebuilt binaries are available in [Releases](https://github.com/thejoaov/tray-l
 ### Install with Homebrew (macOS)
 
 ```bash
-brew tap thejoaov/tray-link
+brew tap thejoaov/tray-link https://github.com/thejoaov/tray-link
 brew install --cask tray-link
 ```
 
