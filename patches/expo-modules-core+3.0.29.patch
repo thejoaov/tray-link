@@ -1,0 +1,33 @@
+diff --git a/node_modules/expo-modules-core/ios/Interfaces/ImageLoader/EXImageLoaderInterface.h b/node_modules/expo-modules-core/ios/Interfaces/ImageLoader/EXImageLoaderInterface.h
+index 1234567..abcdef0 100644
+--- a/node_modules/expo-modules-core/ios/Interfaces/ImageLoader/EXImageLoaderInterface.h
++++ b/node_modules/expo-modules-core/ios/Interfaces/ImageLoader/EXImageLoaderInterface.h
+@@ -1,8 +1,15 @@
+ // Copyright © 2018 650 Industries. All rights reserved.
+ 
++#import <TargetConditionals.h>
+ #import <ExpoModulesCore/Platform.h>
+ 
++#if TARGET_OS_OSX
++#import <AppKit/AppKit.h>
++typedef void (^EXImageLoaderCompletionBlock)(NSError *error, NSImage *image);
++#else
++#import <UIKit/UIKit.h>
+ typedef void (^EXImageLoaderCompletionBlock)(NSError *error, UIImage *image);
++#endif
+ 
+ @protocol EXImageLoaderInterface <NSObject>
+ 
+diff --git a/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h b/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h
+index 1234567..abcdef0 100644
+--- a/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h
++++ b/node_modules/expo-modules-core/ios/JSI/EXJSIInstaller.h
+@@ -36,7 +36,7 @@
+ /**
+  Installs the base class for shared objects, i.e. `global.expo.SharedObject`.
+  */
+-+ (void)installSharedObjectClass:(nonnull EXRuntime *)runtime releaser:(void (^)(long))releaser;
+++ (void)installSharedObjectClass:(nonnull EXRuntime *)runtime releaser:(void (^_Nonnull)(long))releaser;
+ 
+ /**
+  Installs the base class for shared refs, i.e. `global.expo.SharedRef`.

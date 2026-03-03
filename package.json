@@ -19,7 +19,7 @@
     "macos": "cd apps/menu-bar && bun run macos",
     "electron:dev": "cd apps/menu-bar && bun run export:web && cd electron && bun start",
     "electron:package": "cd apps/menu-bar && bun run export:web && cd electron && bun run make",
-    "postinstall": "lefthook install"
+    "postinstall": "patch-package && lefthook install"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
