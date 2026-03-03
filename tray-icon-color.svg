@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Round colorful tray icon for Windows/Linux -->
+  <circle cx="512" cy="512" r="480" fill="#0f172a" />
+  <g transform="translate(512, 512) rotate(-45)" fill="none" stroke-width="64">
+    <rect x="-260" y="-82" width="300" height="164" rx="82" stroke="#22d3ee" />
+    <rect x="-40" y="-82" width="300" height="164" rx="82" stroke="#14b8a6" />
+  </g>
+</svg>

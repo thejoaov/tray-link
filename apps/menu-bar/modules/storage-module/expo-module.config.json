@@ -1,0 +1,6 @@
+{
+  "name": "Storage",
+  "ios": {
+    "modules": ["StorageModule"]
+  }
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Chain link symbol only - black on transparent for macOS template image -->
+  <g transform="translate(512, 512) rotate(-45)" fill="none" stroke-width="72" stroke="#000000">
+    <rect x="-280" y="-90" width="320" height="180" rx="90" />
+    <rect x="-40" y="-90" width="320" height="180" rx="90" />
+  </g>
+</svg>

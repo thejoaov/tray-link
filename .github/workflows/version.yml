@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate Version
         run: |
-          npm version ${{ secrets.VERSION_CONTROL }} -m 'chore: release %s' --allow-same-version --no-commit-hooks
+          bun version ${{ secrets.VERSION_CONTROL }} -m 'chore: release %s' --allow-same-version --no-commit-hooks
 
       - name: Push Version to main
         uses: ad-m/github-push-action@master
