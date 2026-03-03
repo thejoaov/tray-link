@@ -1,7 +1,7 @@
-import ElectronStore from 'electron-store'
 import Store from 'electron-store'
 
-const store = new Store() as ElectronStore
+// biome-ignore lint/suspicious/noExplicitAny: false positive
+const store = new Store() as any
 
 export const StorageMain = {
   setItem: (key: string, value: string) => {
