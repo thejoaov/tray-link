@@ -47,16 +47,47 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             "/repos/${{ github.repository }}/releases/tags/${RELEASE_TAG}")
 
+          echo "Available release assets for ${RELEASE_TAG}:"
+          echo "$release_json" | jq -r '.assets[].name' || true
+
           asset_name=$(echo "$release_json" | jq -r '
             .assets[]
-            | select(.name | test("(?i)mac|darwin"))
-            | select(.name | test("\\.zip$"))
+            | select(.name | test("(?i)tray[-_. ]?link[-_. ]?macos[-_. ]?universal"))
+            | select(.name | test("(?i)\\.zip$"))
             | .name
           ' | head -n1)
 
           if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
-            echo "Could not find a macOS .zip asset in release ${RELEASE_TAG}."
-            echo "Attach a macOS zip binary to the release first."
+            asset_name=$(echo "$release_json" | jq -r '
+              .assets[]
+              | select(.name | test("(?i)darwin"))
+              | select(.name | test("(?i)\\.zip$"))
+              | .name
+            ' | head -n1)
+          fi
+
+          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
+            asset_name=$(echo "$release_json" | jq -r '
+              .assets[]
+              | select(.name | test("(?i)(mac|darwin|osx|universal)"))
+              | select(.name | test("(?i)\\.(zip|dmg|pkg)$"))
+              | .name
+            ' | head -n1)
+          fi
+
+          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
+            asset_name=$(echo "$release_json" | jq -r '
+              .assets[]
+              | select(.name | test("(?i)\\.(zip|dmg|pkg)$"))
+              | select(.name | test("(?i)^source code") | not)
+              | .name
+            ' | head -n1)
+          fi
+
+          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
+            echo "Could not find a macOS installer asset (.zip/.dmg/.pkg) in release ${RELEASE_TAG}."
+            echo "Release assets were:"
+            echo "$release_json" | jq -r '.assets[].name' || true
             exit 1
           fi
 
@@ -65,6 +96,8 @@ jobs:
             | select(.name == $name)
             | .browser_download_url
           ')
+
+          echo "Selected installer asset: ${asset_name}"
 
           echo "asset_name=${asset_name}" >> "$GITHUB_OUTPUT"
           echo "asset_url=${asset_url}" >> "$GITHUB_OUTPUT"

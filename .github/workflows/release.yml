@@ -230,6 +230,9 @@ jobs:
             -name '*.pkg' \
           \) -print0)
 
+          echo "Selected release assets:"
+          find final-assets -type f -maxdepth 1 -print | sed 's#^# - #' || true
+
           if [ -z "$(find final-assets -type f -print -quit)" ]; then
             echo "No distributable assets found in release-artifacts."
             exit 1
