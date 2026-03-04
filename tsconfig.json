@@ -16,6 +16,5 @@
     "alwaysStrict": false,
     "esModuleInterop": true,
     "strict": false
-  },
-  "include": ["src"]
+  }
 }

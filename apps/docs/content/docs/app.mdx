@@ -1,0 +1,158 @@
+---
+title: App
+description: All features of the Tray Link desktop application.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Overview
+
+Tray Link lives in your system menu bar (macOS) or system tray (Windows/Linux). Clicking the icon opens a popover with your project list and quick actions.
+
+{/* // TODO: Inserir print da tela principal do popover */}
+
+## Adding Projects
+
+Click the **+** button in the project list header to add a new project. A native folder picker dialog will open — select the folder you want to add.
+
+The project name defaults to the folder name, but you can also add projects with custom names using the [CLI](./cli).
+
+{/* // TODO: Inserir print do seletor de pastas */}
+
+## Opening Projects
+
+Each project in the list has quick-action icons:
+
+- **Editor icon** — opens the project in your default editor
+- **Terminal icon** — opens the project in your default terminal
+- **Folder icon** — opens the project folder in Finder (macOS), Explorer (Windows), or the default file manager (Linux)
+
+{/* // TODO: Inserir print dos ícones de ação rápida */}
+
+### Opening with a Specific Tool
+
+Click the **ellipsis menu** (⋯) on a project to see additional options:
+
+- **Open with \<editor\>** — choose from any detected or custom editor
+- **Open with \<terminal\>** — choose from any detected or custom terminal
+
+{/* // TODO: Inserir print do menu de contexto */}
+
+## Removing Projects
+
+Click the **trash icon** on a project to remove it. A confirmation dialog will appear with an option to **delete files from disk** as well.
+
+{/* // TODO: Inserir print da janela de confirmação de remoção */}
+
+<Callout type="warn" title="Disk Deletion">
+  When "Delete files from disk" is enabled, the project folder will be permanently deleted. This action cannot be undone.
+</Callout>
+
+## Reordering Projects
+
+Click the **Edit** button to enter reorder mode. Use the **up/down arrows** to change the position of projects in the list. Click **Done** when finished.
+
+{/* // TODO: Inserir print do modo de reordenação */}
+
+## Settings
+
+Click the **gear icon** in the footer to open the Settings window.
+
+{/* // TODO: Inserir print da janela de configurações */}
+
+### Language
+
+Choose between **English**, **Português** (Brazilian Portuguese), and **Español** (Spanish). The language change applies immediately to the entire app.
+
+### Default Editor
+
+Select which editor opens when you click the editor icon on a project. Tray Link auto-detects installed editors on your system.
+
+### Default Terminal
+
+Select which terminal opens when you click the terminal icon on a project. Tray Link auto-detects installed terminals on your system.
+
+### Delete Files from Disk by Default
+
+When enabled, the "Delete files from disk" option is pre-checked in the remove project confirmation dialog.
+
+### Custom Editors and Terminals
+
+You can add custom editors and terminals that are not automatically detected:
+
+1. Click **Add Custom Editor** or **Add Custom Terminal**
+2. Fill in the fields:
+   - **Name** — display name for the tool
+   - **Binary** — the executable binary name (e.g., `my-editor`)
+   - **Open Command** — the command template used to open a project (e.g., `my-editor {{path}}`)
+3. Click **Save**
+
+{/* // TODO: Inserir print da janela de editor/terminal customizado */}
+
+### CLI Management
+
+In the **CLI** section of Settings:
+
+- **Install CLI** — creates a symlink so `tlink` is available in your terminal
+- **Uninstall CLI** — removes the symlink
+
+The status indicator shows whether the CLI is currently installed.
+
+{/* // TODO: Inserir print da seção CLI nas configurações */}
+
+### Advanced
+
+- **Reload editors/terminals list** — re-scans your system for installed tools
+- **Migrate legacy data** — imports projects and preferences from older versions of the app (vs-tray / Tray Link legacy)
+
+## Supported Editors
+
+Tray Link auto-detects the following editors:
+
+| Editor | Slug | Platforms |
+| --- | --- | --- |
+| Visual Studio Code | `code` | macOS, Windows, Linux |
+| VS Code Insiders | `code-insiders` | macOS, Windows, Linux |
+| Visual Studio | `visual-studio` | macOS, Windows |
+| Cursor | `cursor` | macOS, Windows, Linux |
+| Windsurf | `windsurf` | macOS, Windows, Linux |
+| Sublime Text | `sublime-text` | macOS, Windows, Linux |
+| Atom | `atom` | macOS, Windows, Linux |
+| IntelliJ IDEA CE | `intellij-idea-ce` | macOS, Windows, Linux |
+| PyCharm CE | `pycharm-ce` | macOS, Windows, Linux |
+| PyCharm | `pycharm` | macOS, Windows, Linux |
+| Android Studio | `android-studio` | macOS, Windows, Linux |
+| Xcode | `xcode` | macOS |
+| Geany | `geany` | Linux |
+| Gedit | `gedit` | Linux |
+
+## Supported Terminals
+
+Tray Link auto-detects the following terminals:
+
+| Terminal | Slug | Platforms |
+| --- | --- | --- |
+| Terminal | `terminal` | macOS |
+| iTerm | `iterm` | macOS |
+| Warp | `warp` | macOS |
+| Hyper | `hyper` | macOS, Windows, Linux |
+| CMD | `cmd` | Windows |
+| PowerShell | `powershell` | Windows |
+| Windows Terminal | `windows-terminal` | Windows |
+| GNOME Terminal | `gnome-terminal` | Linux |
+
+## Deep Linking
+
+Tray Link supports the `tray-link://` URL scheme, allowing external tools and scripts to interact with the app.
+
+## Shared Configuration
+
+The app and the [CLI](./cli) share the same configuration file (`config.json`). Projects added via the CLI will appear in the app when you next open the popover, and vice-versa.
+
+Configuration file locations:
+
+| Platform | Path |
+| --- | --- |
+| macOS | `~/Library/Application Support/TrayLink/config.json` |
+| Windows | `%APPDATA%/TrayLink/config.json` |
+| Linux | `~/.config/TrayLink/config.json` |

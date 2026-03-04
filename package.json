@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "cli": "cd apps/cli && bun run cli",
-    "dev": "turbo run dev --filter=@tray-link/menu-bar --filter=@tray-link/electron",
+    "dev": "turbo run dev",
     "dev:macos": "turbo run dev:macos --filter=@tray-link/menu-bar",
     "build": "turbo run build",
     "lint": "biome check .",
@@ -30,5 +30,8 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "overrides": {
+    "zod": "^4.0.0"
   }
 }

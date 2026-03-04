@@ -1,0 +1,54 @@
+---
+title: Introduction
+description: System tray app to quickly open and manage your local projects.
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card'
+
+## What is Tray Link?
+
+Tray Link is a system tray/menu bar application that helps you keep your favorite projects one click away. It lives in your menu bar (macOS) or system tray (Windows/Linux), giving you instant access to open, manage, and organize your local development projects.
+
+## Key Features
+
+- **Open projects in your preferred editor** — VS Code, Cursor, Windsurf, Sublime Text, and many more
+- **Open projects in your preferred terminal** — Terminal, iTerm, Warp, Windows Terminal, and others
+- **Open projects in Finder/Explorer** — quickly navigate to any project folder
+- **CLI companion** — the `tlink` command-line interface shares the same configuration, so projects added via CLI appear in the app and vice-versa
+- **Multi-language interface** — English, Portuguese (Brazil), and Spanish
+- **Cross-platform** — macOS (native + Electron), Windows, and Linux
+- **Custom tools** — add your own editors and terminals with custom commands
+- **Legacy migration** — migrate data from older versions (vs-tray)
+
+## Supported Platforms
+
+| Platform | Runtime | Format |
+| --- | --- | --- |
+| macOS | Native (React Native macOS) + Electron | `.app` (universal ZIP) |
+| Windows | Electron | `.exe` (Squirrel installer) |
+| Linux | Electron | `.deb`, `.rpm` |
+
+## Tech Stack
+
+- **Bun** workspaces + **TurboRepo** monorepo
+- **TypeScript** throughout
+- **Expo** + **React Native** (macOS/Web)
+- **Electron** tooling integration
+- **Commander.js** for the CLI
+
+## Project Structure
+
+The project is organized as a monorepo:
+
+- `apps/menu-bar` — Desktop application (React Native + Expo + Electron bridge)
+- `apps/cli` — CLI used by Tray Link (`tlink`)
+- `apps/docs` — This documentation site
+- `packages/common-types` — Shared TypeScript types
+- `packages/tray-shared` — Shared constants, models, i18n, and utilities
+- `packages/rn-electron-modules` — React Native ↔ Electron bridge
+
+<Cards>
+  <Card title="Installation" href="./installation" description="Download and install Tray Link on your platform." />
+  <Card title="App" href="./app" description="Explore all features of the desktop application." />
+  <Card title="CLI" href="./cli" description="Learn how to use the tlink command-line interface." />
+</Cards>

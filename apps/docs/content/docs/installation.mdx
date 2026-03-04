@@ -1,0 +1,124 @@
+---
+title: Installation
+description: How to download and install Tray Link on macOS, Windows, and Linux.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+
+## Download
+
+Prebuilt binaries for all platforms are available on the [GitHub Releases](https://github.com/thejoaov/tray-link/releases) page.
+
+Download the latest version for your operating system and follow the platform-specific instructions below.
+
+## Platform Installation
+
+<Tabs items={["macOS", "Windows", "Linux"]}>
+  <Tab value="macOS">
+    ### Homebrew (recommended)
+
+    The easiest way to install Tray Link on macOS is via Homebrew:
+
+    ```bash
+    brew tap thejoaov/tray-link https://github.com/thejoaov/tray-link
+    brew install --cask tray-link
+    ```
+
+    To update later:
+
+    ```bash
+    brew upgrade --cask tray-link
+    ```
+
+    ### Manual Download
+
+    1. Go to the [Releases](https://github.com/thejoaov/tray-link/releases) page
+    2. Download the `Tray-Link-macOS-universal.zip` file
+    3. Extract and move `Tray Link.app` to your **Applications** folder
+    4. Open the app from your Applications folder
+
+    ### macOS Signing Disclaimer
+
+    <Callout type="warn" title="Unsigned Application">
+      Tray Link is not code-signed yet. macOS may block the app on first launch. You can bypass this verification using the following command:
+    </Callout>
+
+    ```bash
+    xattr -d com.apple.quarantine /Applications/Tray\ Link.app
+    ```
+
+    Alternatively, you can right-click the app and select **Open** from the context menu, then confirm the dialog.
+
+    If you prefer, you can also clone the [repository](https://github.com/thejoaov/tray-link) and build Tray Link locally.
+  </Tab>
+
+  <Tab value="Windows">
+    ### Installer
+
+    1. Go to the [Releases](https://github.com/thejoaov/tray-link/releases) page
+    2. Download the `.exe` installer for Windows
+    3. Run the installer — it uses Squirrel, which installs the app automatically
+    4. Tray Link will appear in your system tray after installation
+  </Tab>
+
+  <Tab value="Linux">
+    ### Debian/Ubuntu (.deb)
+
+    ```bash
+    # Download the .deb package from the Releases page, then:
+    sudo dpkg -i tray-link_<version>_amd64.deb
+    ```
+
+    ### Fedora/RHEL (.rpm)
+
+    ```bash
+    # Download the .rpm package from the Releases page, then:
+    sudo rpm -i tray-link-<version>.x86_64.rpm
+    ```
+
+    After installation, Tray Link will be available in your system tray. You can also find it in your applications menu under the **Utility** category.
+  </Tab>
+</Tabs>
+
+## Installing the CLI
+
+The `tlink` CLI can be installed directly from the Tray Link app:
+
+1. Open Tray Link from your system tray/menu bar
+2. Click **Settings** (gear icon)
+3. In the **CLI** section, click **Install CLI**
+
+This creates a symlink to the `tlink` binary so it's available in your terminal.
+
+You can also uninstall the CLI from the same settings section.
+
+See the [CLI documentation](./cli) for usage details.
+
+## Building from Source
+
+If you prefer to build Tray Link yourself:
+
+### Requirements
+
+- Node.js `>=20`
+- Bun `1.x`
+
+### Steps
+
+```bash
+# Clone the repository
+git clone https://github.com/thejoaov/tray-link.git
+cd tray-link
+
+# Install dependencies
+bun install
+
+# Start development mode
+bun run dev
+
+# Or build for production
+bun run build
+```
+
+See the [README](https://github.com/thejoaov/tray-link#readme) for more available scripts.

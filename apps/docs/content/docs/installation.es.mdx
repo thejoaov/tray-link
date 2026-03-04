@@ -1,0 +1,124 @@
+---
+title: Instalación
+description: Cómo descargar e instalar Tray Link en macOS, Windows y Linux.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+
+## Descarga
+
+Los binarios precompilados para todas las plataformas están disponibles en la página de [Releases de GitHub](https://github.com/thejoaov/tray-link/releases).
+
+Descarga la versión más reciente para tu sistema operativo y sigue las instrucciones específicas de la plataforma a continuación.
+
+## Instalación por Plataforma
+
+<Tabs items={["macOS", "Windows", "Linux"]}>
+  <Tab value="macOS">
+    ### Homebrew (recomendado)
+
+    La forma más fácil de instalar Tray Link en macOS es a través de Homebrew:
+
+    ```bash
+    brew tap thejoaov/tray-link https://github.com/thejoaov/tray-link
+    brew install --cask tray-link
+    ```
+
+    Para actualizar después:
+
+    ```bash
+    brew upgrade --cask tray-link
+    ```
+
+    ### Descarga Manual
+
+    1. Ve a la página de [Releases](https://github.com/thejoaov/tray-link/releases)
+    2. Descarga el archivo `Tray-Link-macOS-universal.zip`
+    3. Extrae y mueve `Tray Link.app` a la carpeta **Aplicaciones**
+    4. Abre la app desde la carpeta de Aplicaciones
+
+    ### Aviso sobre la Firma de macOS
+
+    <Callout type="warn" title="Aplicación No Firmada">
+      Tray Link aún no tiene firma de código. macOS puede bloquear la app en la primera ejecución. Puedes omitir esta verificación usando el siguiente comando:
+    </Callout>
+
+    ```bash
+    xattr -d com.apple.quarantine /Applications/Tray\ Link.app
+    ```
+
+    Alternativamente, puedes hacer clic derecho en la app y seleccionar **Abrir** desde el menú contextual, luego confirma el diálogo.
+
+    Si lo prefieres, también puedes clonar el [repositorio](https://github.com/thejoaov/tray-link) y compilar Tray Link localmente.
+  </Tab>
+
+  <Tab value="Windows">
+    ### Instalador
+
+    1. Ve a la página de [Releases](https://github.com/thejoaov/tray-link/releases)
+    2. Descarga el instalador `.exe` para Windows
+    3. Ejecuta el instalador — usa Squirrel, que instala la app automáticamente
+    4. Tray Link aparecerá en la bandeja del sistema después de la instalación
+  </Tab>
+
+  <Tab value="Linux">
+    ### Debian/Ubuntu (.deb)
+
+    ```bash
+    # Descarga el paquete .deb desde la página de Releases, luego:
+    sudo dpkg -i tray-link_<version>_amd64.deb
+    ```
+
+    ### Fedora/RHEL (.rpm)
+
+    ```bash
+    # Descarga el paquete .rpm desde la página de Releases, luego:
+    sudo rpm -i tray-link-<version>.x86_64.rpm
+    ```
+
+    Después de la instalación, Tray Link estará disponible en la bandeja del sistema. También puedes encontrarlo en el menú de aplicaciones en la categoría **Utilidades**.
+  </Tab>
+</Tabs>
+
+## Instalando la CLI
+
+La CLI `tlink` puede instalarse directamente desde la app Tray Link:
+
+1. Abre Tray Link desde la bandeja del sistema/barra de menús
+2. Haz clic en **Configuración** (ícono de engranaje)
+3. En la sección **CLI**, haz clic en **Instalar CLI**
+
+Esto crea un enlace simbólico hacia el binario `tlink` para que esté disponible en tu terminal.
+
+También puedes desinstalar la CLI desde la misma sección de configuración.
+
+Consulta la [documentación de la CLI](./cli) para detalles de uso.
+
+## Compilar desde el Código Fuente
+
+Si prefieres compilar Tray Link tú mismo:
+
+### Requisitos
+
+- Node.js `>=20`
+- Bun `1.x`
+
+### Pasos
+
+```bash
+# Clona el repositorio
+git clone https://github.com/thejoaov/tray-link.git
+cd tray-link
+
+# Instala las dependencias
+bun install
+
+# Inicia el modo de desarrollo
+bun run dev
+
+# O compila para producción
+bun run build
+```
+
+Consulta el [README](https://github.com/thejoaov/tray-link#readme) para más scripts disponibles.
