@@ -122,5 +122,67 @@ public class ShellUtilsModule: Module {
         return false
       }
     }
+
+    AsyncFunction("isCliInstalled") { () -> Bool in
+      let symlinkPath = "/usr/local/bin/tlink"
+      return FileManager.default.fileExists(atPath: symlinkPath)
+    }
+
+    AsyncFunction("installCli") { () -> [String: Any] in
+      do {
+        guard let bundlePath = Bundle.main.resourceURL else {
+          return ["success": false, "error": "Cannot locate app bundle"]
+        }
+
+        // Determine architecture-specific binary name
+        #if arch(arm64)
+        let binaryName = "tlink-arm64"
+        #else
+        let binaryName = "tlink-x64"
+        #endif
+
+        let cliBinary = bundlePath.appendingPathComponent(binaryName)
+        guard FileManager.default.fileExists(atPath: cliBinary.path) else {
+          return ["success": false, "error": "CLI binary not found in bundle"]
+        }
+
+        let symlinkPath = "/usr/local/bin/tlink"
+
+        // Use osascript for admin privileges
+        let cmd = "ln -sf \\\"\(cliBinary.path)\\\" \\\"\(symlinkPath)\\\""
+        let script = "do shell script \"\(cmd)\" with administrator privileges"
+        let appleScript = NSAppleScript(source: script)
+        var errorDict: NSDictionary?
+        appleScript?.executeAndReturnError(&errorDict)
+
+        if let errorDict = errorDict {
+          let errorMessage = errorDict[NSAppleScript.errorMessage] as? String ?? "Unknown error"
+          return ["success": false, "error": errorMessage]
+        }
+
+        return ["success": true]
+      }
+    }
+
+    AsyncFunction("uninstallCli") { () -> [String: Any] in
+      let symlinkPath = "/usr/local/bin/tlink"
+
+      guard FileManager.default.fileExists(atPath: symlinkPath) else {
+        return ["success": true]
+      }
+
+      let cmd = "rm -f \\\"\(symlinkPath)\\\""
+      let script = "do shell script \"\(cmd)\" with administrator privileges"
+      let appleScript = NSAppleScript(source: script)
+      var errorDict: NSDictionary?
+      appleScript?.executeAndReturnError(&errorDict)
+
+      if let errorDict = errorDict {
+        let errorMessage = errorDict[NSAppleScript.errorMessage] as? String ?? "Unknown error"
+        return ["success": false, "error": errorMessage]
+      }
+
+      return ["success": true]
+    }
   }
 }

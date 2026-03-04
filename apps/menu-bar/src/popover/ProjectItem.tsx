@@ -62,6 +62,11 @@ export const ProjectItem = ({
               <Text style={styles.migratedChipText}>migrated</Text>
             </View>
           ) : null}
+          {project.source === 'cli' ? (
+            <View style={styles.migratedChip}>
+              <Text style={styles.migratedChipText}>cli</Text>
+            </View>
+          ) : null}
         </View>
         <Text style={styles.path} numberOfLines={1} ellipsizeMode="middle">
           {project.path}

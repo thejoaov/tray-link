@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { pickFolder } from '../../modules/file-picker'
 import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
+import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
 import Alert from '../modules/Alert'
 import {
   getEditorOptions,
@@ -56,6 +57,14 @@ export const ProjectList = () => {
       removeSubscription.remove()
     }
   }, [])
+
+  // Reload projects every time the popover becomes visible (e.g. tray icon click)
+  // This ensures CLI-added projects appear without a manual restart
+  usePopoverFocusEffect(
+    useCallback(() => {
+      loadProjects()
+    }, []),
+  )
 
   const loadProjects = async () => {
     try {
