@@ -12,7 +12,7 @@ const WINDOW_OPTIONS: Record<string, Record<string, unknown>> = {
     title: 'Settings',
     windowStyle: {
       width: 600,
-      height: 600,
+      height: 640,
       mask: NON_RESIZABLE_MASK,
     },
   },

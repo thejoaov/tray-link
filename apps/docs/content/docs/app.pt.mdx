@@ -1,0 +1,158 @@
+---
+title: App
+description: Todos os recursos do aplicativo desktop Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Visão Geral
+
+O Tray Link fica na barra de menus do sistema (macOS) ou na bandeja do sistema (Windows/Linux). Clicar no ícone abre um popover com a lista de projetos e ações rápidas.
+
+{/* // TODO: Inserir print da tela principal do popover */}
+
+## Adicionando Projetos
+
+Clique no botão **+** no cabeçalho da lista de projetos para adicionar um novo projeto. Um diálogo nativo de seleção de pastas será aberto — selecione a pasta que deseja adicionar.
+
+O nome do projeto usa o nome da pasta por padrão, mas você também pode adicionar projetos com nomes personalizados usando a [CLI](./cli).
+
+{/* // TODO: Inserir print do seletor de pastas */}
+
+## Abrindo Projetos
+
+Cada projeto na lista possui ícones de ação rápida:
+
+- **Ícone do editor** — abre o projeto no editor padrão
+- **Ícone do terminal** — abre o projeto no terminal padrão
+- **Ícone da pasta** — abre a pasta do projeto no Finder (macOS), Explorer (Windows) ou gerenciador de arquivos padrão (Linux)
+
+{/* // TODO: Inserir print dos ícones de ação rápida */}
+
+### Abrindo com uma Ferramenta Específica
+
+Clique no **menu de reticências** (⋯) em um projeto para ver opções adicionais:
+
+- **Abrir com \<editor\>** — escolha entre qualquer editor detectado ou personalizado
+- **Abrir com \<terminal\>** — escolha entre qualquer terminal detectado ou personalizado
+
+{/* // TODO: Inserir print do menu de contexto */}
+
+## Removendo Projetos
+
+Clique no **ícone da lixeira** em um projeto para removê-lo. Um diálogo de confirmação aparecerá com a opção de **excluir os arquivos do disco** também.
+
+{/* // TODO: Inserir print da janela de confirmação de remoção */}
+
+<Callout type="warn" title="Exclusão do Disco">
+  Quando "Excluir arquivos do disco" está habilitado, a pasta do projeto será permanentemente excluída. Esta ação não pode ser desfeita.
+</Callout>
+
+## Reordenando Projetos
+
+Clique no botão **Editar** para entrar no modo de reordenação. Use as **setas para cima/baixo** para alterar a posição dos projetos na lista. Clique em **Concluído** quando terminar.
+
+{/* // TODO: Inserir print do modo de reordenação */}
+
+## Configurações
+
+Clique no **ícone de engrenagem** no rodapé para abrir a janela de Configurações.
+
+{/* // TODO: Inserir print da janela de configurações */}
+
+### Idioma
+
+Escolha entre **English**, **Português** (Português do Brasil) e **Español** (Espanhol). A mudança de idioma é aplicada imediatamente em todo o app.
+
+### Editor Padrão
+
+Selecione qual editor abre quando você clica no ícone do editor em um projeto. O Tray Link detecta automaticamente os editores instalados no seu sistema.
+
+### Terminal Padrão
+
+Selecione qual terminal abre quando você clica no ícone do terminal em um projeto. O Tray Link detecta automaticamente os terminais instalados no seu sistema.
+
+### Excluir Arquivos do Disco por Padrão
+
+Quando habilitado, a opção "Excluir arquivos do disco" fica pré-marcada no diálogo de confirmação de remoção de projeto.
+
+### Editores e Terminais Personalizados
+
+Você pode adicionar editores e terminais personalizados que não são detectados automaticamente:
+
+1. Clique em **Adicionar Editor Personalizado** ou **Adicionar Terminal Personalizado**
+2. Preencha os campos:
+   - **Nome** — nome de exibição da ferramenta
+   - **Binário** — nome do executável (ex: `meu-editor`)
+   - **Comando de Abertura** — o template de comando usado para abrir um projeto (ex: `meu-editor {{path}}`)
+3. Clique em **Salvar**
+
+{/* // TODO: Inserir print da janela de editor/terminal customizado */}
+
+### Gerenciamento da CLI
+
+Na seção **CLI** das Configurações:
+
+- **Instalar CLI** — cria um link simbólico para que o `tlink` fique disponível no terminal
+- **Desinstalar CLI** — remove o link simbólico
+
+O indicador de status mostra se a CLI está instalada no momento.
+
+{/* // TODO: Inserir print da seção CLI nas configurações */}
+
+### Avançado
+
+- **Recarregar lista de editores/terminais** — re-escaneia o sistema em busca de ferramentas instaladas
+- **Migrar dados legados** — importa projetos e preferências de versões anteriores do app (vs-tray / Tray Link legado)
+
+## Editores Suportados
+
+O Tray Link detecta automaticamente os seguintes editores:
+
+| Editor | Slug | Plataformas |
+| --- | --- | --- |
+| Visual Studio Code | `code` | macOS, Windows, Linux |
+| VS Code Insiders | `code-insiders` | macOS, Windows, Linux |
+| Visual Studio | `visual-studio` | macOS, Windows |
+| Cursor | `cursor` | macOS, Windows, Linux |
+| Windsurf | `windsurf` | macOS, Windows, Linux |
+| Sublime Text | `sublime-text` | macOS, Windows, Linux |
+| Atom | `atom` | macOS, Windows, Linux |
+| IntelliJ IDEA CE | `intellij-idea-ce` | macOS, Windows, Linux |
+| PyCharm CE | `pycharm-ce` | macOS, Windows, Linux |
+| PyCharm | `pycharm` | macOS, Windows, Linux |
+| Android Studio | `android-studio` | macOS, Windows, Linux |
+| Xcode | `xcode` | macOS |
+| Geany | `geany` | Linux |
+| Gedit | `gedit` | Linux |
+
+## Terminais Suportados
+
+O Tray Link detecta automaticamente os seguintes terminais:
+
+| Terminal | Slug | Plataformas |
+| --- | --- | --- |
+| Terminal | `terminal` | macOS |
+| iTerm | `iterm` | macOS |
+| Warp | `warp` | macOS |
+| Hyper | `hyper` | macOS, Windows, Linux |
+| CMD | `cmd` | Windows |
+| PowerShell | `powershell` | Windows |
+| Windows Terminal | `windows-terminal` | Windows |
+| GNOME Terminal | `gnome-terminal` | Linux |
+
+## Deep Linking
+
+O Tray Link suporta o esquema de URL `tray-link://`, permitindo que ferramentas externas e scripts interajam com o app.
+
+## Configuração Compartilhada
+
+O app e a [CLI](./cli) compartilham o mesmo arquivo de configuração (`config.json`). Projetos adicionados via CLI aparecerão no app quando você abrir o popover novamente, e vice-versa.
+
+Localização do arquivo de configuração:
+
+| Plataforma | Caminho |
+| --- | --- |
+| macOS | `~/Library/Application Support/TrayLink/config.json` |
+| Windows | `%APPDATA%/TrayLink/config.json` |
+| Linux | `~/.config/TrayLink/config.json` |

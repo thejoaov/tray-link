@@ -4,9 +4,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, TouchableOpacity } from 'react-native'
 import { installCli, isCliInstalled, uninstallCli } from '../../modules/shell-utils/src'
+import Analytics, { AnalyticsEvent } from '../analytics'
 import { Checkbox, Divider, Row, Text, View } from '../components'
 import { Linking } from '../modules/Linking'
-import { UserPreferences } from '../modules/Storage'
+import { defaultUserPreferences, UserPreferences } from '../modules/Storage'
 import { getLegacyMigrationPreview, hasLegacyMigrationCompleted, runLegacyMigration } from '../services/legacyMigration'
 import {
   getEditorOptions,
@@ -31,11 +32,12 @@ const CREATOR_URL = 'https://github.com/thejoaov'
 
 export const Settings = () => {
   const { t } = useTranslation()
-  const [preferences, setPreferences] = useState<UserPreferences>(() => loadPreferences())
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultUserPreferences)
   const [reloadingTools, setReloadingTools] = useState(false)
   const [toolsVersion, setToolsVersion] = useState(0)
+  const [toolsReady, setToolsReady] = useState(false)
   const [migratingLegacyData, setMigratingLegacyData] = useState(false)
-  const [legacyMigrationDone, setLegacyMigrationDone] = useState(() => hasLegacyMigrationCompleted())
+  const [legacyMigrationDone, setLegacyMigrationDone] = useState(false)
   const [legacyProjectsPreviewCount, setLegacyProjectsPreviewCount] = useState(0)
   const [cliInstalled, setCliInstalled] = useState(false)
   const [installingCli, setInstallingCli] = useState(false)
@@ -52,22 +54,47 @@ export const Settings = () => {
     [preferences.customTerminals, toolsVersion],
   )
 
-  const updatePreference = <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
+  const updatePreference = async <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
     const next = { ...preferences, [key]: value }
     setPreferences(next)
-    persistPreferences(next)
+    await persistPreferences(next)
   }
 
   useEffect(() => {
+    // Load preferences asynchronously on mount
+    loadPreferences()
+      .then(setPreferences)
+      .catch((e) => {
+        Analytics.track(AnalyticsEvent.ERROR, { error: String(e) })
+      })
+
     const subscription = subscribePreferencesChange(() => {
-      setPreferences(loadPreferences())
+      loadPreferences()
+        .then(setPreferences)
+        .catch((e) => {
+          Analytics.track(AnalyticsEvent.ERROR, { error: String(e) })
+        })
       setToolsVersion((v) => v + 1)
     })
 
+    // Check legacy migration status
+    hasLegacyMigrationCompleted()
+      .then(setLegacyMigrationDone)
+      .catch((e) => {
+        Analytics.track(AnalyticsEvent.ERROR, { error: String(e) })
+      })
+
     // Discover tools on mount (needed because Settings runs in a separate BrowserWindow)
-    initializeToolOptions().then(() => {
-      setToolsVersion((v) => v + 1)
-    })
+    initializeToolOptions()
+      .then(() => {
+        setToolsVersion((v) => v + 1)
+        setToolsReady(true)
+      })
+      .catch(() => {
+        // Force a version bump even on error so the UI reflects whatever was discovered
+        setToolsVersion((v) => v + 1)
+        setToolsReady(true)
+      })
 
     // Check CLI install status
     isCliInstalled()
@@ -96,13 +123,16 @@ export const Settings = () => {
       <View border="light" rounded="medium" style={styles.box}>
         <Row align="center" justify="between" style={styles.boxItem}>
           <Text style={styles.itemLabel}>{t('language')}</Text>
-          <View border="light" rounded="small" style={styles.pickerWrap}>
-            <Picker selectedValue={preferences.locale} onValueChange={(value) => updatePreference('locale', value)}>
-              {LOCALE_OPTIONS.map((option) => (
-                <Picker.Item key={option.value} label={option.label} value={option.value} />
-              ))}
-            </Picker>
-          </View>
+
+          <Picker
+            selectedValue={preferences.locale}
+            onValueChange={(value) => updatePreference('locale', value)}
+            style={styles.picker}
+          >
+            {LOCALE_OPTIONS.map((option) => (
+              <Picker.Item key={option.value} label={option.label} value={option.value} />
+            ))}
+          </Picker>
         </Row>
 
         <Divider />
@@ -110,23 +140,27 @@ export const Settings = () => {
         <Row align="center" justify="between" style={styles.boxItem}>
           <Text style={styles.itemLabel}>{t('defaultEditor')}</Text>
           <Row align="center" style={styles.controlRow}>
-            <View border="light" rounded="small" style={styles.pickerWrap}>
-              <Picker
-                selectedValue={preferences.defaultEditor}
-                onValueChange={(value) => updatePreference('defaultEditor', value)}
-              >
-                <Picker.Item label={t('systemDefault')} value={null} />
-                {editorOptions.map((option) => (
-                  <Picker.Item key={option.command} label={option.label} value={option.command} />
-                ))}
-              </Picker>
-            </View>
+            <Picker
+              selectedValue={preferences.defaultEditor}
+              onValueChange={(value) => {
+                if (!toolsReady) return
+                updatePreference('defaultEditor', value)
+              }}
+              enabled={toolsReady}
+              style={styles.picker}
+            >
+              <Picker.Item label={t('systemDefault')} value={null} />
+              {editorOptions.map((option) => (
+                <Picker.Item key={option.command} label={option.label} value={option.command} />
+              ))}
+            </Picker>
+
             <TouchableOpacity
               accessibilityLabel={t('addCustomEditor')}
               onPress={() => WindowsNavigator.open('CustomEditorWindow')}
               style={styles.iconButton}
             >
-              <Ionicons name="add" size={16} />
+              <Ionicons name="add" size={16} color="var(--text-color)" />
             </TouchableOpacity>
           </Row>
         </Row>
@@ -136,23 +170,26 @@ export const Settings = () => {
         <Row align="center" justify="between" style={styles.boxItem}>
           <Text style={styles.itemLabel}>{t('defaultTerminal')}</Text>
           <Row align="center" style={styles.controlRow}>
-            <View border="light" rounded="small" style={styles.pickerWrap}>
-              <Picker
-                selectedValue={preferences.defaultTerminal}
-                onValueChange={(value) => updatePreference('defaultTerminal', value)}
-              >
-                <Picker.Item label={t('systemDefault')} value={null} />
-                {terminalOptions.map((option) => (
-                  <Picker.Item key={option.command} label={option.label} value={option.command} />
-                ))}
-              </Picker>
-            </View>
+            <Picker
+              selectedValue={preferences.defaultTerminal}
+              onValueChange={(value) => {
+                if (!toolsReady) return
+                updatePreference('defaultTerminal', value)
+              }}
+              enabled={toolsReady}
+              style={styles.picker}
+            >
+              <Picker.Item label={t('systemDefault')} value={null} />
+              {terminalOptions.map((option) => (
+                <Picker.Item key={option.command} label={option.label} value={option.command} />
+              ))}
+            </Picker>
             <TouchableOpacity
               accessibilityLabel={t('addCustomTerminal')}
               onPress={() => WindowsNavigator.open('CustomTerminalWindow')}
               style={styles.iconButton}
             >
-              <Ionicons name="add" size={16} />
+              <Ionicons name="add" size={16} color="var(--text-color)" />
             </TouchableOpacity>
           </Row>
         </Row>
@@ -199,7 +236,11 @@ export const Settings = () => {
             }}
             style={[styles.button, installingCli && styles.buttonDisabled]}
           >
-            <Ionicons name={cliInstalled ? 'close-circle-outline' : 'terminal-outline'} size={14} />
+            <Ionicons
+              name={cliInstalled ? 'close-circle-outline' : 'terminal-outline'}
+              size={14}
+              color="var(--text-color)"
+            />
             <Text style={styles.buttonText}>{t(cliInstalled ? 'uninstallCli' : 'installCli')}</Text>
           </TouchableOpacity>
         </Row>
@@ -220,12 +261,14 @@ export const Settings = () => {
               try {
                 await reloadToolOptions()
               } finally {
+                setToolsVersion((v) => v + 1)
+                setToolsReady(true)
                 setReloadingTools(false)
               }
             }}
             style={[styles.button, reloadingTools && styles.buttonDisabled]}
           >
-            <Ionicons name="refresh" size={14} />
+            <Ionicons name="refresh" size={14} color="var(--text-color)" />
             <Text style={styles.buttonText}>{t('reload')}</Text>
           </TouchableOpacity>
         </Row>
@@ -250,7 +293,8 @@ export const Settings = () => {
               setMigratingLegacyData(true)
               try {
                 const migrated = await runLegacyMigration()
-                if (migrated || hasLegacyMigrationCompleted()) {
+                const done = await hasLegacyMigrationCompleted()
+                if (migrated || done) {
                   setLegacyMigrationDone(true)
                   setLegacyProjectsPreviewCount(0)
                 }
@@ -260,7 +304,7 @@ export const Settings = () => {
             }}
             style={[styles.button, (legacyMigrationDone || migratingLegacyData) && styles.buttonDisabled]}
           >
-            <Ionicons name="download-outline" size={14} />
+            <Ionicons name="download-outline" size={14} color="var(--text-color)" />
             <Text style={styles.buttonText}>{t('migrate') || 'Migrate'}</Text>
           </TouchableOpacity>
         </Row>
@@ -281,7 +325,7 @@ export const Settings = () => {
           onPress={() => Linking.openURL(RELEASES_URL)}
           style={styles.releaseButton}
         >
-          <Ionicons name="rocket-outline" size={14} />
+          <Ionicons name="rocket-outline" size={14} color="var(--text-color)" />
           <Text style={styles.releaseButtonText}>Releases</Text>
         </TouchableOpacity>
       </View>
@@ -329,11 +373,13 @@ const styles = StyleSheet.create({
   controlRow: {
     gap: 8,
   },
-  pickerWrap: {
-    overflow: 'hidden',
+  picker: {
+    borderWidth: 0,
+    borderRadius: 6,
     width: 160,
     height: 28,
-    justifyContent: 'center',
+    color: 'var(--text-color)',
+    backgroundColor: 'rgba(150, 150, 150, 0.1)',
   },
   iconButton: {
     width: 28,

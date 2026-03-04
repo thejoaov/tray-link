@@ -1,0 +1,158 @@
+---
+title: App
+description: Todas las funcionalidades de la aplicación de escritorio Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Descripción General
+
+Tray Link reside en la barra de menús del sistema (macOS) o la bandeja del sistema (Windows/Linux). Al hacer clic en el ícono se abre un popover con la lista de proyectos y acciones rápidas.
+
+{/* // TODO: Inserir print da tela principal do popover */}
+
+## Agregar Proyectos
+
+Haz clic en el botón **+** en el encabezado de la lista de proyectos para agregar un nuevo proyecto. Se abrirá un diálogo nativo de selección de carpetas — selecciona la carpeta que deseas agregar.
+
+El nombre del proyecto usa el nombre de la carpeta por defecto, pero también puedes agregar proyectos con nombres personalizados usando la [CLI](./cli).
+
+{/* // TODO: Inserir print do seletor de pastas */}
+
+## Abrir Proyectos
+
+Cada proyecto en la lista tiene íconos de acción rápida:
+
+- **Ícono del editor** — abre el proyecto en el editor predeterminado
+- **Ícono del terminal** — abre el proyecto en la terminal predeterminada
+- **Ícono de carpeta** — abre la carpeta del proyecto en Finder (macOS), Explorador (Windows) o el gestor de archivos predeterminado (Linux)
+
+{/* // TODO: Inserir print dos ícones de ação rápida */}
+
+### Abrir con una Herramienta Específica
+
+Haz clic en el **menú de puntos suspensivos** (⋯) de un proyecto para ver opciones adicionales:
+
+- **Abrir con \<editor\>** — elige entre cualquier editor detectado o personalizado
+- **Abrir con \<terminal\>** — elige entre cualquier terminal detectada o personalizada
+
+{/* // TODO: Inserir print do menu de contexto */}
+
+## Eliminar Proyectos
+
+Haz clic en el **ícono de la papelera** en un proyecto para eliminarlo. Aparecerá un diálogo de confirmación con la opción de **eliminar los archivos del disco** también.
+
+{/* // TODO: Inserir print da janela de confirmação de remoção */}
+
+<Callout type="warn" title="Eliminación del Disco">
+  Cuando "Eliminar archivos del disco" está habilitado, la carpeta del proyecto se eliminará permanentemente. Esta acción no se puede deshacer.
+</Callout>
+
+## Reordenar Proyectos
+
+Haz clic en el botón **Editar** para entrar en el modo de reordenación. Usa las **flechas arriba/abajo** para cambiar la posición de los proyectos en la lista. Haz clic en **Listo** cuando termines.
+
+{/* // TODO: Inserir print do modo de reordenação */}
+
+## Configuración
+
+Haz clic en el **ícono de engranaje** en el pie de página para abrir la ventana de Configuración.
+
+{/* // TODO: Inserir print da janela de configurações */}
+
+### Idioma
+
+Elige entre **English**, **Português** (Portugués de Brasil) y **Español**. El cambio de idioma se aplica de inmediato en toda la app.
+
+### Editor Predeterminado
+
+Selecciona qué editor se abre cuando haces clic en el ícono del editor en un proyecto. Tray Link detecta automáticamente los editores instalados en tu sistema.
+
+### Terminal Predeterminada
+
+Selecciona qué terminal se abre cuando haces clic en el ícono del terminal en un proyecto. Tray Link detecta automáticamente las terminales instaladas en tu sistema.
+
+### Eliminar Archivos del Disco por Defecto
+
+Cuando está habilitado, la opción "Eliminar archivos del disco" aparece premarcada en el diálogo de confirmación de eliminación de proyecto.
+
+### Editores y Terminales Personalizados
+
+Puedes agregar editores y terminales personalizados que no se detectan automáticamente:
+
+1. Haz clic en **Agregar Editor Personalizado** o **Agregar Terminal Personalizada**
+2. Completa los campos:
+   - **Nombre** — nombre para mostrar de la herramienta
+   - **Binario** — nombre del ejecutable (ej: `mi-editor`)
+   - **Comando de Apertura** — la plantilla de comando usada para abrir un proyecto (ej: `mi-editor {{path}}`)
+3. Haz clic en **Guardar**
+
+{/* // TODO: Inserir print da janela de editor/terminal customizado */}
+
+### Gestión de la CLI
+
+En la sección **CLI** de Configuración:
+
+- **Instalar CLI** — crea un enlace simbólico para que `tlink` esté disponible en la terminal
+- **Desinstalar CLI** — elimina el enlace simbólico
+
+El indicador de estado muestra si la CLI está instalada actualmente.
+
+{/* // TODO: Inserir print da seção CLI nas configurações */}
+
+### Avanzado
+
+- **Recargar lista de editores/terminales** — vuelve a escanear el sistema en busca de herramientas instaladas
+- **Migrar datos heredados** — importa proyectos y preferencias de versiones anteriores de la app (vs-tray / Tray Link heredado)
+
+## Editores Soportados
+
+Tray Link detecta automáticamente los siguientes editores:
+
+| Editor | Slug | Plataformas |
+| --- | --- | --- |
+| Visual Studio Code | `code` | macOS, Windows, Linux |
+| VS Code Insiders | `code-insiders` | macOS, Windows, Linux |
+| Visual Studio | `visual-studio` | macOS, Windows |
+| Cursor | `cursor` | macOS, Windows, Linux |
+| Windsurf | `windsurf` | macOS, Windows, Linux |
+| Sublime Text | `sublime-text` | macOS, Windows, Linux |
+| Atom | `atom` | macOS, Windows, Linux |
+| IntelliJ IDEA CE | `intellij-idea-ce` | macOS, Windows, Linux |
+| PyCharm CE | `pycharm-ce` | macOS, Windows, Linux |
+| PyCharm | `pycharm` | macOS, Windows, Linux |
+| Android Studio | `android-studio` | macOS, Windows, Linux |
+| Xcode | `xcode` | macOS |
+| Geany | `geany` | Linux |
+| Gedit | `gedit` | Linux |
+
+## Terminales Soportadas
+
+Tray Link detecta automáticamente las siguientes terminales:
+
+| Terminal | Slug | Plataformas |
+| --- | --- | --- |
+| Terminal | `terminal` | macOS |
+| iTerm | `iterm` | macOS |
+| Warp | `warp` | macOS |
+| Hyper | `hyper` | macOS, Windows, Linux |
+| CMD | `cmd` | Windows |
+| PowerShell | `powershell` | Windows |
+| Windows Terminal | `windows-terminal` | Windows |
+| GNOME Terminal | `gnome-terminal` | Linux |
+
+## Deep Linking
+
+Tray Link soporta el esquema de URL `tray-link://`, permitiendo que herramientas externas y scripts interactúen con la app.
+
+## Configuración Compartida
+
+La app y la [CLI](./cli) comparten el mismo archivo de configuración (`config.json`). Los proyectos agregados por CLI aparecerán en la app cuando abras el popover nuevamente, y viceversa.
+
+Ubicación del archivo de configuración:
+
+| Plataforma | Ruta |
+| --- | --- |
+| macOS | `~/Library/Application Support/TrayLink/config.json` |
+| Windows | `%APPDATA%/TrayLink/config.json` |
+| Linux | `~/.config/TrayLink/config.json` |

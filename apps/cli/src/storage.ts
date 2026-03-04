@@ -1,4 +1,4 @@
-import { Project } from '@tray-link/common-types'
+import { Project, Settings } from '@tray-link/common-types'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
@@ -92,5 +92,49 @@ export const projectStore = {
       projects[index] = project
       await projectStore.saveProjects(projects)
     }
+  },
+}
+
+const PREFERENCES_KEY = 'user-preferences'
+
+const defaultPreferences: Settings = {
+  locale: 'en',
+  defaultEditor: null,
+  defaultTerminal: null,
+  launchOnLogin: false,
+  removeFromDiskByDefault: false,
+  customEditors: [],
+  customTerminals: [],
+}
+
+export const preferencesStore = {
+  getPreferences: (): Settings => {
+    try {
+      const config = readConfig()
+      const data = config[PREFERENCES_KEY]
+      if (!data) return { ...defaultPreferences }
+      if (typeof data === 'string') {
+        return { ...defaultPreferences, ...(JSON.parse(data) as Partial<Settings>) }
+      }
+      return { ...defaultPreferences, ...(data as Partial<Settings>) }
+    } catch {
+      return { ...defaultPreferences }
+    }
+  },
+
+  savePreferences: (preferences: Settings): void => {
+    const config = readConfig()
+    config[PREFERENCES_KEY] = JSON.stringify(preferences)
+    writeConfig(config)
+  },
+
+  setDefaultEditor: (command: string | null): void => {
+    const prefs = preferencesStore.getPreferences()
+    preferencesStore.savePreferences({ ...prefs, defaultEditor: command })
+  },
+
+  setDefaultTerminal: (command: string | null): void => {
+    const prefs = preferencesStore.getPreferences()
+    preferencesStore.savePreferences({ ...prefs, defaultTerminal: command })
   },
 }

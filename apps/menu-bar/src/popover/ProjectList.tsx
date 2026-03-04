@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noEmptyBlockStatements: Fail silently if loading preferences on popover focus fails for any reason, to avoid breaking other popover functionality */
 import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -7,6 +8,7 @@ import { pickFolder } from '../../modules/file-picker'
 import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
 import Alert from '../modules/Alert'
+import { defaultUserPreferences } from '../modules/Storage'
 import {
   getEditorOptions,
   getTerminalOptions,
@@ -27,15 +29,20 @@ export const ProjectList = () => {
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [contextMenuProjectId, setContextMenuProjectId] = useState<string | null>(null)
-  const [preferences, setPreferences] = useState(() => loadPreferences())
+  const [preferences, setPreferences] = useState(defaultUserPreferences)
   const editorOptions = getEditorOptions(preferences.customEditors)
   const terminalOptions = getTerminalOptions(preferences.customTerminals)
 
   useEffect(() => {
     loadProjects()
+    loadPreferences()
+      .then(setPreferences)
+      .catch(() => {})
 
     const preferencesSubscription = subscribePreferencesChange(() => {
-      setPreferences(loadPreferences())
+      loadPreferences()
+        .then(setPreferences)
+        .catch(() => {})
     })
 
     const removeSubscription = subscribeProjectRemoveConfirm(async (payload) => {
@@ -57,11 +64,14 @@ export const ProjectList = () => {
     }
   }, [])
 
-  // Reload projects every time the popover becomes visible (e.g. tray icon click)
-  // This ensures CLI-added projects appear without a manual restart
+  // Reload projects and preferences every time the popover becomes visible
+  // This ensures CLI changes appear without a manual restart
   usePopoverFocusEffect(
     useCallback(() => {
       loadProjects()
+      loadPreferences()
+        .then(setPreferences)
+        .catch(() => {})
     }, []),
   )
 

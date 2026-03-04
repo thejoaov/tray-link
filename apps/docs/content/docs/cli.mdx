@@ -1,0 +1,251 @@
+---
+title: CLI
+description: The tlink command-line interface for managing your projects.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Introduction
+
+`tlink` is the companion CLI for Tray Link. It shares the same configuration as the desktop app — projects added via the CLI appear in the app, and vice-versa.
+
+### Installing the CLI
+
+You can install the CLI in two ways:
+
+1. **From the app** — Open Settings → CLI section → click **Install CLI**
+2. **Automatically** — the CLI is bundled with the desktop app and can be symlinked to your PATH
+
+Once installed, verify it works:
+
+```bash
+tlink --help
+```
+
+## Configuration File
+
+The CLI reads and writes to the same `config.json` file used by the desktop app:
+
+| Platform | Path |
+| --- | --- |
+| macOS | `~/Library/Application Support/TrayLink/config.json` |
+| Windows | `%APPDATA%/TrayLink/config.json` |
+| Linux | `~/.config/TrayLink/config.json` |
+
+## Commands
+
+### `tlink add`
+
+Add a project to the list.
+
+```bash
+tlink add <path> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+| --- | --- |
+| `path` | Absolute path to the project folder |
+
+**Options:**
+
+| Option | Description |
+| --- | --- |
+| `-n, --name <name>` | Custom name for the project (defaults to the folder name) |
+
+**Examples:**
+
+```bash
+# Add a project using the folder name
+tlink add /Users/me/projects/my-app
+
+# Add a project with a custom name
+tlink add /Users/me/projects/my-app --name "My App"
+```
+
+---
+
+### `tlink list`
+
+Display a table of all registered projects.
+
+```bash
+tlink list
+```
+
+**Example output:**
+
+```
+┌──────────┬──────────────────────────────────┬──────────┐
+│ Name     │ Path                             │ Favorite │
+├──────────┼──────────────────────────────────┼──────────┤
+│ my-app   │ /Users/me/projects/my-app        │ No       │
+│ website  │ /Users/me/projects/website       │ No       │
+└──────────┴──────────────────────────────────┴──────────┘
+```
+
+---
+
+### `tlink remove`
+
+Remove a project from the list.
+
+```bash
+tlink remove <name-or-id>
+```
+
+**Arguments:**
+
+| Argument | Description |
+| --- | --- |
+| `name-or-id` | Project name or UUID |
+
+**Examples:**
+
+```bash
+# Remove by name
+tlink remove my-app
+
+# Remove by ID
+tlink remove 550e8400-e29b-41d4-a716-446655440000
+```
+
+---
+
+### `tlink open`
+
+Open a project in your editor and/or terminal.
+
+```bash
+tlink open <project> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+| --- | --- |
+| `project` | Project name or UUID |
+
+**Options:**
+
+| Option | Description |
+| --- | --- |
+| `-e, --editor [slug]` | Open in editor. Optionally pass a slug to choose a specific editor. |
+| `-t, --terminal [slug]` | Open in terminal. Optionally pass a slug to choose a specific terminal. |
+
+<Callout type="info">
+  When neither `-e` nor `-t` is provided, the project opens in **both** the default editor and the default terminal.
+</Callout>
+
+**Examples:**
+
+```bash
+# Open in both default editor and terminal
+tlink open my-app
+
+# Open only in a specific editor
+tlink open my-app -e cursor
+
+# Open only in a specific terminal
+tlink open my-app -t iterm
+
+# Open in a specific editor and terminal
+tlink open my-app -e code -t warp
+```
+
+---
+
+### `tlink config list`
+
+List available editors or terminals.
+
+```bash
+tlink config list <type> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+| --- | --- |
+| `type` | `editor` or `terminal` |
+
+**Options:**
+
+| Option | Description |
+| --- | --- |
+| `--detected` | Only show tools that are detected/installed on your system |
+
+The current default is marked with `*` in the output.
+
+**Examples:**
+
+```bash
+# List all known editors
+tlink config list editor
+
+# List only detected/installed terminals
+tlink config list terminal --detected
+```
+
+---
+
+### `tlink config set`
+
+Set the default editor or terminal.
+
+```bash
+tlink config set <type> [slug] [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+| --- | --- |
+| `type` | `editor` or `terminal` |
+| `slug` | (Optional) Slug of the tool to set as default |
+
+**Options:**
+
+| Option | Description |
+| --- | --- |
+| `-i, --interactive` | Choose interactively from detected tools |
+
+**Examples:**
+
+```bash
+# Set default editor directly
+tlink config set editor cursor
+
+# Set default terminal interactively
+tlink config set terminal -i
+```
+
+---
+
+### `tlink migrate`
+
+Migrate data from legacy versions of the app (vs-tray, old Tray Link).
+
+```bash
+tlink migrate [options]
+```
+
+**Options:**
+
+| Option | Description |
+| --- | --- |
+| `--dry-run` | Preview what would be migrated without making changes |
+| `-f, --force` | Skip duplicate check and force migration |
+
+The migration searches for legacy configuration files in known locations and normalizes them into the current format.
+
+**Examples:**
+
+```bash
+# Preview migration
+tlink migrate --dry-run
+
+# Run migration, skipping duplicate checks
+tlink migrate --force
+```

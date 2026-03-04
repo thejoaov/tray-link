@@ -19,14 +19,14 @@ export const CustomTerminalWindow = () => {
   const [binary, setBinary] = useState('')
   const [command, setCommand] = useState('')
 
-  const onSave = () => {
+  const onSave = async () => {
     const result = customToolSchema.safeParse({ name, binary, command })
     if (!result.success) {
       Alert.alert(t('invalidTerminal'), result.error.issues[0]?.message || t('invalidValues'))
       return
     }
 
-    const preferences = loadPreferences()
+    const preferences = await loadPreferences()
     const tool: CustomTool = {
       id: Date.now().toString(),
       name: result.data.name,
@@ -34,7 +34,7 @@ export const CustomTerminalWindow = () => {
       command: result.data.command,
     }
 
-    persistPreferences({
+    await persistPreferences({
       ...preferences,
       customTerminals: [...preferences.customTerminals, tool],
     })

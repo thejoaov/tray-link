@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noEmptyBlockStatements: Fail silently */
 import React, { useEffect } from 'react'
 import { StyleSheet } from 'react-native'
 
@@ -8,7 +9,7 @@ import Popover from './popover'
 import { FluentProvider } from './providers/FluentProvider'
 import { ThemeProvider } from './providers/ThemeProvider'
 import { subscribeLanguageSync, syncI18nLanguageFromPreferences } from './services/i18n'
-import { initializeToolOptions as initializeDiscoveredTools } from './services/preferences'
+import { initializePreferences } from './services/preferences'
 
 type Props = {
   isDevWindow: boolean
@@ -18,10 +19,8 @@ function App(props: Props = { isDevWindow: false }) {
   useEffect(() => {
     Analytics.track(AnalyticsEvent.APP_OPENED)
 
-    syncI18nLanguageFromPreferences()
-    initializeDiscoveredTools().catch(() => {
-      // Non-fatal: discovery failures should not block app bootstrap.
-    })
+    syncI18nLanguageFromPreferences().catch(() => {})
+    initializePreferences().catch(() => {})
     const languageSubscription = subscribeLanguageSync()
 
     return () => {
