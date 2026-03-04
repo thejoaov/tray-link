@@ -3,67 +3,57 @@ import fs from 'fs'
 import { DefaultTerminal } from '../../constants/defaults'
 import SettingsItem from '../../models/SettingsItem'
 import Platform from '../../utils/platform'
+import { generateSlug } from '../../utils/slug'
 import { Settings } from './index'
 
-export function getFilteredSettingsList(settingsList: Settings[]): SettingsItem[] {
-  const filteredList = settingsList
-    .map((item) => {
+export async function getFilteredSettingsList(settingsList: Settings[]): Promise<SettingsItem[]> {
+  const results = await Promise.all(
+    settingsList.map(async (item) => {
+      const command = item.command ?? ''
+      if (!command) return null
+
       let path = ''
-      let command = item.command ?? ''
 
-      if (item.enableBinaryCheck) {
-        execaCommand(
-          Platform.select({
-            darwin: `which -a ${item.binary}`,
-            win32: `where.exe ${item.binary}`,
-            linux: `which -a ${item.binary}`,
-          }) as string,
-          {
-            reject: false,
-            detached: true,
-          },
-        ).then((result) => {
-          if (result.stdout?.length) path = result.stdout
+      if (item.enableBinaryCheck && item.binary) {
+        try {
+          const result = await execaCommand(
+            Platform.select({
+              darwin: `which -a ${item.binary}`,
+              win32: `where.exe ${item.binary}`,
+              linux: `which -a ${item.binary}`,
+            }) as string,
+            { reject: false },
+          )
+          if (result.stdout?.trim().length) {
+            path = result.stdout.trim().split('\n')[0]
+          }
+        } catch {
+          // binary not found — fall through to path check
+        }
+      }
+
+      if (!path && item.enableCommonPathCheck && item.commonFilepaths?.length) {
+        const found = item.commonFilepaths.find((filepath) => {
+          try {
+            return fs.existsSync(filepath)
+          } catch {
+            return false
+          }
         })
-      } else if (item.enableCommonPathCheck && item.commonFilepaths?.length) {
-        path =
-          item.commonFilepaths.find((filepath) => {
-            if (fs.existsSync(filepath)) return filepath
-          }) || ''
+        if (found) path = found
       }
 
-      if (!path?.length) {
-        execaCommand(
-          Platform.select({
-            darwin: `which -a ${item.binary}`,
-            win32: `where.exe ${item.binary}`,
-            linux: `which -a ${item.binary}`,
-          }) as string,
-          {
-            reject: false,
-            detached: true,
-          },
-        ).then((result) => {
-          if (result.stdout?.length) path = result.stdout
-        })
-      }
+      if (!path) return null
 
-      if (item.command?.length) {
-        command = item.command
-      } else if (path) {
-        command = path
-      }
-
-      const newItem = new SettingsItem({
+      return new SettingsItem({
         name: item.name,
+        slug: generateSlug(item.name),
         isDefault: item.name === DefaultTerminal.name,
         command,
         path,
       })
+    }),
+  )
 
-      return newItem
-    })
-    .filter((item) => item.command?.length && item.path?.length)
-
-  return filteredList
+  return results.filter((item): item is SettingsItem => item !== null)
 }

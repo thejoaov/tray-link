@@ -2,11 +2,25 @@ import { CustomTool } from '@tray-link/common-types'
 import { EmitterSubscription } from 'react-native'
 import { fileExists, which } from '../../modules/shell-utils/src'
 import { DeviceEventEmitter } from '../modules/DeviceEventEmitter'
-import { defaultUserPreferences, getUserPreferences, saveUserPreferences, UserPreferences } from '../modules/Storage'
+import {
+  defaultUserPreferences,
+  getUserPreferences,
+  migratePreferencesFromMMKV,
+  saveUserPreferences,
+  UserPreferences,
+} from '../modules/Storage'
+
+/** Generates a URL-safe slug from a tool name (local copy to avoid pulling Node-only tray-shared barrel). */
+const generateSlug = (name: string): string =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 
 export type ToolOption = {
   label: string
   command: string
+  slug: string
 }
 
 type DiscoverableTool = {
@@ -202,13 +216,23 @@ export const PREFERENCES_CHANGED_EVENT = 'preferencesChanged'
 let discoveredEditorOptions: ToolOption[] = []
 let discoveredTerminalOptions: ToolOption[] = []
 
-export const loadPreferences = (): UserPreferences => {
-  return { ...defaultUserPreferences, ...getUserPreferences() }
+export const loadPreferences = async (): Promise<UserPreferences> => {
+  const stored = await getUserPreferences()
+  return { ...defaultUserPreferences, ...stored }
 }
 
-export const persistPreferences = (next: UserPreferences) => {
-  saveUserPreferences(next)
+export const persistPreferences = async (next: UserPreferences): Promise<void> => {
+  await saveUserPreferences(next)
   DeviceEventEmitter.emit(PREFERENCES_CHANGED_EVENT)
+}
+
+/**
+ * Run once on app startup: migrates MMKV preferences to config.json,
+ * then kicks off tool detection.
+ */
+export const initializePreferences = async (): Promise<void> => {
+  await migratePreferencesFromMMKV()
+  await initializeToolOptions()
 }
 
 export const subscribePreferencesChange = (listener: () => void): EmitterSubscription => {
@@ -220,19 +244,23 @@ const isToolInstalled = async (tool: DiscoverableTool): Promise<boolean> => {
     return true
   }
 
-  if (tool.binary) {
-    const binaryPath = await which(tool.binary)
-    if (binaryPath) {
-      return true
-    }
-  }
-
-  if (tool.commonFilepaths?.length) {
-    for (const filepath of tool.commonFilepaths) {
-      if (await fileExists(filepath)) {
+  try {
+    if (tool.binary) {
+      const binaryPath = await which(tool.binary)
+      if (binaryPath) {
         return true
       }
     }
+
+    if (tool.commonFilepaths?.length) {
+      for (const filepath of tool.commonFilepaths) {
+        if (await fileExists(filepath)) {
+          return true
+        }
+      }
+    }
+  } catch {
+    // IPC or native module call failed — treat tool as not installed
   }
 
   return false
@@ -244,7 +272,7 @@ const discoverTools = async (candidates: DiscoverableTool[]): Promise<ToolOption
   for (const tool of candidates) {
     const installed = await isToolInstalled(tool)
     if (installed) {
-      discovered.push({ label: tool.label, command: tool.command })
+      discovered.push({ label: tool.label, command: tool.command, slug: generateSlug(tool.label) })
     }
   }
 
@@ -252,10 +280,17 @@ const discoverTools = async (candidates: DiscoverableTool[]): Promise<ToolOption
 }
 
 export const reloadToolOptions = async () => {
-  const [editors, terminals] = await Promise.all([discoverTools(EDITOR_CANDIDATES), discoverTools(TERMINAL_CANDIDATES)])
+  try {
+    const [editors, terminals] = await Promise.all([
+      discoverTools(EDITOR_CANDIDATES),
+      discoverTools(TERMINAL_CANDIDATES),
+    ])
 
-  discoveredEditorOptions = dedupeOptions(editors)
-  discoveredTerminalOptions = dedupeOptions(terminals)
+    discoveredEditorOptions = dedupeOptions(editors)
+    discoveredTerminalOptions = dedupeOptions(terminals)
+  } catch {
+    // Tool discovery failed — keep whatever was previously discovered
+  }
   DeviceEventEmitter.emit(PREFERENCES_CHANGED_EVENT)
 }
 
@@ -268,12 +303,20 @@ export const initializeToolOptions = async () => {
 }
 
 export const getEditorOptions = (customEditors: CustomTool[] = []): ToolOption[] => {
-  const custom = customEditors.map((item) => ({ label: item.name, command: item.command }))
+  const custom = customEditors.map((item) => ({
+    label: item.name,
+    command: item.command,
+    slug: generateSlug(item.name),
+  }))
   return dedupeOptions([...discoveredEditorOptions, ...custom])
 }
 
 export const getTerminalOptions = (customTerminals: CustomTool[] = []): ToolOption[] => {
-  const custom = customTerminals.map((item) => ({ label: item.name, command: item.command }))
+  const custom = customTerminals.map((item) => ({
+    label: item.name,
+    command: item.command,
+    slug: generateSlug(item.name),
+  }))
   return dedupeOptions([...discoveredTerminalOptions, ...custom])
 }
 

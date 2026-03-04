@@ -15,6 +15,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@clack/prompts": "^1.1.0",
     "@tray-link/common-types": "workspace:*",
     "@tray-link/tray-shared": "workspace:*",
     "commander": "^10.0.1",

@@ -1,6 +1,7 @@
 import { Project } from '@tray-link/common-types'
 import { loadLegacyTrayLinkData } from '../../modules/shell-utils/src'
-import { defaultUserPreferences, storage } from '../modules/Storage'
+import { getItem, setItem } from '../../modules/storage-module/src'
+import { defaultUserPreferences } from '../modules/Storage'
 import { loadPreferences, persistPreferences } from './preferences'
 import { projectStore } from './projectStore'
 
@@ -65,12 +66,12 @@ const normalizeLegacyProjects = (items: LegacyProject[] = []): Project[] => {
     .map((item, index) => ({ ...item, position: index }))
 }
 
-const migratePreferencesIfNeeded = (legacySettings?: LegacySettings): boolean => {
+const migratePreferencesIfNeeded = async (legacySettings?: LegacySettings): Promise<boolean> => {
   if (!legacySettings) {
     return false
   }
 
-  const current = loadPreferences()
+  const current = await loadPreferences()
   const next = { ...current }
   let changed = false
 
@@ -92,19 +93,20 @@ const migratePreferencesIfNeeded = (legacySettings?: LegacySettings): boolean =>
   }
 
   if (changed) {
-    persistPreferences(next)
+    await persistPreferences(next)
   }
 
   return changed
 }
 
-export const hasLegacyMigrationCompleted = () => {
-  return Boolean(storage.getBoolean(LEGACY_MIGRATION_DONE_KEY))
+export const hasLegacyMigrationCompleted = async (): Promise<boolean> => {
+  const value = await getItem(LEGACY_MIGRATION_DONE_KEY)
+  return value === 'true'
 }
 
 export const runLegacyMigration = async (): Promise<boolean> => {
-  const alreadyMigrated = storage.getBoolean(LEGACY_MIGRATION_DONE_KEY)
-  if (alreadyMigrated) {
+  const alreadyMigrated = await getItem(LEGACY_MIGRATION_DONE_KEY)
+  if (alreadyMigrated === 'true') {
     return false
   }
 
@@ -115,7 +117,7 @@ export const runLegacyMigration = async (): Promise<boolean> => {
 
   const root = legacyData as { settings?: LegacySettings; projects?: LegacyProject[] }
 
-  const preferencesMigrated = migratePreferencesIfNeeded(root.settings)
+  const preferencesMigrated = await migratePreferencesIfNeeded(root.settings)
 
   let projectsMigrated = false
   const existingProjects = await projectStore.getProjects()
@@ -134,7 +136,7 @@ export const runLegacyMigration = async (): Promise<boolean> => {
     }
   }
 
-  storage.set(LEGACY_MIGRATION_DONE_KEY, true)
+  await setItem(LEGACY_MIGRATION_DONE_KEY, 'true')
   return preferencesMigrated || projectsMigrated
 }
 

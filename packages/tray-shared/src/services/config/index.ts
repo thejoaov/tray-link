@@ -343,17 +343,17 @@ export const editorList: Settings[] = [
   },
 ]
 
-export function getTerminalList(): SettingsItem[] {
+export function getTerminalList(): Promise<SettingsItem[]> {
   return getFilteredSettingsList(terminalList)
 }
 
-export function getEditorList(): SettingsItem[] {
+export function getEditorList(): Promise<SettingsItem[]> {
   return getFilteredSettingsList(editorList)
 }
 
 export const defaultConfig = {
-  editorList: getEditorList(),
-  terminalList: getTerminalList(),
+  editorList,
+  terminalList,
   defaultTerminal: DefaultTerminal,
   defaultEditor: DefaultEditor,
 }

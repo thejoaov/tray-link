@@ -2,7 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import { EmitterSubscription } from 'react-native'
 
-import { defaultUserPreferences, getUserPreferences, UserPreferences } from '../modules/Storage'
+import { defaultUserPreferences, UserPreferences } from '../modules/Storage'
 import { loadPreferences, subscribePreferencesChange } from './preferences'
 
 type Locale = NonNullable<UserPreferences['locale']>
@@ -215,7 +215,9 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
 }
 
 export const resolveLocale = (): Locale => {
-  const locale = getUserPreferences()?.locale ?? defaultUserPreferences.locale
+  // Synchronous fallback at module init time — language will be updated
+  // asynchronously via syncI18nLanguageFromPreferences() once prefs are loaded.
+  const locale = defaultUserPreferences.locale
   if (locale === 'pt' || locale === 'es') {
     return locale
   }
@@ -240,8 +242,9 @@ if (!i18n.isInitialized) {
   })
 }
 
-export const syncI18nLanguageFromPreferences = () => {
-  const locale = loadPreferences().locale
+export const syncI18nLanguageFromPreferences = async () => {
+  const prefs = await loadPreferences()
+  const locale = prefs.locale
   const nextLanguage = locale === 'pt' || locale === 'es' ? locale : 'en'
   if (i18n.language !== nextLanguage) {
     i18n.changeLanguage(nextLanguage)
@@ -250,7 +253,8 @@ export const syncI18nLanguageFromPreferences = () => {
 
 export const subscribeLanguageSync = (): EmitterSubscription => {
   return subscribePreferencesChange(() => {
-    syncI18nLanguageFromPreferences()
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: fail silently if syncing language from preferences fails for any reason, to avoid breaking other prefs functionality
+    syncI18nLanguageFromPreferences().catch(() => {})
   })
 }
 
