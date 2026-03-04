@@ -6,6 +6,9 @@ on:
     workflows: ["Build and Release"]
     types: [completed]
 
+permissions:
+  contents: write
+
 jobs:
   update-homebrew-cask:
     runs-on: ubuntu-latest
@@ -156,4 +159,4 @@ jobs:
           fi
 
           git commit -m "chore(cask): ${CASK_NAME} ${{ steps.release_version.outputs.version }}"
-          git push
+          git push --force
