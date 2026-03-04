@@ -9,7 +9,7 @@ export type ElectronModule = {
     | { [key: string]: number | string | boolean }
 }
 
-export type Registry = ElectronModule[]
+export type Registry = Array<ElectronModule>
 
 export type IpcMainModules = {
   [moduleName: string]: { functions: string[]; values: string[] }

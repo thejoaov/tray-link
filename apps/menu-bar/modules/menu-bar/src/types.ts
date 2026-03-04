@@ -30,7 +30,7 @@ export interface ElectronMainMenuBarModule
   runCli: (command: string, args: string[], listenerId: number, event: IpcMainInvokeEvent) => Promise<string>
 }
 
-export interface ElectronPreloadMenuBarModule extends Pick<NativeMenuBarModule, PreloadKeys> {
+export interface ElectronPreloadMenuBarModule extends Pick<NativeMenuBarModule, PreloadKeys>, ElectronModule {
   name: string
   addListener(type: string, listener: (data: unknown) => void): EmitterSubscription
 }
