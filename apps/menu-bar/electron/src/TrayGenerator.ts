@@ -1,91 +1,86 @@
 import {
-  Tray,
-  Menu,
-  screen,
-  BrowserWindow,
-  MenuItemConstructorOptions,
-  ipcMain,
   app,
+  BrowserWindow,
+  Display,
+  ipcMain,
+  Menu,
+  MenuItemConstructorOptions,
   nativeTheme,
   Rectangle,
-  Display,
-} from 'electron';
-import path from 'path';
+  screen,
+  Tray,
+} from 'electron'
+import path from 'path'
 
-import WindowManager from '../modules/WindowManager/main';
+import WindowManager from '../modules/WindowManager/main'
 
 export default class TrayGenerator {
-  mainWindow: BrowserWindow;
-  tray: Tray | null;
+  mainWindow: BrowserWindow
+  tray: Tray | null
 
   constructor(mainWindow: BrowserWindow) {
-    this.tray = null;
-    this.mainWindow = mainWindow;
+    this.tray = null
+    this.mainWindow = mainWindow
   }
   calculateWindowPosition = (display: Display) => {
     if (this.tray === null) {
-      return;
+      return
     }
-    const windowBounds = this.mainWindow.getBounds();
-    const trayBounds = this.tray.getBounds();
-    const { workArea } = display;
-    const PADDING = 12;
+    const windowBounds = this.mainWindow.getBounds()
+    const trayBounds = this.tray.getBounds()
+    const { workArea } = display
+    const PADDING = 12
 
     // Determine closest horizontal edge
-    const trayCenterX = trayBounds.x + trayBounds.width / 2;
-    const distanceToLeft = trayCenterX - workArea.x;
-    const distanceToRight = workArea.x + workArea.width - trayCenterX;
-    let isLeft = distanceToLeft < distanceToRight;
+    const trayCenterX = trayBounds.x + trayBounds.width / 2
+    const distanceToLeft = trayCenterX - workArea.x
+    const distanceToRight = workArea.x + workArea.width - trayCenterX
+    let isLeft = distanceToLeft < distanceToRight
 
     // Determine closest vertical edge
-    const trayCenterY = trayBounds.y + trayBounds.height / 2;
-    const distanceToTop = trayCenterY - workArea.y;
-    const distanceToBottom = workArea.y + workArea.height - trayCenterY;
-    let isTop = distanceToTop < distanceToBottom;
+    const trayCenterY = trayBounds.y + trayBounds.height / 2
+    const distanceToTop = trayCenterY - workArea.y
+    const distanceToBottom = workArea.y + workArea.height - trayCenterY
+    let isTop = distanceToTop < distanceToBottom
 
-    const zeroTray =
-      trayBounds.x === 0 && trayBounds.y === 0 && trayBounds.width === 0 && trayBounds.height === 0;
+    const zeroTray = trayBounds.x === 0 && trayBounds.y === 0 && trayBounds.width === 0 && trayBounds.height === 0
     if (process.platform === 'linux' && zeroTray) {
       // On Linux trayBounds may return an empty Rectagle, in these cases force to top-right corner
-      isTop = true;
-      isLeft = false;
+      isTop = true
+      isLeft = false
     }
 
-    const x = isLeft
-      ? workArea.x + PADDING
-      : workArea.x + workArea.width - windowBounds.width - PADDING;
+    const x = isLeft ? workArea.x + PADDING : workArea.x + workArea.width - windowBounds.width - PADDING
 
-    const y = isTop
-      ? workArea.y + PADDING
-      : workArea.y + workArea.height - windowBounds.height - PADDING;
+    const y = isTop ? workArea.y + PADDING : workArea.y + workArea.height - windowBounds.height - PADDING
 
-    return { x, y };
-  };
+    return { x, y }
+  }
   showWindow = (bounds?: Rectangle) => {
     const currentDisplay = bounds
       ? screen.getDisplayMatching(bounds)
-      : screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+      : screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
 
-    const { height, width } = currentDisplay.size;
-    this.mainWindow.webContents.send('popoverFocused', { screenSize: { height, width } });
-    const position = this.calculateWindowPosition(currentDisplay);
+    const { height, width } = currentDisplay.size
+    this.mainWindow.webContents.send('popoverFocused', { screenSize: { height, width } })
+    const position = this.calculateWindowPosition(currentDisplay)
 
     if (!position) {
-      return;
+      return
     }
-    this.mainWindow.setPosition(position.x, position.y, false);
-    this.mainWindow.show();
-  };
+    this.mainWindow.setPosition(position.x, position.y, false)
+    this.mainWindow.show()
+  }
   hideWindow = () => {
-    this.mainWindow.hide();
-  };
+    this.mainWindow.hide()
+  }
   toggleWindow = (_: KeyboardEvent, bounds: Rectangle) => {
     if (this.mainWindow.isVisible()) {
-      this.hideWindow();
+      this.hideWindow()
     } else {
-      this.showWindow(bounds);
+      this.showWindow(bounds)
     }
-  };
+  }
   rightClickMenu = () => {
     const menu: MenuItemConstructorOptions[] = [
       {
@@ -99,39 +94,39 @@ export default class TrayGenerator {
               height: 580,
               width: 500,
             },
-          });
+          })
         },
       },
       {
         role: 'quit',
         accelerator: 'Command+Q',
       },
-    ];
-    this.tray?.popUpContextMenu(Menu.buildFromTemplate(menu));
-  };
+    ]
+    this.tray?.popUpContextMenu(Menu.buildFromTemplate(menu))
+  }
   createTray = () => {
-    this.tray = new Tray(getIconPath());
+    this.tray = new Tray(getIconPath())
     nativeTheme.addListener('updated', () => {
-      this.tray?.setImage(getIconPath());
-    });
+      this.tray?.setImage(getIconPath())
+    })
 
-    this.tray.setIgnoreDoubleClickEvents(true);
-    this.tray.on('click', this.toggleWindow);
-    this.tray.on('right-click', this.rightClickMenu);
+    this.tray.setIgnoreDoubleClickEvents(true)
+    this.tray.on('click', this.toggleWindow)
+    this.tray.on('right-click', this.rightClickMenu)
 
-    ipcMain.handle('open-popover', () => this.showWindow());
-    ipcMain.handle('close-popover', this.hideWindow);
+    ipcMain.handle('open-popover', () => this.showWindow())
+    ipcMain.handle('close-popover', this.hideWindow)
 
-    app.on('open-url', () => this.showWindow());
-    app.on('second-instance', () => this.showWindow());
+    app.on('open-url', () => this.showWindow())
+    app.on('second-instance', () => this.showWindow())
 
     this.mainWindow.on('blur', () => {
       if (!this.tray) {
-        return;
+        return
       }
 
-      const cursor = screen.getCursorScreenPoint();
-      const trayBounds = this.tray.getBounds();
+      const cursor = screen.getCursorScreenPoint()
+      const trayBounds = this.tray.getBounds()
       if (
         cursor.x >= trayBounds.x &&
         cursor.x <= trayBounds.x + trayBounds.width &&
@@ -139,32 +134,29 @@ export default class TrayGenerator {
         cursor.y <= trayBounds.y + trayBounds.height
       ) {
         // Cursor is within tray bounds, do not hide
-        return;
+        return
       }
 
-      this.hideWindow();
-    });
-  };
+      this.hideWindow()
+    })
+  }
 }
-module.exports = TrayGenerator;
+module.exports = TrayGenerator
 
 const getIconPath = () => {
-  const iconName = getIconName();
+  const iconName = getIconName()
 
-  return path.join(
-    path.dirname(__dirname),
-    `${app.isPackaged ? '../..' : '..'}/assets/images/tray/${iconName}`
-  );
-};
+  return path.join(path.dirname(__dirname), `${app.isPackaged ? '../..' : '..'}/assets/images/tray/${iconName}`)
+}
 
 const getIconName = () => {
   if (process.platform === 'darwin') {
-    return 'iconTemplate.png';
+    return 'iconTemplate.png'
   }
 
   if (process.platform === 'win32') {
-    return 'icon.ico';
+    return 'icon.ico'
   }
 
-  return 'icon.png';
-};
+  return 'icon.png'
+}

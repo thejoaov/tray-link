@@ -1,13 +1,9 @@
-import { Checkbox as FluentCheckbox } from '@fluentui/react-checkbox';
-import React from 'react';
+import { Checkbox as FluentCheckbox } from '@fluentui/react-checkbox'
+import React from 'react'
 
-import { CheckboxChangeEvent, NativeCheckboxProps } from './types';
+import { CheckboxChangeEvent, NativeCheckboxProps } from './types'
 
-const Checkbox = ({
-  value,
-  onChange,
-  ref: _ref,
-}: NativeCheckboxProps & { ref?: React.Ref<unknown> }) => {
+const Checkbox = ({ value, onChange, ref: _ref }: NativeCheckboxProps & { ref?: React.Ref<unknown> }) => {
   return (
     <FluentCheckbox
       type="checkbox"
@@ -20,7 +16,7 @@ const Checkbox = ({
         } as CheckboxChangeEvent)
       }
     />
-  );
-};
+  )
+}
 
-export default Checkbox;
+export default Checkbox

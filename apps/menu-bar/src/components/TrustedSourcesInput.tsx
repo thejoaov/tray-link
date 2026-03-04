@@ -1,12 +1,11 @@
-import { darkTheme, lightTheme } from '@expo/styleguide-native';
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, TextInput as NativeTextInput } from 'react-native';
-
-import { TextInput } from './Text';
-import { Row } from './View';
-import { PlatformColor } from '../modules/PlatformColor';
-import { addOpacity } from '../utils/theme';
-import { useCurrentTheme } from '../utils/useExpoTheme';
+import { darkTheme, lightTheme } from '@expo/styleguide-native'
+import React, { useEffect, useState } from 'react'
+import { TextInput as NativeTextInput, StyleSheet } from 'react-native'
+import { PlatformColor } from '../modules/PlatformColor'
+import { addOpacity } from '../utils/theme'
+import { useCurrentTheme } from '../utils/useExpoTheme'
+import { TextInput } from './Text'
+import { Row } from './View'
 
 const TrustedSourcesInput = ({
   editable,
@@ -14,37 +13,36 @@ const TrustedSourcesInput = ({
   ref,
   ...props
 }: React.ComponentProps<typeof TextInput> & {
-  onSave: (trustedSources: string) => void;
-  ref?: React.Ref<NativeTextInput>;
+  onSave: (trustedSources: string) => void
+  ref?: React.Ref<NativeTextInput>
 }) => {
-  const theme = useCurrentTheme();
-  const [value, setValue] = useState(props.value ?? '');
+  const theme = useCurrentTheme()
+  const [value, setValue] = useState(props.value ?? '')
 
   const backgroundColor =
-    theme === 'light'
-      ? addOpacity(lightTheme.background.default, 0.6)
-      : addOpacity(darkTheme.background.default, 0.2);
+    theme === 'light' ? addOpacity(lightTheme.background.default, 0.6) : addOpacity(darkTheme.background.default, 0.2)
 
   useEffect(() => {
-    setValue(props.value ?? '');
-  }, [props.value]);
+    setValue(props.value ?? '')
+  }, [props.value])
 
   const handleSave = () => {
     const formattedValue = value
       ?.split(',')
       .map((domain) => domain.trim())
       .filter((i) => !!i)
-      .join(',');
+      .join(',')
 
-    onSave(formattedValue);
-  };
+    onSave(formattedValue)
+  }
 
   return (
     <Row
       border="light"
       rounded="medium"
       align="center"
-      style={[styles.inputContainer, { backgroundColor }, !editable && styles.inputDisabled]}>
+      style={[styles.inputContainer, { backgroundColor }, !editable && styles.inputDisabled]}
+    >
       <TextInput
         shadow="input"
         {...props}
@@ -58,10 +56,10 @@ const TrustedSourcesInput = ({
         numberOfLines={2}
       />
     </Row>
-  );
-};
+  )
+}
 
-export default TrustedSourcesInput;
+export default TrustedSourcesInput
 
 const styles = StyleSheet.create({
   inputContainer: {
@@ -82,4 +80,4 @@ const styles = StyleSheet.create({
   icon: {
     paddingHorizontal: 6,
   },
-});
+})

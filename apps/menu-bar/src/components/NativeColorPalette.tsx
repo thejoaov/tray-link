@@ -1,15 +1,15 @@
-import { useClipboard } from '@react-native-clipboard/clipboard';
-import { useState } from 'react';
-import { FlatList, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { useClipboard } from '@react-native-clipboard/clipboard'
+import { useState } from 'react'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import { PlatformColor } from '../modules/PlatformColor';
+import { PlatformColor } from '../modules/PlatformColor'
 
-const SMALL_SQUARE_SIZE = 25;
-const NUMBER_OF_COLUMNS = 9;
+const SMALL_SQUARE_SIZE = 25
+const NUMBER_OF_COLUMNS = 9
 
 const NativeColorPalette = () => {
-  const [selectedColor, setSelectedColor] = useState<string>();
-  const [, setClipboardString] = useClipboard();
+  const [selectedColor, setSelectedColor] = useState<string>()
+  const [, setClipboardString] = useClipboard()
   return (
     <View style={styles.container}>
       <View style={{ alignItems: 'flex-start' }}>
@@ -26,7 +26,7 @@ const NativeColorPalette = () => {
                 ]}
                 onPress={() => setSelectedColor((prev) => (prev !== item ? item : undefined))}
               />
-            );
+            )
           }}
           keyExtractor={(item) => item}
           numColumns={NUMBER_OF_COLUMNS}
@@ -42,18 +42,16 @@ const NativeColorPalette = () => {
               },
             ]}
           />
-          <TouchableOpacity
-            style={styles.selectedColorText}
-            onPress={() => setClipboardString(selectedColor)}>
+          <TouchableOpacity style={styles.selectedColorText} onPress={() => setClipboardString(selectedColor)}>
             <Text>{selectedColor}</Text>
           </TouchableOpacity>
         </View>
       ) : null}
     </View>
-  );
-};
+  )
+}
 
-export default NativeColorPalette;
+export default NativeColorPalette
 
 const styles = StyleSheet.create({
   container: {
@@ -78,7 +76,7 @@ const styles = StyleSheet.create({
   selectedColorText: {
     margin: 10,
   },
-});
+})
 
 const colorsArray = [
   'labelColor',
@@ -126,4 +124,4 @@ const colorsArray = [
   'systemPurpleColor',
   'systemRedColor',
   'systemYellowColor',
-];
+]

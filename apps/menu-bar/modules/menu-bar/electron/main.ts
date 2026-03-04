@@ -1,45 +1,30 @@
-import { app, dialog, BrowserWindow } from 'electron';
-import type { IpcMainInvokeEvent } from 'electron';
-import path from 'path';
+import type { IpcMainInvokeEvent } from 'electron'
+import { app, BrowserWindow, dialog } from 'electron'
+import path from 'path'
+import { ElectronMainMenuBarModule } from '../src/types'
+import spawnCliAsync from './spawnCliAsync'
 
-import spawnCliAsync from './spawnCliAsync';
-import { ElectronMainMenuBarModule } from '../src/types';
+const runCli = async (command: string, args: string[], listenerId: number, event: IpcMainInvokeEvent) => {
+  const webContents = BrowserWindow.getAllWindows().find((window) => window.webContents === event.sender)?.webContents
 
-const runCli = async (
-  command: string,
-  args: string[],
-  listenerId: number,
-  event: IpcMainInvokeEvent
-) => {
-  const webContents = BrowserWindow.getAllWindows().find(
-    (window) => window.webContents === event.sender
-  )?.webContents;
+  const cliPath = path.join(__dirname, './cli/index')
 
-  const cliPath = path.join(__dirname, './cli/index');
-
-  const commandOutput = await spawnCliAsync(
-    cliPath,
-    command,
-    args,
-    listenerId,
-    {},
-    (event) => {
-      webContents?.postMessage('onCLIOutput', event);
-    }
-  );
-  return commandOutput;
-};
+  const commandOutput = await spawnCliAsync(cliPath, command, args, listenerId, {}, (event) => {
+    webContents?.postMessage('onCLIOutput', event)
+  })
+  return commandOutput
+}
 
 const MenuBarModule: ElectronMainMenuBarModule = {
   name: 'MenuBar',
   appVersion: app.getVersion(),
   runCli,
   exitApp() {
-    app.quit();
+    app.quit()
   },
   setLoginItemEnabled(enabled: boolean) {
-    app.setLoginItemSettings({ openAtLogin: enabled });
-    return Promise.resolve();
+    app.setLoginItemSettings({ openAtLogin: enabled })
+    return Promise.resolve()
   },
   showMultiOptionAlert: async (title: string, message: string, _options: string[]) => {
     const { response } = await dialog.showMessageBox({
@@ -48,13 +33,13 @@ const MenuBarModule: ElectronMainMenuBarModule = {
       detail: message,
       type: 'question',
       buttons: ['Cancel', 'OK'],
-    });
+    })
 
-    return response;
+    return response
   },
   setEnvVars(_envVars) {
     //
   },
-};
+}
 
-export default MenuBarModule;
+export default MenuBarModule

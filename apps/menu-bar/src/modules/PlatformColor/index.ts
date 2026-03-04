@@ -1,1 +1,1 @@
-export { PlatformColor } from 'react-native';
+export { PlatformColor } from 'react-native'

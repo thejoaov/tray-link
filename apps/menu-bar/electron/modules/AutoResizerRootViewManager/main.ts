@@ -1,13 +1,13 @@
-import { BrowserWindow, screen } from 'electron';
-import type { IpcMainInvokeEvent } from 'electron';
+import type { IpcMainInvokeEvent } from 'electron'
+import { BrowserWindow, screen } from 'electron'
 
 async function setPopoverSize(width: number, height: number, event: IpcMainInvokeEvent) {
   for (const window of BrowserWindow.getAllWindows()) {
     if (event.sender === window.webContents) {
-      const [oldX, oldY] = window.getPosition();
-      const [oldWidth, oldHeight] = window.getSize();
+      const [oldX, oldY] = window.getPosition()
+      const [oldWidth, oldHeight] = window.getSize()
 
-      const display = screen.getDisplayNearestPoint({ x: oldX, y: oldY });
+      const display = screen.getDisplayNearestPoint({ x: oldX, y: oldY })
 
       window.setBounds(
         {
@@ -16,18 +16,18 @@ async function setPopoverSize(width: number, height: number, event: IpcMainInvok
           x: oldX + oldWidth - width,
           y: display.size.height / 2 > oldY ? oldY : oldY + oldHeight - height,
         },
-        true
-      );
+        true,
+      )
     }
   }
 }
 
 const AutoResizerRootViewManager: {
-  name: string;
-  setPopoverSize: (width: number, height: number, event: IpcMainInvokeEvent) => void;
+  name: string
+  setPopoverSize: (width: number, height: number, event: IpcMainInvokeEvent) => void
 } = {
   name: 'AutoResizerRootViewManager',
   setPopoverSize,
-};
+}
 
-export default AutoResizerRootViewManager;
+export default AutoResizerRootViewManager

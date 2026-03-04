@@ -1,15 +1,14 @@
-import { StyleSheet } from "react-native";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next'
+import { StyleSheet } from 'react-native'
+import { Divider, Text, View } from '../components'
+import MenuBarModule from '../modules/MenuBarModule'
+import { WindowsNavigator } from '../windows'
+import Item from './Item'
 
-import Item from "./Item";
-import { Divider, Text, View } from "../components";
-import MenuBarModule from "../modules/MenuBarModule";
-import { WindowsNavigator } from "../windows";
-
-export const FOOTER_HEIGHT = 62;
+export const FOOTER_HEIGHT = 62
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   return (
     <View style={styles.container}>
@@ -17,15 +16,15 @@ export default function Footer() {
         <Divider />
       </View>
       <View py="tiny" pb="1.5">
-        <Item onPress={() => WindowsNavigator.open("Settings")}>
-          <Text>{t("settingsMenu")}</Text>
+        <Item onPress={() => WindowsNavigator.open('Settings')}>
+          <Text>{t('settingsMenu')}</Text>
         </Item>
         <Item onPress={MenuBarModule.exitApp} shortcut="⌘ Q">
-          <Text>{t("quit")}</Text>
+          <Text>{t('quit')}</Text>
         </Item>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -33,4 +32,4 @@ const styles = StyleSheet.create({
     marginTop: 24,
     // height: FOOTER_HEIGHT,
   },
-});
+})

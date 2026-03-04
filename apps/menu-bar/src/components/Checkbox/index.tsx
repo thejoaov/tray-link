@@ -1,23 +1,17 @@
-import { type ElementRef, useRef } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { type ElementRef, useRef } from 'react'
+import { Pressable, StyleSheet } from 'react-native'
+import { Text } from '../Text'
+import { Row } from '../View'
+import NativeCheckbox from './NativeCheckbox'
+import { CheckboxChangeEvent, CheckboxProps } from './types'
 
-import NativeCheckbox from "./NativeCheckbox";
-import { CheckboxChangeEvent, CheckboxProps } from "./types";
-import { Text } from "../Text";
-import { Row } from "../View";
-
-const Checkbox = ({
-  onChange,
-  onValueChange,
-  label,
-  ...props
-}: CheckboxProps) => {
-  const nativeCheckboxRef = useRef<ElementRef<typeof NativeCheckbox>>(null);
+const Checkbox = ({ onChange, onValueChange, label, ...props }: CheckboxProps) => {
+  const nativeCheckboxRef = useRef<ElementRef<typeof NativeCheckbox>>(null)
 
   const handleChange = (event: CheckboxChangeEvent) => {
-    onChange?.(event);
-    onValueChange?.(event.nativeEvent.value);
-  };
+    onChange?.(event)
+    onValueChange?.(event.nativeEvent.value)
+  }
 
   return (
     <Row align="center" gap="1">
@@ -30,19 +24,19 @@ const Checkbox = ({
       {label && (
         <Pressable
           onPress={() => {
-            onValueChange?.(!props.value);
-            nativeCheckboxRef.current?.setNativeValue(!props.value);
+            onValueChange?.(!props.value)
+            nativeCheckboxRef.current?.setNativeValue(!props.value)
           }}
         >
           <Text size="small">{label}</Text>
         </Pressable>
       )}
     </Row>
-  );
-};
+  )
+}
 
-export default Checkbox;
+export default Checkbox
 
 const styles = StyleSheet.create({
   checkbox: { height: 18, width: 18 },
-});
+})

@@ -1,4 +1,4 @@
-import Svg, { G, Path, SvgProps } from 'react-native-svg';
+import Svg, { G, Path, SvgProps } from 'react-native-svg'
 
 const AlertTriangle = ({ fill = '#946800', ...props }: SvgProps) => (
   <Svg width="20" height="20" viewBox="0 0 20 20" {...props}>
@@ -12,6 +12,6 @@ const AlertTriangle = ({ fill = '#946800', ...props }: SvgProps) => (
       />
     </G>
   </Svg>
-);
+)
 
-export default AlertTriangle;
+export default AlertTriangle

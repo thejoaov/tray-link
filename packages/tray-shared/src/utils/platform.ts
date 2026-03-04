@@ -5,9 +5,9 @@ const Platform = {
   select: <T>(options: Partial<Record<NodeJS.Platform, T>>): T | null => {
     const value = options[process.platform]
     if (value === undefined) {
-      return null;
+      return null
     }
-    return value;
+    return value
   },
   OS: process.platform,
 }

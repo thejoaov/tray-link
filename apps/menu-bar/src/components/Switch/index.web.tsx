@@ -1,5 +1,5 @@
-import { Switch as FluentSwitch } from '@fluentui/react-switch';
-import { SwitchProps } from 'react-native';
+import { Switch as FluentSwitch } from '@fluentui/react-switch'
+import { SwitchProps } from 'react-native'
 
 export function Switch({ onValueChange, value, disabled }: SwitchProps) {
   return (
@@ -8,9 +8,9 @@ export function Switch({ onValueChange, value, disabled }: SwitchProps) {
       checked={value}
       onChange={(ev) => {
         if (onValueChange) {
-          onValueChange(Boolean(ev.target.checked));
+          onValueChange(Boolean(ev.target.checked))
         }
       }}
     />
-  );
+  )
 }

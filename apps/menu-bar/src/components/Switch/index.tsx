@@ -1,1 +1,1 @@
-export { Switch } from 'react-native';
+export { Switch } from 'react-native'

@@ -1,6 +1,6 @@
 export interface AnalyticsAdapter {
-  track(event: string, properties?: Record<string, unknown>): void;
-  identify(userId: string): void;
+  track(event: string, properties?: Record<string, unknown>): void
+  identify(userId: string): void
 }
 
 export enum AnalyticsEvent {

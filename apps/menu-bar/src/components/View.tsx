@@ -1,21 +1,21 @@
-import { lightTheme, darkTheme, shadows, palette } from '@expo/styleguide-native';
-import { View as RNView, StyleSheet } from 'react-native';
+import { darkTheme, lightTheme, palette, shadows } from '@expo/styleguide-native'
+import { View as RNView, StyleSheet } from 'react-native'
 
-import { create } from '../utils/create-component-primitive';
+import { create } from '../utils/create-component-primitive'
 import {
-  scale,
-  padding,
-  margin,
-  rounded,
+  addOpacity,
   bg,
   bgDark,
-  width,
-  height,
-  borderDark,
   border,
+  borderDark,
   gap,
-  addOpacity,
-} from '../utils/theme';
+  height,
+  margin,
+  padding,
+  rounded,
+  scale,
+  width,
+} from '../utils/theme'
 
 export const View = create(RNView, {
   variants: {
@@ -130,7 +130,7 @@ export const View = create(RNView, {
       bg: {},
     },
   },
-});
+})
 
 export const Row = create(RNView, {
   base: {
@@ -184,7 +184,7 @@ export const Row = create(RNView, {
       border: borderDark,
     },
   },
-});
+})
 
 const Horizontal = create(RNView, {
   base: {
@@ -207,7 +207,7 @@ const Horizontal = create(RNView, {
       bg: bgDark,
     },
   },
-});
+})
 
 const Vertical = create(RNView, {
   base: {
@@ -230,12 +230,12 @@ const Vertical = create(RNView, {
       bg: bgDark,
     },
   },
-});
+})
 
 export const Spacer = {
   Vertical,
   Horizontal,
-};
+}
 
 export const Divider = create(RNView, {
   base: {
@@ -262,7 +262,7 @@ export const Divider = create(RNView, {
       },
     },
   },
-});
+})
 
 export const StatusIndicator = create(RNView, {
   base: {
@@ -300,4 +300,4 @@ export const StatusIndicator = create(RNView, {
       default: { backgroundColor: darkTheme.status.default },
     },
   },
-});
+})

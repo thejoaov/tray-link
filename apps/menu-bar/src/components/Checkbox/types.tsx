@@ -1,18 +1,18 @@
-import { TargetedEvent, NativeSyntheticEvent, ViewProps } from 'react-native';
+import { NativeSyntheticEvent, TargetedEvent, ViewProps } from 'react-native'
 
 interface CheckboxChangeEventData extends TargetedEvent {
-  value: boolean;
+  value: boolean
 }
 
 export interface CheckboxChangeEvent extends NativeSyntheticEvent<CheckboxChangeEventData> {}
 
 export type NativeCheckboxProps = ViewProps & {
-  disabled?: boolean;
-  onChange?: (event: CheckboxChangeEvent) => void;
-  value?: boolean;
-};
+  disabled?: boolean
+  onChange?: (event: CheckboxChangeEvent) => void
+  value?: boolean
+}
 
 export type CheckboxProps = Omit<NativeCheckboxProps, ''> & {
-  onValueChange?: (value: boolean) => void;
-  label?: string;
-};
+  onValueChange?: (value: boolean) => void
+  label?: string
+}
