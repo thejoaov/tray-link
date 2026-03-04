@@ -12,7 +12,7 @@ export const WindowsList = [
   {
     name: 'Settings',
     component: Settings,
-    options: { title: 'Settings', width: 400, height: 580, resizable: false },
+    options: { title: 'Settings', width: 400, height: 680, resizable: false },
   },
   {
     name: 'CustomEditorWindow',
