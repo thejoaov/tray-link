@@ -55,7 +55,7 @@
     "jest-expo": "~54.0.16",
     "react-native-svg-transformer": "^1.5.1",
     "react-test-renderer": "18.2.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.9.3"
   },
   "jest": {
     "preset": "jest-expo"

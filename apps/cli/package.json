@@ -24,6 +24,6 @@
     "@types/jest": "^29.5.14",
     "pkg": "^5.8.1",
     "ts-jest": "^29.3.4",
-    "typescript": "^5.5.4"
+    "typescript": "^5.9.3"
   }
 }
