@@ -27,5 +27,5 @@ const SectionHeader = ({ accessoryRight, label, style }: Props) => {
 export default memo(SectionHeader)
 
 const styles = StyleSheet.create({
-  row: { height: SECTION_HEADER_HEIGHT },
+  row: { paddingVertical: 4 },
 })

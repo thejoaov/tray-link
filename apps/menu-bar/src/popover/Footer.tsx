@@ -5,13 +5,11 @@ import MenuBarModule from '../modules/MenuBarModule'
 import { WindowsNavigator } from '../windows'
 import Item from './Item'
 
-export const FOOTER_HEIGHT = 62
-
 export default function Footer() {
   const { t } = useTranslation()
 
   return (
-    <View style={styles.container}>
+    <View>
       <View px="medium">
         <Divider />
       </View>
@@ -26,10 +24,3 @@ export default function Footer() {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 24,
-    // height: FOOTER_HEIGHT,
-  },
-})
