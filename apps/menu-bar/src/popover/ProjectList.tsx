@@ -15,12 +15,11 @@ import {
 } from '../services/preferences'
 import { projectStore } from '../services/projectStore'
 import { setPendingProjectRemove, subscribeProjectRemoveConfirm } from '../services/removeProjectDialog'
+import { MAX_UI_HEIGHT } from '../utils/constants'
 import { WindowsNavigator } from '../windows'
 import Footer from './Footer'
 import { ProjectItem } from './ProjectItem'
 import SectionHeader from './SectionHeader'
-
-const MAX_LIST_HEIGHT = Dimensions.get('screen').height * 0.7
 
 export const ProjectList = () => {
   const { t } = useTranslation()
@@ -157,11 +156,6 @@ export const ProjectList = () => {
     WindowsNavigator.open('RemoveProjectWindow')
   }
 
-  const getListHeight = useMemo(() => {
-    const height = projects.length * 120
-    return height > MAX_LIST_HEIGHT ? MAX_LIST_HEIGHT : height
-  }, [projects])
-
   if (loading) {
     return (
       <View style={styles.emptyContainer}>
@@ -171,7 +165,11 @@ export const ProjectList = () => {
   }
 
   return (
-    <>
+    <View
+      style={{
+        maxHeight: MAX_UI_HEIGHT,
+      }}
+    >
       <SectionHeader
         label={t('projects')}
         accessoryRight={
@@ -188,7 +186,6 @@ export const ProjectList = () => {
       <FlatList
         data={projects}
         keyExtractor={(item) => item.id}
-        style={{ height: getListHeight }}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>{t('noProjectsYet')}</Text>
@@ -222,8 +219,9 @@ export const ProjectList = () => {
           />
         )}
       />
+
       <Footer />
-    </>
+    </View>
   )
 }
 
