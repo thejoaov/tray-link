@@ -1,6 +1,7 @@
 {
   "name": "Storage",
-  "ios": {
+  "platforms": ["apple", "web"],
+  "apple": {
     "modules": ["StorageModule"]
   }
 }

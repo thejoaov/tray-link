@@ -1,6 +1,6 @@
 export function formatError(error: unknown) {
   if (error instanceof Error) {
-    return error.message;
+    return error.message
   }
-  return String(error);
+  return String(error)
 }

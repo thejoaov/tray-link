@@ -1,36 +1,31 @@
-import React, { memo } from "react";
-import { StyleSheet, ViewStyle } from "react-native";
+import React, { memo } from 'react'
+import { StyleSheet, ViewStyle } from 'react-native'
 
-import { Row, Text } from "../components";
-import { useTheme } from "../providers/ThemeProvider";
+import { Row, Text } from '../components'
+import { useTheme } from '../providers/ThemeProvider'
 
-export const SECTION_HEADER_HEIGHT = 20;
+export const SECTION_HEADER_HEIGHT = 20
 
 type Props = {
-  label: string;
-  accessoryRight?: React.ReactNode;
-  style?: ViewStyle;
-};
+  label: string
+  accessoryRight?: React.ReactNode
+  style?: ViewStyle
+}
 
 const SectionHeader = ({ accessoryRight, label, style }: Props) => {
-  const theme = useTheme();
+  const theme = useTheme()
   return (
     <Row px="medium" justify="between" style={[styles.row, style]}>
-      <Text
-        weight="semibold"
-        size="tiny"
-        color="default"
-        style={{ opacity: theme === "dark" ? 0.65 : 0.85 }}
-      >
+      <Text weight="semibold" size="tiny" color="default" style={{ opacity: theme === 'dark' ? 0.65 : 0.85 }}>
         {label}
       </Text>
       {accessoryRight ? accessoryRight : null}
     </Row>
-  );
-};
+  )
+}
 
-export default memo(SectionHeader);
+export default memo(SectionHeader)
 
 const styles = StyleSheet.create({
   row: { height: SECTION_HEADER_HEIGHT },
-});
+})

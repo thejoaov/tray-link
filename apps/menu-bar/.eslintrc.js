@@ -19,4 +19,4 @@ module.exports = {
     'electron/out/**',
     'src/generated/**',
   ],
-};
+}

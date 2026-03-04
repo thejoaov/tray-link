@@ -1,1 +1,1 @@
-export { DeviceEventEmitter } from 'react-native';
+export { DeviceEventEmitter } from 'react-native'

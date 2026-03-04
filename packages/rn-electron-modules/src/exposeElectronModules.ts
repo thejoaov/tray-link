@@ -1,41 +1,40 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron'
 
-import { ElectronModule, IpcMainModules, Registry } from './types';
+import { ElectronModule, IpcMainModules, Registry } from './types'
 
 export function exposeElectronModules(preloadModules: Registry) {
   const registeredModules: {
-    [key: string]: ElectronModule;
-  } = {};
+    [key: string]: ElectronModule
+  } = {}
 
-  const ipcMainModules: IpcMainModules = ipcRenderer.sendSync('get-all-ipc-main-modules');
+  const ipcMainModules: IpcMainModules = ipcRenderer.sendSync('get-all-ipc-main-modules')
 
   // Merge preload modules with ipcMain modules
   for (const module of preloadModules) {
-    registeredModules[module.name] = mergeModule(module, ipcMainModules[module.name]);
+    registeredModules[module.name] = mergeModule(module, ipcMainModules[module.name])
   }
 
   // Register ipcMain only modules
   for (const [moduleName, ipcMainModule] of Object.entries(ipcMainModules)) {
     if (!registeredModules[moduleName]) {
-      registeredModules[moduleName] = mergeModule({ name: moduleName }, ipcMainModule);
+      registeredModules[moduleName] = mergeModule({ name: moduleName }, ipcMainModule)
     }
   }
 
-  contextBridge.exposeInMainWorld('__reactNativeElectronModules', { modules: registeredModules });
+  contextBridge.exposeInMainWorld('__reactNativeElectronModules', { modules: registeredModules })
 }
 
 function mergeModule(module: ElectronModule, ipcMainModule?: IpcMainModules[0]): ElectronModule {
   if (!ipcMainModule) {
-    return module;
+    return module
   }
 
   for (const moduleFunction of ipcMainModule.functions) {
-    module[moduleFunction] = (...args: unknown[]) =>
-      ipcRenderer.invoke(`${module.name}:${moduleFunction}`, ...args);
+    module[moduleFunction] = (...args: unknown[]) => ipcRenderer.invoke(`${module.name}:${moduleFunction}`, ...args)
   }
 
   for (const moduleValue of ipcMainModule.values) {
-    module[moduleValue] = ipcRenderer.sendSync(`${module.name}:${moduleValue}`);
+    module[moduleValue] = ipcRenderer.sendSync(`${module.name}:${moduleValue}`)
   }
-  return module;
+  return module
 }

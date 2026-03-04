@@ -1,33 +1,15 @@
 name: Lint, Typecheck and Build
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/pullrequest.yml'
-      - 'apps/**'
-      - 'packages/**'
-      - 'tooling/**'
-      - 'turbo.json'
-      - 'package.json'
-      - 'bun.lock'
   pull_request:
     branches: [main]
-    paths:
-      - '.github/workflows/pullrequest.yml'
-      - 'apps/**'
-      - 'packages/**'
-      - 'tooling/**'
-      - 'turbo.json'
-      - 'package.json'
-      - 'bun.lock'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  lint-typecheck-build:
+  build:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -36,11 +18,27 @@ jobs:
       - name: Setup
         uses: ./tooling/github/setup
 
-      - name: Lint
-        run: bun run lint
-
-      - name: Typecheck
-        run: bun run typecheck
-
-      - name: Build
+      - name: build
         run: bun run build
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./tooling/github/setup
+
+      - name: lint
+        run: bun run lint
+  typecheck:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./tooling/github/setup
+
+      - name: typecheck
+        run: bun run typecheck

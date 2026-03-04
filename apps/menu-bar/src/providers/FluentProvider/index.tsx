@@ -1,13 +1,11 @@
-import { type ComponentType, ReactElement } from "react";
+import { type ComponentType, ReactElement } from 'react'
 
-export const withFluentProvider = <P extends object>(
-  WrappedComponent: ComponentType<P>,
-) => {
+export const withFluentProvider = <P extends object>(WrappedComponent: ComponentType<P>) => {
   return (props: P) => {
-    return <WrappedComponent {...props} />;
-  };
-};
+    return <WrappedComponent {...props} />
+  }
+}
 
 export const FluentProvider = ({ children }: { children: ReactElement }) => {
-  return children;
-};
+  return children
+}

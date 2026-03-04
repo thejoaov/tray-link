@@ -1,7 +1,7 @@
-import { IpcRendererEvent, ipcRenderer } from 'electron';
-import { EmitterSubscription } from 'react-native';
+import { IpcRendererEvent, ipcRenderer } from 'electron'
+import { EmitterSubscription } from 'react-native'
 
-import { ElectronPreloadMenuBarModule } from '../src/types';
+import { ElectronPreloadMenuBarModule } from '../src/types'
 
 const MenuBarModule: ElectronPreloadMenuBarModule = {
   name: 'MenuBar',
@@ -10,23 +10,23 @@ const MenuBarModule: ElectronPreloadMenuBarModule = {
     width: globalThis.screen?.width || 0,
   },
   openPopover: () => {
-    ipcRenderer.invoke('open-popover');
+    ipcRenderer.invoke('open-popover')
   },
   closePopover: () => {
-    ipcRenderer.invoke('close-popover');
+    ipcRenderer.invoke('close-popover')
   },
   addListener: (event: string, callback: (...args: string[]) => void) => {
     const listener = (_event: IpcRendererEvent, ...args: unknown[]) => {
-      callback(...(args as string[]));
-    };
-    ipcRenderer.on(event, listener);
+      callback(...(args as string[]))
+    }
+    ipcRenderer.on(event, listener)
 
     return {
       remove: () => {
-        ipcRenderer.removeListener(event, listener);
+        ipcRenderer.removeListener(event, listener)
       },
-    } as EmitterSubscription;
+    } as EmitterSubscription
   },
-};
+}
 
-export default MenuBarModule;
+export default MenuBarModule

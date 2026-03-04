@@ -1,26 +1,27 @@
-import { ScrollView } from 'react-native';
-
-import DebugLogRow from './DebugLogRow';
-import MenuBarModule from '../../modules/MenuBarModule';
-import { useExpoPalette } from '../../utils/useExpoTheme';
-import { Text } from '../Text';
-import { Row } from '../View';
+import { ScrollView } from 'react-native'
+import MenuBarModule from '../../modules/MenuBarModule'
+import { useExpoPalette } from '../../utils/useExpoTheme'
+import { Text } from '../Text'
+import { Row } from '../View'
+import DebugLogRow from './DebugLogRow'
 
 export const DebugLogs = () => {
-  const palette = useExpoPalette();
+  const palette = useExpoPalette()
 
   return (
     <ScrollView
       contentContainerStyle={{
         backgroundColor: palette['gray']['200'],
         borderRadius: 4,
-      }}>
+      }}
+    >
       <Row
         flex="1"
         style={{
           paddingHorizontal: 10,
           paddingVertical: 5,
-        }}>
+        }}
+      >
         <Text style={{ marginRight: 40 }}>Command: </Text>
         <Text style={{ flex: 1 }}>Extra info:</Text>
       </Row>
@@ -34,8 +35,8 @@ export const DebugLogs = () => {
               backgroundColor: index % 2 === 1 ? palette['gray']['400'] : palette['gray']['200'],
             }}
           />
-        );
+        )
       })}
     </ScrollView>
-  );
-};
+  )
+}

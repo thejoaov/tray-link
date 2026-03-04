@@ -1,17 +1,17 @@
-import React, { memo, PropsWithChildren, useState } from 'react';
-import { Pressable, PressableProps, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import React, { memo, PropsWithChildren, useState } from 'react'
+import { Pressable, PressableProps, StyleProp, StyleSheet, ViewStyle } from 'react-native'
 
-import { Row, Text } from '../components';
-import { useCurrentTheme } from '../utils/useExpoTheme';
+import { Row, Text } from '../components'
+import { useCurrentTheme } from '../utils/useExpoTheme'
 
 type Props = PropsWithChildren<PressableProps> & {
-  shortcut?: string;
-  style?: StyleProp<ViewStyle>;
-};
+  shortcut?: string
+  style?: StyleProp<ViewStyle>
+}
 
 const Item = ({ children, onPress, shortcut, style }: Props) => {
-  const [isHovered, setHovered] = useState(false);
-  const theme = useCurrentTheme();
+  const [isHovered, setHovered] = useState(false)
+  const theme = useCurrentTheme()
 
   return (
     <Pressable
@@ -24,16 +24,17 @@ const Item = ({ children, onPress, shortcut, style }: Props) => {
         isHovered && {
           backgroundColor: theme === 'dark' ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.12)',
         },
-      ]}>
+      ]}
+    >
       <Row gap="1.5" my="tiny" px="2.5" align="center">
         {children}
         {shortcut && <Text style={styles.shortcut}>{shortcut}</Text>}
       </Row>
     </Pressable>
-  );
-};
+  )
+}
 
-export default memo(Item);
+export default memo(Item)
 
 const styles = StyleSheet.create({
   itemContainer: {
@@ -44,4 +45,4 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
     opacity: 0.4,
   },
-});
+})

@@ -1,25 +1,21 @@
-import { useState } from "react";
-import { TouchableOpacity, StyleProp, ViewStyle } from "react-native";
-
-import { ObjectInspector } from "./ObjectInspector";
-import { Log } from "../../modules/Logs";
-import { Text } from "../Text";
-import { View, Row } from "../View";
+import { useState } from 'react'
+import { StyleProp, TouchableOpacity, ViewStyle } from 'react-native'
+import { Log } from '../../modules/Logs'
+import { Text } from '../Text'
+import { Row, View } from '../View'
+import { ObjectInspector } from './ObjectInspector'
 
 interface Props {
-  log: Log;
-  style?: StyleProp<ViewStyle>;
+  log: Log
+  style?: StyleProp<ViewStyle>
 }
 
 const DebugLogRow = ({ log, style }: Props) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <View style={style}>
-      <TouchableOpacity
-        onPress={() => setIsOpen((prev) => !prev)}
-        disabled={!log.info}
-      >
+      <TouchableOpacity onPress={() => setIsOpen((prev) => !prev)} disabled={!log.info}>
         <Row
           flex="1"
           style={{
@@ -34,23 +30,22 @@ const DebugLogRow = ({ log, style }: Props) => {
         {isOpen ? <ExtraInfo log={log} /> : null}
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
 const ExtraInfo = ({ log }: Props) => {
-  let extraInfo = log.info;
-  const looksLikeJSON =
-    extraInfo?.startsWith("{") || extraInfo?.startsWith("[");
+  let extraInfo = log.info
+  const looksLikeJSON = extraInfo?.startsWith('{') || extraInfo?.startsWith('[')
 
   if (looksLikeJSON) {
     try {
-      extraInfo = JSON.parse(log.info);
+      extraInfo = JSON.parse(log.info)
     } catch {
       // Keep original text when it is not valid JSON.
     }
   }
 
-  return <ObjectInspector obj={extraInfo} />;
-};
+  return <ObjectInspector obj={extraInfo} />
+}
 
-export default DebugLogRow;
+export default DebugLogRow

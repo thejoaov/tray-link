@@ -3,7 +3,7 @@ import { Picker } from '@react-native-picker/picker'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-
+import { installCli, isCliInstalled, uninstallCli } from '../../modules/shell-utils/src'
 import { Checkbox, Divider, Row, Text, View } from '../components'
 import { Linking } from '../modules/Linking'
 import { UserPreferences } from '../modules/Storage'
@@ -37,6 +37,8 @@ export const Settings = () => {
   const [migratingLegacyData, setMigratingLegacyData] = useState(false)
   const [legacyMigrationDone, setLegacyMigrationDone] = useState(() => hasLegacyMigrationCompleted())
   const [legacyProjectsPreviewCount, setLegacyProjectsPreviewCount] = useState(0)
+  const [cliInstalled, setCliInstalled] = useState(false)
+  const [installingCli, setInstallingCli] = useState(false)
 
   const editorOptions = useMemo(
     () => getEditorOptions(preferences.customEditors),
@@ -66,6 +68,11 @@ export const Settings = () => {
     initializeToolOptions().then(() => {
       setToolsVersion((v) => v + 1)
     })
+
+    // Check CLI install status
+    isCliInstalled()
+      .then(setCliInstalled)
+      .catch(() => setCliInstalled(false))
 
     return () => {
       subscription.remove()
@@ -158,6 +165,43 @@ export const Settings = () => {
             onValueChange={(value) => updatePreference('removeFromDiskByDefault', value)}
             label={t('deleteFilesFromDiskByDefault')}
           />
+        </Row>
+      </View>
+
+      <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('cli')}</Text>
+
+      <View border="light" rounded="medium" style={styles.box}>
+        <Row align="center" justify="between" style={styles.boxItem}>
+          <View style={styles.itemTextContainer}>
+            <Text style={styles.itemLabel}>{t(cliInstalled ? 'uninstallCli' : 'installCli')} CLI</Text>
+            <Text style={styles.itemDescription}>{cliInstalled ? t('cliInstalled') : t('cliNotInstalled')}</Text>
+          </View>
+          <TouchableOpacity
+            accessibilityLabel={cliInstalled ? t('uninstallCli') : t('installCli')}
+            disabled={installingCli}
+            onPress={async () => {
+              setInstallingCli(true)
+              try {
+                if (cliInstalled) {
+                  const result = await uninstallCli()
+                  if (result.success) {
+                    setCliInstalled(false)
+                  }
+                } else {
+                  const result = await installCli()
+                  if (result.success) {
+                    setCliInstalled(true)
+                  }
+                }
+              } finally {
+                setInstallingCli(false)
+              }
+            }}
+            style={[styles.button, installingCli && styles.buttonDisabled]}
+          >
+            <Ionicons name={cliInstalled ? 'close-circle-outline' : 'terminal-outline'} size={14} />
+            <Text style={styles.buttonText}>{t(cliInstalled ? 'uninstallCli' : 'installCli')}</Text>
+          </TouchableOpacity>
         </Row>
       </View>
 

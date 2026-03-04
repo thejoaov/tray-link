@@ -10,6 +10,9 @@ type ShellUtilsModuleType = {
   fileExists: (path: string) => Promise<boolean>
   loadLegacyTrayLinkData: () => Promise<Record<string, unknown> | null>
   removeFromDisk: (path: string) => Promise<boolean>
+  isCliInstalled: () => Promise<boolean>
+  installCli: () => Promise<{ success: boolean; error?: string }>
+  uninstallCli: () => Promise<{ success: boolean; error?: string }>
 }
 
 let ShellUtilsModule: ShellUtilsModuleType
@@ -33,6 +36,9 @@ if (isElectron) {
       fileExists: async () => false,
       loadLegacyTrayLinkData: async () => null,
       removeFromDisk: async () => false,
+      isCliInstalled: async () => false,
+      installCli: async () => ({ success: false, error: 'Not available' }),
+      uninstallCli: async () => ({ success: false, error: 'Not available' }),
     }
   }
 }
@@ -63,4 +69,16 @@ export function loadLegacyTrayLinkData(): Promise<Record<string, unknown> | null
 
 export function removeFromDisk(path: string): Promise<boolean> {
   return ShellUtilsModule.removeFromDisk(path)
+}
+
+export function isCliInstalled(): Promise<boolean> {
+  return ShellUtilsModule.isCliInstalled()
+}
+
+export function installCli(): Promise<{ success: boolean; error?: string }> {
+  return ShellUtilsModule.installCli()
+}
+
+export function uninstallCli(): Promise<{ success: boolean; error?: string }> {
+  return ShellUtilsModule.uninstallCli()
 }

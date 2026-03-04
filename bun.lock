@@ -15,12 +15,11 @@
     },
     "apps/cli": {
       "name": "@tray-link/cli",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": {
         "@tray-link/common-types": "workspace:*",
         "@tray-link/tray-shared": "workspace:*",
         "commander": "^10.0.1",
-        "electron-store": "^11.0.2",
         "uuid": "^13.0.0",
       },
       "devDependencies": {
@@ -32,7 +31,7 @@
     },
     "apps/menu-bar": {
       "name": "@tray-link/menu-bar",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": {
         "@expo/metro-runtime": "~6.1.2",
         "@expo/styleguide-native": "^1.0.1",
@@ -80,7 +79,7 @@
     },
     "apps/menu-bar/electron": {
       "name": "@tray-link/electron",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": {
         "@tray-link/common-types": "workspace:*",
         "@tray-link/rn-electron-modules": "workspace:*",
@@ -108,22 +107,22 @@
     },
     "apps/menu-bar/modules/file-picker": {
       "name": "file-picker",
-      "version": "0.0.0",
+      "version": "2.1.0",
     },
     "apps/menu-bar/modules/menu-bar": {
       "name": "menu-bar",
-      "version": "0.0.0",
+      "version": "2.1.0",
     },
     "apps/menu-bar/modules/shell-utils": {
       "name": "shell-utils",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": {
         "expo-modules-core": "*",
       },
     },
     "apps/menu-bar/modules/storage-module": {
       "name": "storage-module",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": {
         "electron-store": "^11.0.2",
         "expo-modules-core": "*",
@@ -131,14 +130,14 @@
     },
     "packages/common-types": {
       "name": "@tray-link/common-types",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "devDependencies": {
         "typescript": "^5.5.4",
       },
     },
     "packages/rn-electron-modules": {
       "name": "@tray-link/rn-electron-modules",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "devDependencies": {
         "electron": "33.2.0",
         "electron-store": "^11.0.2",
@@ -147,7 +146,7 @@
     },
     "packages/tray-shared": {
       "name": "@tray-link/tray-shared",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": {
         "@tray-link/common-types": "workspace:*",
         "execa": "^9.6.1",
@@ -1354,7 +1353,7 @@
 
     "env-editor": ["env-editor@0.4.2", "", {}, "sha512-ObFo8v4rQJAE59M69QzwloxPZtd33TpYEIjtKD1rrFDcM1Gd7IkDxEBU+HriziN6HSHQnBJi8Dmy+JWkav5HKA=="],
 
-    "env-paths": ["env-paths@3.0.0", "", {}, "sha512-dtJUTepzMW3Lm/NPxRf3wP4642UWhjL2sQxc+ym2YMj1m/H2zDNQOlezafzkHwn6sMstjHTwG6iQQsctDW/b1A=="],
+    "env-paths": ["env-paths@2.2.1", "", {}, "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A=="],
 
     "err-code": ["err-code@2.0.3", "", {}, "sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA=="],
 
@@ -2698,13 +2697,9 @@
 
     "@electron/asar/minimatch": ["minimatch@3.1.5", "", { "dependencies": { "brace-expansion": "^1.1.7" } }, "sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w=="],
 
-    "@electron/get/env-paths": ["env-paths@2.2.1", "", {}, "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A=="],
-
     "@electron/get/fs-extra": ["fs-extra@8.1.0", "", { "dependencies": { "graceful-fs": "^4.2.0", "jsonfile": "^4.0.0", "universalify": "^0.1.0" } }, "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g=="],
 
     "@electron/get/semver": ["semver@6.3.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="],
-
-    "@electron/node-gyp/env-paths": ["env-paths@2.2.1", "", {}, "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A=="],
 
     "@electron/node-gyp/glob": ["glob@8.1.0", "", { "dependencies": { "fs.realpath": "^1.0.0", "inflight": "^1.0.4", "inherits": "2", "minimatch": "^5.0.1", "once": "^1.3.0" } }, "sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ=="],
 
@@ -2879,6 +2874,8 @@
     "compression/debug": ["debug@2.6.9", "", { "dependencies": { "ms": "2.0.0" } }, "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA=="],
 
     "compression/negotiator": ["negotiator@0.6.4", "", {}, "sha512-myRT3DiWPHqho5PrJaIRyaMv2kgYf0mUVgBNOYMuCH5Ki1yEiQaf/ZJuQ62nvpc44wL5WDbTX7yGJi1Neevw8w=="],
+
+    "conf/env-paths": ["env-paths@3.0.0", "", {}, "sha512-dtJUTepzMW3Lm/NPxRf3wP4642UWhjL2sQxc+ym2YMj1m/H2zDNQOlezafzkHwn6sMstjHTwG6iQQsctDW/b1A=="],
 
     "connect/debug": ["debug@2.6.9", "", { "dependencies": { "ms": "2.0.0" } }, "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA=="],
 
@@ -3333,8 +3330,6 @@
     "electron-winstaller/fs-extra/jsonfile": ["jsonfile@4.0.0", "", { "optionalDependencies": { "graceful-fs": "^4.1.6" } }, "sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg=="],
 
     "electron-winstaller/fs-extra/universalify": ["universalify@0.1.2", "", {}, "sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg=="],
-
-    "electron/@electron/get/env-paths": ["env-paths@2.2.1", "", {}, "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A=="],
 
     "electron/@electron/get/fs-extra": ["fs-extra@8.1.0", "", { "dependencies": { "graceful-fs": "^4.2.0", "jsonfile": "^4.0.0", "universalify": "^0.1.0" } }, "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g=="],
 

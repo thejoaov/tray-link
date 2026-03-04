@@ -1,8 +1,8 @@
-import { borderRadius, iconSize } from '@expo/styleguide-native';
-import { Image as RNImage } from 'react-native';
+import { borderRadius, iconSize } from '@expo/styleguide-native'
+import { Image as RNImage } from 'react-native'
 
-import { create } from '../utils/create-component-primitive';
-import { scale } from '../utils/theme';
+import { create } from '../utils/create-component-primitive'
+import { scale } from '../utils/theme'
 
 export const Image = create(RNImage, {
   base: {
@@ -38,4 +38,4 @@ export const Image = create(RNImage, {
       full: { borderRadius: 99999 },
     },
   },
-});
+})

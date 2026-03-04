@@ -1,51 +1,51 @@
-import { shell, app, BrowserWindow, WebContents, ipcMain } from 'electron';
-import { LinkingImpl } from 'react-native';
+import { app, BrowserWindow, ipcMain, shell, WebContents } from 'electron'
+import { LinkingImpl } from 'react-native'
 
-const openURLTargets = new WeakSet<WebContents>();
+const openURLTargets = new WeakSet<WebContents>()
 
 function sendOpenURL(url: string) {
   for (const window of BrowserWindow.getAllWindows()) {
     if (openURLTargets.has(window.webContents)) {
-      window.webContents.send('open-url', url);
+      window.webContents.send('open-url', url)
     }
   }
 }
 
 ipcMain.handle('register-open-url-target', (event) => {
-  openURLTargets.add(event.sender);
-});
+  openURLTargets.add(event.sender)
+})
 ipcMain.handle('unregister-open-url-target', (event) => {
-  openURLTargets.delete(event.sender);
-});
+  openURLTargets.delete(event.sender)
+})
 
 app.on('open-url', (_, url) => {
-  sendOpenURL(url);
-});
+  sendOpenURL(url)
+})
 
 app.on('second-instance', (_, argv) => {
-  const lastArg = argv[argv.length - 1];
+  const lastArg = argv[argv.length - 1]
   if (typeof lastArg === 'string' && lastArg.includes('://')) {
-    sendOpenURL(lastArg);
+    sendOpenURL(lastArg)
   }
-});
+})
 
 async function getInitialURL() {
-  const lastArg = process.argv[process.argv.length - 1];
+  const lastArg = process.argv[process.argv.length - 1]
   if (typeof lastArg === 'string' && lastArg.includes('://')) {
-    return lastArg;
+    return lastArg
   }
 
-  return undefined;
+  return undefined
 }
 
 async function openURL(url: string) {
-  await shell.openExternal(url);
+  await shell.openExternal(url)
 }
 
 const Linking: Partial<LinkingImpl> & { name: string } = {
   name: 'Linking',
   openURL,
   getInitialURL,
-};
+}
 
-export default Linking;
+export default Linking

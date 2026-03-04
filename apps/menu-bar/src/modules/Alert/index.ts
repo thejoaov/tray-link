@@ -1,16 +1,16 @@
-import { Alert as RNAlert, AlertOptions, AlertButton } from 'react-native';
+import { AlertButton, AlertOptions, Alert as RNAlert } from 'react-native'
 
 type MacOSAlertOptions = AlertOptions & {
-  modal?: boolean;
-  critical?: boolean;
-};
+  modal?: boolean
+  critical?: boolean
+}
 
 export function abbreviatedAlertMessage(message: string) {
-  const maxMessageLength = 1000;
-  const longMessageTrailer = `...\n\n + Messages over ${maxMessageLength} characters are abbreviated.`;
+  const maxMessageLength = 1000
+  const longMessageTrailer = `...\n\n + Messages over ${maxMessageLength} characters are abbreviated.`
   return message.length < maxMessageLength
     ? message
-    : message.substring(0, maxMessageLength - longMessageTrailer.length) + longMessageTrailer;
+    : message.substring(0, maxMessageLength - longMessageTrailer.length) + longMessageTrailer
 }
 
 /**
@@ -20,17 +20,12 @@ export function abbreviatedAlertMessage(message: string) {
  **/
 const Alert = {
   ...RNAlert,
-  alert(
-    title: string,
-    message?: string,
-    buttons?: AlertButton[],
-    options: MacOSAlertOptions = {}
-  ): void {
+  alert(title: string, message?: string, buttons?: AlertButton[], options: MacOSAlertOptions = {}): void {
     RNAlert.alert(title, message && abbreviatedAlertMessage(message), buttons, {
       modal: true,
       ...options,
-    });
+    })
   },
-};
+}
 
-export default Alert;
+export default Alert

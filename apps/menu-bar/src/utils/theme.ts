@@ -1,19 +1,12 @@
-import {
-  spacing,
-  lightTheme,
-  darkTheme,
-  borderRadius,
-  typography,
-  palette,
-} from '@expo/styleguide-native';
-import { TextStyle, Platform, StyleSheet } from 'react-native';
+import { borderRadius, darkTheme, lightTheme, palette, spacing, typography } from '@expo/styleguide-native'
+import { Platform, StyleSheet, TextStyle } from 'react-native'
 
-import { PlatformColor } from '../modules/PlatformColor';
+import { PlatformColor } from '../modules/PlatformColor'
 
-type SpacingKey = `${keyof typeof spacing}`;
-type DescriptiveScale = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'xl';
-type ScaleKey = SpacingKey | DescriptiveScale;
-type Scale = Record<ScaleKey, number>;
+type SpacingKey = `${keyof typeof spacing}`
+type DescriptiveScale = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'xl'
+type ScaleKey = SpacingKey | DescriptiveScale
+type Scale = Record<ScaleKey, number>
 
 export const scale: Scale = {
   micro: spacing[0.5],
@@ -23,23 +16,23 @@ export const scale: Scale = {
   large: spacing[6],
   xl: spacing[8],
   ...spacing,
-};
+}
 
 function fullSpacingScaleForAttributes(attributes: string[]) {
-  const obj: Record<string, Record<string, number>> = {};
+  const obj: Record<string, Record<string, number>> = {}
 
   Object.keys(scale).forEach((key) => {
-    key = `${key}`;
-    const value: { [attribute: string]: number } = {};
+    key = `${key}`
+    const value: { [attribute: string]: number } = {}
 
     attributes.forEach((attribute) => {
-      value[attribute] = scale[key as ScaleKey];
-    });
+      value[attribute] = scale[key as ScaleKey]
+    })
 
-    obj[key] = value;
-  });
+    obj[key] = value
+  })
 
-  return obj as Record<SpacingKey | DescriptiveScale, Record<string, number>>;
+  return obj as Record<SpacingKey | DescriptiveScale, Record<string, number>>
 }
 
 export const padding = {
@@ -48,7 +41,7 @@ export const padding = {
   py: fullSpacingScaleForAttributes(['paddingVertical']),
   pb: fullSpacingScaleForAttributes(['paddingBottom']),
   pt: fullSpacingScaleForAttributes(['paddingTop']),
-};
+}
 
 export const margin = {
   margin: fullSpacingScaleForAttributes(['margin']),
@@ -56,11 +49,11 @@ export const margin = {
   my: fullSpacingScaleForAttributes(['marginVertical']),
   mb: fullSpacingScaleForAttributes(['marginBottom']),
   mt: fullSpacingScaleForAttributes(['marginTop']),
-};
+}
 
-export const gap = fullSpacingScaleForAttributes(['gap']);
-export const width = fullSpacingScaleForAttributes(['width']);
-export const height = fullSpacingScaleForAttributes(['height']);
+export const gap = fullSpacingScaleForAttributes(['gap'])
+export const width = fullSpacingScaleForAttributes(['width'])
+export const height = fullSpacingScaleForAttributes(['height'])
 
 export const rounded = {
   rounded: {
@@ -104,7 +97,7 @@ export const rounded = {
     },
     full: { borderBottomLeftRadius: 9999, borderBottomRightRadius: 9999 },
   },
-};
+}
 
 export const text = {
   align: {
@@ -205,7 +198,7 @@ export const text = {
     primary: { color: lightTheme.button.primary.background },
     link: { color: lightTheme.link.default },
   },
-};
+}
 
 export const textDark = {
   color: {
@@ -226,7 +219,7 @@ export const textDark = {
     primary: { color: darkTheme.button.primary.background },
     link: { color: darkTheme.link.default },
   },
-};
+}
 
 export const bg = {
   none: { backgroundColor: 'transparent' },
@@ -236,7 +229,7 @@ export const bg = {
   success: { backgroundColor: lightTheme.background.success },
   warning: { backgroundColor: lightTheme.background.warning },
   error: { backgroundColor: lightTheme.background.error },
-};
+}
 
 export const bgDark = {
   default: { backgroundColor: darkTheme.background.default },
@@ -245,7 +238,7 @@ export const bgDark = {
   success: { backgroundColor: darkTheme.background.success },
   warning: { backgroundColor: darkTheme.background.warning },
   error: { backgroundColor: darkTheme.background.error },
-};
+}
 
 export const border = {
   default: {
@@ -265,7 +258,7 @@ export const border = {
     borderColor: lightTheme.border.default,
     borderWidth: StyleSheet.hairlineWidth,
   },
-};
+}
 
 export const borderDark = {
   default: {
@@ -285,18 +278,18 @@ export const borderDark = {
     borderColor: darkTheme.border.default,
     borderWidth: StyleSheet.hairlineWidth,
   },
-};
+}
 
 export function addOpacity(colorString: string, opacity: number) {
-  const opacityHex = Math.round(opacity * 255).toString(16);
+  const opacityHex = Math.round(opacity * 255).toString(16)
 
-  let color = colorString.replace('#', '').substring(0, 6);
+  let color = colorString.replace('#', '').substring(0, 6)
   if (color.length === 3) {
-    const [r, g, b] = color;
-    color = r + r + g + g + b + b;
+    const [r, g, b] = color
+    color = r + r + g + g + b + b
   }
 
-  return `#${color}${opacityHex}`;
+  return `#${color}${opacityHex}`
 }
 
 const COLORS_MAP = {
@@ -312,14 +305,14 @@ const COLORS_MAP = {
   'app-lime': '#aabd04',
   'app-light-green': '#6aa72a',
   'app-dark-green': '#3a8e39',
-} as const;
+} as const
 
-const COLORS = Object.values(COLORS_MAP);
+const COLORS = Object.values(COLORS_MAP)
 
 function hashNameToColorIndex(name: string) {
-  return Array.from(name).reduce((acc, val) => (acc * 31 + val.charCodeAt(0)) % COLORS.length, 0);
+  return Array.from(name).reduce((acc, val) => (acc * 31 + val.charCodeAt(0)) % COLORS.length, 0)
 }
 
 export function getProjectBackgroundColor(name: string) {
-  return COLORS[hashNameToColorIndex(name)];
+  return COLORS[hashNameToColorIndex(name)]
 }

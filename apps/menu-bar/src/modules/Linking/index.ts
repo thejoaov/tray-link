@@ -1,1 +1,1 @@
-export { Linking } from 'react-native';
+export { Linking } from 'react-native'

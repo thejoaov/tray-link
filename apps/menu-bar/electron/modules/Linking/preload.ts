@@ -1,37 +1,37 @@
-import { ipcRenderer } from 'electron';
-import { EmitterSubscription, LinkingImpl } from 'react-native';
+import { ipcRenderer } from 'electron'
+import { EmitterSubscription, LinkingImpl } from 'react-native'
 
-const eventHandlers = new Map<(event: { url: string }) => void, (event: { url: string }) => void>();
+const eventHandlers = new Map<(event: { url: string }) => void, (event: { url: string }) => void>()
 
 ipcRenderer.addListener('open-url', (_, url) => {
   for (const handler of eventHandlers.values()) {
-    handler({ url });
+    handler({ url })
   }
-});
+})
 
 const addEventListener = (_: 'url', handler: (event: { url: string }) => void) => {
   if (eventHandlers.size === 0) {
-    ipcRenderer.invoke('register-open-url-target');
+    ipcRenderer.invoke('register-open-url-target')
   }
-  eventHandlers.set(handler, handler);
+  eventHandlers.set(handler, handler)
 
   return {
     remove: () => {
-      eventHandlers.delete(handler);
+      eventHandlers.delete(handler)
       if (eventHandlers.size === 0) {
-        ipcRenderer.invoke('unregister-open-url-target');
+        ipcRenderer.invoke('unregister-open-url-target')
       }
     },
-  } as EmitterSubscription;
-};
+  } as EmitterSubscription
+}
 
 // Apply same behavior as react-native-web
-const canOpenURL = (): Promise<boolean> => Promise.resolve(true);
+const canOpenURL = (): Promise<boolean> => Promise.resolve(true)
 
 const Linking: Partial<LinkingImpl> & { name: string } = {
   name: 'Linking',
   canOpenURL,
   addEventListener,
-};
+}
 
-export default Linking;
+export default Linking

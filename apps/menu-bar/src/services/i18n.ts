@@ -51,6 +51,12 @@ type TranslationKey =
   | 'invalidEditor'
   | 'invalidTerminal'
   | 'invalidValues'
+  | 'cli'
+  | 'installCli'
+  | 'uninstallCli'
+  | 'cliInstalled'
+  | 'cliNotInstalled'
+  | 'cliInstallError'
 
 export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -97,6 +103,12 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     invalidEditor: 'Invalid editor',
     invalidTerminal: 'Invalid terminal',
     invalidValues: 'Invalid values',
+    cli: 'CLI',
+    installCli: 'Install',
+    uninstallCli: 'Uninstall',
+    cliInstalled: 'tlink command is available in your terminal',
+    cliNotInstalled: 'Install tlink to use from any terminal',
+    cliInstallError: 'Failed to install CLI: {{error}}',
   },
   pt: {
     settings: 'Configurações',
@@ -142,6 +154,12 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     invalidEditor: 'Editor inválido',
     invalidTerminal: 'Terminal inválido',
     invalidValues: 'Valores inválidos',
+    cli: 'CLI',
+    installCli: 'Instalar',
+    uninstallCli: 'Desinstalar',
+    cliInstalled: 'O comando tlink está disponível no seu terminal',
+    cliNotInstalled: 'Instale o tlink para usar em qualquer terminal',
+    cliInstallError: 'Falha ao instalar CLI: {{error}}',
   },
   es: {
     settings: 'Configuración',
@@ -187,6 +205,12 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     invalidEditor: 'Editor inválido',
     invalidTerminal: 'Terminal inválido',
     invalidValues: 'Valores inválidos',
+    cli: 'CLI',
+    installCli: 'Instalar',
+    uninstallCli: 'Desinstalar',
+    cliInstalled: 'El comando tlink está disponible en tu terminal',
+    cliNotInstalled: 'Instala tlink para usar desde cualquier terminal',
+    cliInstallError: 'Error al instalar CLI: {{error}}',
   },
 }
 

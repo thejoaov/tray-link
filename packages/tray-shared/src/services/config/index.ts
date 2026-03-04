@@ -70,9 +70,7 @@ export const terminalList: Settings[] = [
     commonFilepaths: Platform.select({
       darwin: null,
       linux: null,
-      win32: [
-        'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
-      ],
+      win32: ['C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'],
     }),
   },
   {
@@ -110,7 +108,7 @@ export const terminalList: Settings[] = [
       linux: ['/usr/bin/warp-terminal'],
       win32: ['C:\\Users\\%USERNAME%\\AppData\\Local\\Warp\\warp.exe'],
     }),
-  }
+  },
 ]
 
 export const editorList: Settings[] = [
@@ -244,9 +242,7 @@ export const editorList: Settings[] = [
     commonFilepaths: Platform.select({
       darwin: ['/Applications/IntelliJ IDEA CE.app'],
       linux: ['/usr/share/intellij-idea-ce/bin/idea.sh'],
-      win32: [
-        'C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2023.1.4\\bin\\idea64.exe',
-      ],
+      win32: ['C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2023.1.4\\bin\\idea64.exe'],
     }),
   },
   {
@@ -257,9 +253,7 @@ export const editorList: Settings[] = [
     commonFilepaths: Platform.select({
       darwin: ['/Applications/PyCharm CE.app'],
       linux: ['/usr/share/pycharm/bin/pycharm.sh'],
-      win32: [
-        'C:\\Program Files\\JetBrains\\PyCharm Community Edition 2023.1.4\\bin\\pycharm64.exe',
-      ],
+      win32: ['C:\\Program Files\\JetBrains\\PyCharm Community Edition 2023.1.4\\bin\\pycharm64.exe'],
     }),
     command: Platform.select({
       darwin: 'open -a PyCharm CE',
@@ -290,9 +284,7 @@ export const editorList: Settings[] = [
     commonFilepaths: Platform.select({
       darwin: ['/Applications/Android Studio.app'],
       linux: ['/usr/share/android-studio/bin/studio.sh'],
-      win32: [
-        'C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe',
-      ],
+      win32: ['C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe'],
     }),
     enableCommonPathCheck: true,
     command: Platform.select({

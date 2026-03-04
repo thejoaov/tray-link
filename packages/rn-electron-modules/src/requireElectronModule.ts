@@ -1,14 +1,14 @@
-import { ElectronModule } from './types';
+import { ElectronModule } from './types'
 
 type ReactNativeElectronModulesObject = {
   modules: {
-    [moduleName: string]: ElectronModule;
-  };
-};
+    [moduleName: string]: ElectronModule
+  }
+}
 
 declare global {
   // eslint-disable-next-line no-var
-  var __reactNativeElectronModules: ReactNativeElectronModulesObject | undefined;
+  var __reactNativeElectronModules: ReactNativeElectronModulesObject | undefined
 }
 
 /**
@@ -19,11 +19,10 @@ declare global {
  * @throws Error when there is no electron module with given name.
  */
 export function requireElectronModule<ModuleType = unknown>(moduleName: string): ModuleType {
-  const nativeModule =
-    (globalThis.__reactNativeElectronModules?.modules?.[moduleName] as ModuleType) ?? null;
+  const nativeModule = (globalThis.__reactNativeElectronModules?.modules?.[moduleName] as ModuleType) ?? null
 
   if (!nativeModule) {
-    throw new Error(`Cannot find electron module '${moduleName}'`);
+    throw new Error(`Cannot find electron module '${moduleName}'`)
   }
-  return nativeModule;
+  return nativeModule
 }

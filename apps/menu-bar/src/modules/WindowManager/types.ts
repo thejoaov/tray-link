@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType } from 'react'
 
 export enum WindowStyleMask {
   Borderless,
@@ -15,23 +15,23 @@ export enum WindowStyleMask {
 }
 
 export type WindowOptions = {
-  title?: string;
+  title?: string
   windowStyle?: {
-    mask?: WindowStyleMask[];
-    height?: number;
-    width?: number;
-    titlebarAppearsTransparent?: boolean;
-  };
-};
+    mask?: WindowStyleMask[]
+    height?: number
+    width?: number
+    titlebarAppearsTransparent?: boolean
+  }
+}
 
 export type WindowsConfig = {
   [key: string]: {
-    component: ComponentType<unknown>;
-    options?: WindowOptions;
-  };
-};
+    component: ComponentType<unknown>
+    options?: WindowOptions
+  }
+}
 
 export type WindowsManagerType = {
-  openWindow: (window: string, options: WindowOptions) => Promise<void>;
-  closeWindow(window: string): void;
-};
+  openWindow: (window: string, options: WindowOptions) => Promise<void>
+  closeWindow(window: string): void
+}

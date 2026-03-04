@@ -26,9 +26,10 @@ export function getFilteredSettingsList(settingsList: Settings[]): SettingsItem[
           if (result.stdout?.length) path = result.stdout
         })
       } else if (item.enableCommonPathCheck && item.commonFilepaths?.length) {
-        path = item.commonFilepaths.find((filepath) => {
-          if (fs.existsSync(filepath)) return filepath
-        }) || ''
+        path =
+          item.commonFilepaths.find((filepath) => {
+            if (fs.existsSync(filepath)) return filepath
+          }) || ''
       }
 
       if (!path?.length) {

@@ -1,35 +1,45 @@
 import { Project } from '@tray-link/common-types'
 import { Platform } from 'react-native'
-import { MMKV } from 'react-native-mmkv'
-
-type StorageLike = {
-  set: (key: string, value: string) => Promise<boolean> | void
-  getString: (key: string) => Promise<string | null | undefined> | string | null | undefined
-  delete: (key: string) => Promise<boolean> | void
-  getAllKeys: () => Promise<string[]> | string[]
-}
-
-let storage: StorageLike
-
-if (Platform.OS === 'macos' || Platform.OS === 'ios' || Platform.OS === 'android') {
-  storage = new MMKV({ id: 'tray-link-projects' })
-} else {
-  // Para electron usamos o modulo que criamos
-  const { setItem, getItem, removeItem, getAllKeys } = require('../../modules/storage-module/src/index')
-  storage = {
-    set: (key: string, value: string) => setItem(key, value),
-    getString: (key: string) => getItem(key),
-    delete: (key: string) => removeItem(key),
-    getAllKeys: () => getAllKeys(),
-  }
-}
+import { getItem, setItem } from '../../modules/storage-module/src/index'
 
 const PROJECTS_KEY = 'projects'
+
+/**
+ * One-time migration: move projects from MMKV to shared config.json
+ * so that native macOS, Electron, and CLI all share the same data.
+ */
+let mmkvMigrationDone = false
+async function migrateFromMmkv(): Promise<void> {
+  if (mmkvMigrationDone) return
+  mmkvMigrationDone = true
+
+  // Only needed on native macOS where MMKV was previously used
+  if (Platform.OS !== 'macos') return
+
+  try {
+    // If config.json already has projects, skip migration
+    const existing = await getItem(PROJECTS_KEY)
+    if (existing) return
+
+    // Try to read from old MMKV storage
+    const { MMKV } = require('react-native-mmkv')
+    const mmkv = new MMKV({ id: 'tray-link-projects' })
+    const data = mmkv.getString(PROJECTS_KEY)
+    if (data) {
+      await setItem(PROJECTS_KEY, data)
+      // Clear MMKV after successful migration
+      mmkv.delete(PROJECTS_KEY)
+    }
+  } catch (_e) {
+    // MMKV not available or no data — nothing to migrate
+  }
+}
 
 export const projectStore = {
   getProjects: async (): Promise<Project[]> => {
     try {
-      const data = await storage.getString(PROJECTS_KEY)
+      await migrateFromMmkv()
+      const data = await getItem(PROJECTS_KEY)
       if (!data) return []
       return JSON.parse(data)
     } catch (e) {
@@ -40,7 +50,7 @@ export const projectStore = {
 
   saveProjects: async (projects: Project[]): Promise<void> => {
     try {
-      await storage.set(PROJECTS_KEY, JSON.stringify(projects))
+      await setItem(PROJECTS_KEY, JSON.stringify(projects))
     } catch (e) {
       console.error('Error saving projects', e)
     }

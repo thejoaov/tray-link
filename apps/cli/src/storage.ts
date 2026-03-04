@@ -1,27 +1,78 @@
 import { Project } from '@tray-link/common-types'
-import Store from 'electron-store'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 
-type TypedStore = {
-  get: (key: string) => unknown
-  set: (key: string, value: string) => void
+/**
+ * Computes the same config path that the Electron app's electron-store uses.
+ * electron-store defaults to `app.getPath('userData')` which resolves to:
+ *   macOS:   ~/Library/Application Support/<productName>/
+ *   Linux:   ~/.config/<productName>/  (or $XDG_CONFIG_HOME)
+ *   Windows: %APPDATA%/<productName>/
+ *
+ * The productName in electron/package.json is "TrayLink".
+ */
+const APP_NAME = 'TrayLink'
+
+function getConfigPath(): string {
+  let dir: string
+  switch (process.platform) {
+    case 'darwin':
+      dir = path.join(os.homedir(), 'Library', 'Application Support', APP_NAME)
+      break
+    case 'win32':
+      dir = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), APP_NAME)
+      break
+    default:
+      dir = path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), APP_NAME)
+      break
+  }
+  return path.join(dir, 'config.json')
 }
 
-const store = new Store({ projectName: 'tray-link' }) as unknown as TypedStore
+function readConfig(): Record<string, unknown> {
+  try {
+    const raw = fs.readFileSync(getConfigPath(), 'utf8')
+    return JSON.parse(raw)
+  } catch {
+    return {}
+  }
+}
+
+function writeConfig(config: Record<string, unknown>): void {
+  const configPath = getConfigPath()
+  fs.mkdirSync(path.dirname(configPath), { recursive: true })
+  // Match electron-store/conf format: JSON with tabs + trailing newline
+  fs.writeFileSync(configPath, JSON.stringify(config, undefined, '\t') + '\n', 'utf8')
+}
+
 const PROJECTS_KEY = 'projects'
 
 export const projectStore = {
   getProjects: async (): Promise<Project[]> => {
     try {
-      const data = store.get(PROJECTS_KEY) as string | null
+      const config = readConfig()
+      const data = config[PROJECTS_KEY]
       if (!data) return []
-      return JSON.parse(data)
+      // The Electron app stores projects as a JSON string value
+      if (typeof data === 'string') {
+        return JSON.parse(data)
+      }
+      // Fallback: if stored as native array (old CLI format)
+      if (Array.isArray(data)) {
+        return data
+      }
+      return []
     } catch (_e) {
       return []
     }
   },
 
   saveProjects: async (projects: Project[]): Promise<void> => {
-    store.set(PROJECTS_KEY, JSON.stringify(projects))
+    const config = readConfig()
+    // Store as JSON string to match the Electron app's format
+    config[PROJECTS_KEY] = JSON.stringify(projects)
+    writeConfig(config)
   },
 
   addProject: async (project: Project): Promise<void> => {

@@ -1,24 +1,23 @@
-import React, { useEffect } from "react";
-
-import Core from "./Core";
-import { ErrorBoundary, FallbackProps } from "./ErrorBoundary";
-import Footer from "./Footer";
-import { Text, View } from "../components";
-import { useSafeDisplayDimensions } from "../hooks/useSafeDisplayDimensions";
-import MenuBarModule from "../modules/MenuBarModule";
-import { storage } from "../modules/Storage";
-import { WindowsNavigator } from "../windows";
+import React, { useEffect } from 'react'
+import { Text, View } from '../components'
+import { useSafeDisplayDimensions } from '../hooks/useSafeDisplayDimensions'
+import MenuBarModule from '../modules/MenuBarModule'
+import { storage } from '../modules/Storage'
+import { WindowsNavigator } from '../windows'
+import Core from './Core'
+import { ErrorBoundary, FallbackProps } from './ErrorBoundary'
+import Footer from './Footer'
 
 type Props = {
-  isDevWindow: boolean;
-};
+  isDevWindow: boolean
+}
 
 function Popover(props: Props) {
-  const { height } = useSafeDisplayDimensions();
+  const { height } = useSafeDisplayDimensions()
 
   useEffect(() => {
-    MenuBarModule.openPopover();
-  }, []);
+    MenuBarModule.openPopover()
+  }, [])
 
   return (
     <View
@@ -31,10 +30,10 @@ function Popover(props: Props) {
         <Core isDevWindow={props.isDevWindow} />
       </ErrorBoundary>
     </View>
-  );
+  )
 }
 
-export default Popover;
+export default Popover
 
 const Fallback = ({ error }: FallbackProps) => {
   return (
@@ -42,5 +41,5 @@ const Fallback = ({ error }: FallbackProps) => {
       <Text weight="medium">Something went wrong, please restart the app</Text>
       <Text color="secondary">Error message: {error?.message}</Text>
     </View>
-  );
-};
+  )
+}

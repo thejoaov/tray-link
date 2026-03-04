@@ -1,9 +1,9 @@
-import { shadows } from '@expo/styleguide-native';
-import { Platform, Text as RNText, TextInput as RNTextInput } from 'react-native';
+import { shadows } from '@expo/styleguide-native'
+import { Platform, Text as RNText, TextInput as RNTextInput } from 'react-native'
 
-import { PlatformColor } from '../modules/PlatformColor';
-import { create } from '../utils/create-component-primitive';
-import { text, textDark, padding, rounded } from '../utils/theme';
+import { PlatformColor } from '../modules/PlatformColor'
+import { create } from '../utils/create-component-primitive'
+import { padding, rounded, text, textDark } from '../utils/theme'
 
 export const Text = create(RNText, {
   base: {
@@ -27,7 +27,7 @@ export const Text = create(RNText, {
   selectors: {
     dark: textDark,
   },
-});
+})
 
 export const TextInput = create(RNTextInput, {
   base: {
@@ -64,4 +64,4 @@ export const TextInput = create(RNTextInput, {
       },
     },
   },
-});
+})
