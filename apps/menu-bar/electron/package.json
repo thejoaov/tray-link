@@ -1,6 +1,6 @@
 {
   "name": "@tray-link/electron",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "productName": "TrayLink",
   "description": "An app to manage your projects from the system tray",
   "license": "MIT",

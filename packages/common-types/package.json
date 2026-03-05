@@ -1,6 +1,6 @@
 {
   "name": "@tray-link/common-types",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "private": true,
   "main": "src/index.ts",
   "types": "src/index.ts",
