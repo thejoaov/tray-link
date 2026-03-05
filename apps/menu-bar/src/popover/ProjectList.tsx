@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { pickFolder } from '../../modules/file-picker'
 import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
@@ -17,7 +17,7 @@ import {
 } from '../services/preferences'
 import { projectStore } from '../services/projectStore'
 import { setPendingProjectRemove, subscribeProjectRemoveConfirm } from '../services/removeProjectDialog'
-import { MAX_UI_HEIGHT } from '../utils/constants'
+import { MAX_UI_HEIGHT, PROJECT_LIST_HEIGHT } from '../utils/constants'
 import { WindowsNavigator } from '../windows'
 import Footer from './Footer'
 import { ProjectItem } from './ProjectItem'
@@ -196,6 +196,7 @@ export const ProjectList = () => {
       <FlatList
         data={projects}
         keyExtractor={(item) => item.id}
+        style={{ height: PROJECT_LIST_HEIGHT }}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>{t('noProjectsYet')}</Text>

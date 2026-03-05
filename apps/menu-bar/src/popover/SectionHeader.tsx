@@ -3,8 +3,9 @@ import { StyleSheet, ViewStyle } from 'react-native'
 
 import { Row, Text } from '../components'
 import { useTheme } from '../providers/ThemeProvider'
+import { HEADER_HEIGHT, MAX_HEADER_HEIGHT } from '../utils/constants'
 
-export const SECTION_HEADER_HEIGHT = 20
+export const SECTION_HEADER_HEIGHT = Math.min(HEADER_HEIGHT, MAX_HEADER_HEIGHT)
 
 type Props = {
   label: string
@@ -27,5 +28,9 @@ const SectionHeader = ({ accessoryRight, label, style }: Props) => {
 export default memo(SectionHeader)
 
 const styles = StyleSheet.create({
-  row: { paddingVertical: 4 },
+  row: {
+    paddingVertical: 4,
+    height: HEADER_HEIGHT,
+    maxHeight: MAX_HEADER_HEIGHT,
+  },
 })

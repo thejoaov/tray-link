@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
 import { Divider, Text, View } from '../components'
 import MenuBarModule from '../modules/MenuBarModule'
+import { FOOTER_HEIGHT, MAX_FOOTER_HEIGHT } from '../utils/constants'
 import { WindowsNavigator } from '../windows'
 import Item from './Item'
 
@@ -9,7 +9,12 @@ export default function Footer() {
   const { t } = useTranslation()
 
   return (
-    <View>
+    <View
+      style={{
+        height: FOOTER_HEIGHT,
+        maxHeight: MAX_FOOTER_HEIGHT,
+      }}
+    >
       <View px="medium">
         <Divider />
       </View>
