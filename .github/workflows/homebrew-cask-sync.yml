@@ -17,8 +17,9 @@ jobs:
       contents: write
     env:
       CASK_NAME: tray-link
+      HOMEBREW_TAP_REPO: thejoaov/homebrew-tray-link
     steps:
-      - name: Checkout
+      - name: Checkout source repo (for tags)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -129,12 +130,19 @@ jobs:
 
           echo "version=${version}" >> "$GITHUB_OUTPUT"
 
+      - name: Checkout Homebrew tap repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.HOMEBREW_TAP_REPO }}
+          token: ${{ secrets.PAT }}
+          path: homebrew-tap
+
       - name: Update Cask file
         run: |
           set -euo pipefail
 
           version="${{ steps.release_version.outputs.version }}"
-          cask_file="Casks/${CASK_NAME}.rb"
+          cask_file="homebrew-tap/Casks/${CASK_NAME}.rb"
 
           if [ ! -f "$cask_file" ]; then
             echo "Missing cask file: $cask_file"
@@ -145,9 +153,11 @@ jobs:
           perl -0pi -e "s#sha256\s+\"[^\"]+\"#sha256 \"${{ steps.checksum.outputs.sha256 }}\"#" "$cask_file"
           perl -0pi -e "s#url\s+\"[^\"]+\"#url \"${{ steps.release_asset.outputs.asset_url }}\"#" "$cask_file"
 
-      - name: Commit and push
+      - name: Commit and push to Homebrew tap
         run: |
           set -euo pipefail
+          cd homebrew-tap
+
           git config user.name "thejoaov"
           git config user.email "thejoaov@users.noreply.github.com"
 
@@ -159,9 +169,4 @@ jobs:
           fi
 
           git commit -m "chore(cask): ${CASK_NAME} ${{ steps.release_version.outputs.version }}"
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.PAT }}
-          branch: main
-          force_with_lease: true
+          git push origin main
