@@ -12,6 +12,8 @@ jobs:
   build:
     uses: ./.github/workflows/build.yml
     secrets: inherit
+    # Only trigger build if the workflow Version runs successfully
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
 
   create-release:
     name: Create GitHub release
