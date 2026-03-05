@@ -19,6 +19,8 @@
 
 Tray Link helps you keep your favorite projects one click away from the menu bar/tray.
 
+Documentation: [tray-link-docs.vercel.app](https://tray-link-docs.vercel.app)
+
 With it, you can:
 
 - Open a project folder quickly
