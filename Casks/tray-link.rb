@@ -1,6 +1,6 @@
 cask "tray-link" do
   version "2.1.1"
-  sha256 "aa603a1f84be5d6f6ab0c5e71a61686d08756225ed86e269c8da9218d2a1f5cc"
+  sha256 "7657e3352111a076750ec667233f328dadf0ff97b8c0469509abfdeac22658a1"
 
   url "https://github.com/thejoaov/tray-link/releases/download/v2.1.1/Tray-Link-macOS-universal.zip"
   name "Tray Link"
