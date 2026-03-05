@@ -3,7 +3,7 @@ import { StyleSheet, ViewStyle } from 'react-native'
 
 import { Row, Text } from '../components'
 import { useTheme } from '../providers/ThemeProvider'
-import { HEADER_HEIGHT, MAX_HEADER_HEIGHT, MAX_UI_HEIGHT } from '../utils/constants'
+import { HEADER_HEIGHT, MAX_HEADER_HEIGHT } from '../utils/constants'
 
 export const SECTION_HEADER_HEIGHT = 20
 

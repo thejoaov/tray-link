@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
 import { Divider, Text, View } from '../components'
 import MenuBarModule from '../modules/MenuBarModule'
 import { FOOTER_HEIGHT, MAX_FOOTER_HEIGHT } from '../utils/constants'
