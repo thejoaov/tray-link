@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import { View } from '../components'
 import { ProjectList } from './ProjectList'
 
 type Props = {
@@ -7,11 +6,7 @@ type Props = {
 }
 
 function Core(_props: Props) {
-  return (
-    <View>
-      <ProjectList />
-    </View>
-  )
+  return <ProjectList />
 }
 
 export default memo(Core)
