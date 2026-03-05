@@ -32,7 +32,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       <h1 className="text-4xl font-bold">{titles[lang] ?? titles.en}</h1>
       <p className="text-lg text-fd-muted-foreground max-w-md">{descriptions[lang] ?? descriptions.en}</p>
       <Link
-        href={`/${lang ?? 'en'}`}
+        href={`/${lang ?? 'en'}/docs`}
         className="inline-flex items-center justify-center rounded-md bg-fd-primary text-fd-primary-foreground px-6 py-3 text-sm font-medium shadow hover:bg-fd-primary/90 transition-colors"
       >
         {cta[lang] ?? cta.en}
