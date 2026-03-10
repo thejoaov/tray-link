@@ -13,7 +13,7 @@ export function baseOptions(locale: string): BaseLayoutProps {
     nav: {
       title: (
         <div className="flex items-center gap-2">
-          <img src="/tray-link.svg" alt="Tray Link" width={24} height={24} className="rounded-md" />
+          <img src="/tray-link.png" alt="Tray Link" width={24} height={24} className="rounded-md" />
           <span>Tray Link</span>
         </div>
       ),
@@ -22,7 +22,7 @@ export function baseOptions(locale: string): BaseLayoutProps {
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
     links: [
       {
-        icon: <img src="/tray-link.svg" alt="Tray Link" width={16} height={16} className="rounded-sm" />,
+        icon: <img src="/tray-link.png" alt="Tray Link" width={16} height={16} className="rounded-sm" />,
         text: 'Docs',
         url: `/${locale}/docs`,
       },
