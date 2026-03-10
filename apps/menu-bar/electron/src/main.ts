@@ -7,10 +7,17 @@ import { MainModules } from '../modules/mainRegistry'
 import { LocalServer } from './LocalServer'
 import TrayGenerator from './TrayGenerator'
 
+declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string
+declare const MAIN_WINDOW_VITE_NAME: string
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (process.platform === 'win32' && started) {
   app.quit()
 }
+
+// Ensure a stable app name across dev and packaged builds so electron-store
+// resolves the same userData/config.json path.
+app.setName('TrayLink')
 
 // Use a different protocol for macos so it doesn't conflict with the react-native-macos project
 const scheme = os.platform() !== 'darwin' ? 'tlink' : 'tlink-debug'
@@ -22,7 +29,12 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient(scheme)
 }
 
-protocol.registerSchemesAsPrivileged([{ scheme, privileges: { standard: true, supportFetchAPI: true, secure: true } }])
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme,
+    privileges: { standard: true, supportFetchAPI: true, secure: true },
+  },
+])
 
 const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
@@ -45,13 +57,11 @@ const createMainWindow = () => {
     skipTaskbar: true,
   })
 
-  const development = !app.isPackaged
-  if (development) {
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
-
-    mainWindow.loadURL('http://localhost:8081')
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
   } else {
-    mainWindow.loadURL(`file://${path.join(__dirname, `./renderer/dist/index.html`)}`)
+    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`))
   }
 
   mainWindow.webContents.once('dom-ready', () => {

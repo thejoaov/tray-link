@@ -8,6 +8,8 @@ type StorageModuleType = {
   removeItem: (key: string) => Promise<boolean>
   getAllKeys: () => Promise<string[]>
   clear: () => Promise<boolean>
+  appendErrorLog: (entryJson: string) => Promise<boolean>
+  getErrorLogPath: () => Promise<string>
 }
 
 let StorageModule: StorageModuleType
@@ -24,6 +26,8 @@ if (isElectron) {
     removeItem: async () => false,
     getAllKeys: async () => [],
     clear: async () => false,
+    appendErrorLog: async () => false,
+    getErrorLogPath: async () => '',
   }
 }
 
@@ -45,4 +49,12 @@ export function getAllKeys(): Promise<string[]> {
 
 export function clear(): Promise<boolean> {
   return StorageModule.clear()
+}
+
+export function appendErrorLog(entryJson: string): Promise<boolean> {
+  return StorageModule.appendErrorLog(entryJson)
+}
+
+export function getErrorLogPath(): Promise<string> {
+  return StorageModule.getErrorLogPath()
 }

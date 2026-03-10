@@ -30,10 +30,31 @@ function getConfigPath(): string {
   return path.join(dir, 'config.json')
 }
 
+function parseJSONStringValueIfNeeded(value: unknown): unknown {
+  if (typeof value !== 'string') {
+    return value
+  }
+
+  try {
+    return JSON.parse(value)
+  } catch {
+    return value
+  }
+}
+
 function readConfig(): Record<string, unknown> {
   try {
     const raw = fs.readFileSync(getConfigPath(), 'utf8')
-    return JSON.parse(raw)
+    const parsed = JSON.parse(raw) as Record<string, unknown>
+    const normalized = Object.fromEntries(
+      Object.entries(parsed).map(([key, value]) => [key, parseJSONStringValueIfNeeded(value)]),
+    )
+
+    if (JSON.stringify(parsed) !== JSON.stringify(normalized)) {
+      writeConfig(normalized)
+    }
+
+    return normalized
   } catch {
     return {}
   }
@@ -54,11 +75,9 @@ export const projectStore = {
       const config = readConfig()
       const data = config[PROJECTS_KEY]
       if (!data) return []
-      // The Electron app stores projects as a JSON string value
       if (typeof data === 'string') {
         return JSON.parse(data)
       }
-      // Fallback: if stored as native array (old CLI format)
       if (Array.isArray(data)) {
         return data
       }
@@ -70,8 +89,7 @@ export const projectStore = {
 
   saveProjects: async (projects: Project[]): Promise<void> => {
     const config = readConfig()
-    // Store as JSON string to match the Electron app's format
-    config[PROJECTS_KEY] = JSON.stringify(projects)
+    config[PROJECTS_KEY] = projects
     writeConfig(config)
   },
 
@@ -125,7 +143,7 @@ export const preferencesStore = {
 
   savePreferences: (preferences: Settings): void => {
     const config = readConfig()
-    config[PREFERENCES_KEY] = JSON.stringify(preferences)
+    config[PREFERENCES_KEY] = preferences
     writeConfig(config)
   },
 

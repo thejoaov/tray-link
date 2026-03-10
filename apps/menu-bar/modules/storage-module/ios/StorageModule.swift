@@ -2,9 +2,57 @@ import ExpoModulesCore
 import Foundation
 
 public class StorageModule: Module {
-  private func configPath() -> String {
+  private func supportDirectory() -> String {
     let home = FileManager.default.homeDirectoryForCurrentUser.path
-    return "\(home)/Library/Application Support/TrayLink/config.json"
+    return "\(home)/Library/Application Support/TrayLink"
+  }
+
+  private func configPath() -> String {
+    return "\(supportDirectory())/config.json"
+  }
+
+  private func errorLogPath() -> String {
+    return "\(supportDirectory())/error-log.json"
+  }
+
+  private func parseJSONStringValueIfNeeded(_ value: Any) -> Any {
+    guard let stringValue = value as? String,
+          let data = stringValue.data(using: .utf8),
+          let parsed = try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed]) else {
+      return value
+    }
+
+    switch parsed {
+    case is [String: Any], is [Any], is NSNumber, is NSNull:
+      return parsed
+    default:
+      return value
+    }
+  }
+
+  private func serializeStoredValue(_ value: Any) -> String? {
+    if let stringValue = value as? String {
+      return stringValue
+    }
+
+    if let boolValue = value as? Bool {
+      return boolValue ? "true" : "false"
+    }
+
+    if let numberValue = value as? NSNumber {
+      return numberValue.stringValue
+    }
+
+    if value is NSNull {
+      return "null"
+    }
+
+    guard JSONSerialization.isValidJSONObject(value),
+          let data = try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys]) else {
+      return nil
+    }
+
+    return String(data: data, encoding: .utf8)
   }
 
   private func readConfig() -> [String: Any] {
@@ -15,22 +63,80 @@ public class StorageModule: Module {
           let dict = json as? [String: Any] else {
       return [:]
     }
-    return dict
+
+    var normalized = dict
+    var changed = false
+
+    for (key, value) in dict {
+      let nextValue = parseJSONStringValueIfNeeded(value)
+      let valueChanged = String(describing: nextValue) != String(describing: value)
+      if valueChanged {
+        normalized[key] = nextValue
+        changed = true
+      }
+    }
+
+    if changed {
+      writeConfig(normalized)
+    }
+
+    return normalized
+  }
+
+  private func ensureSupportDirectory() {
+    try? FileManager.default.createDirectory(atPath: supportDirectory(), withIntermediateDirectories: true, attributes: nil)
   }
 
   private func writeConfig(_ config: [String: Any]) {
     let path = configPath()
-    let dir = (path as NSString).deletingLastPathComponent
-    try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true, attributes: nil)
+    ensureSupportDirectory()
 
     guard let data = try? JSONSerialization.data(withJSONObject: config, options: [.prettyPrinted, .sortedKeys]) else {
       return
     }
-    // Convert spaces to tabs to match electron-store/conf format
     var jsonString = String(data: data, encoding: .utf8) ?? "{}"
     jsonString = jsonString.replacingOccurrences(of: "  ", with: "\t")
     jsonString += "\n"
     try? jsonString.write(toFile: path, atomically: true, encoding: .utf8)
+  }
+
+  private func readErrorLog() -> [[String: Any]] {
+    let path = errorLogPath()
+    guard FileManager.default.fileExists(atPath: path),
+          let data = FileManager.default.contents(atPath: path),
+          let json = try? JSONSerialization.jsonObject(with: data, options: []),
+          let entries = json as? [[String: Any]] else {
+      return []
+    }
+    return entries
+  }
+
+  private func appendErrorLogEntry(_ entryJson: String) -> Bool {
+    guard let data = entryJson.data(using: .utf8),
+          let json = try? JSONSerialization.jsonObject(with: data, options: []),
+          let entry = json as? [String: Any] else {
+      return false
+    }
+
+    ensureSupportDirectory()
+
+    var entries = readErrorLog()
+    entries.append(entry)
+
+    guard let encoded = try? JSONSerialization.data(withJSONObject: entries, options: [.prettyPrinted, .sortedKeys]) else {
+      return false
+    }
+
+    var jsonString = String(data: encoded, encoding: .utf8) ?? "[]"
+    jsonString = jsonString.replacingOccurrences(of: "  ", with: "\t")
+    jsonString += "\n"
+
+    do {
+      try jsonString.write(toFile: errorLogPath(), atomically: true, encoding: .utf8)
+      return true
+    } catch {
+      return false
+    }
   }
 
   public func definition() -> ModuleDefinition {
@@ -38,14 +144,17 @@ public class StorageModule: Module {
 
     AsyncFunction("setItem") { (key: String, value: String) -> Bool in
       var config = self.readConfig()
-      config[key] = value
+      config[key] = self.parseJSONStringValueIfNeeded(value)
       self.writeConfig(config)
       return true
     }
 
     AsyncFunction("getItem") { (key: String) -> String? in
       let config = self.readConfig()
-      return config[key] as? String
+      guard let value = config[key] else {
+        return nil
+      }
+      return self.serializeStoredValue(value)
     }
 
     AsyncFunction("removeItem") { (key: String) -> Bool in
@@ -63,6 +172,14 @@ public class StorageModule: Module {
     AsyncFunction("clear") { () -> Bool in
       self.writeConfig([:])
       return true
+    }
+
+    AsyncFunction("appendErrorLog") { (entryJson: String) -> Bool in
+      return self.appendErrorLogEntry(entryJson)
+    }
+
+    AsyncFunction("getErrorLogPath") { () -> String in
+      return self.errorLogPath()
     }
   }
 }

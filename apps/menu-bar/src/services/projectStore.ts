@@ -1,6 +1,7 @@
 import { Project } from '@tray-link/common-types'
 import { Platform } from 'react-native'
 import { getItem, setItem } from '../../modules/storage-module/src/index'
+import { logError } from './errorLogger'
 
 const PROJECTS_KEY = 'projects'
 
@@ -42,8 +43,9 @@ export const projectStore = {
       const data = await getItem(PROJECTS_KEY)
       if (!data) return []
       return JSON.parse(data)
-    } catch (e) {
-      console.error('Error reading projects', e)
+    } catch (error) {
+      console.error('Error reading projects', error)
+      await logError('project-store:getProjects', error)
       return []
     }
   },
@@ -51,8 +53,11 @@ export const projectStore = {
   saveProjects: async (projects: Project[]): Promise<void> => {
     try {
       await setItem(PROJECTS_KEY, JSON.stringify(projects))
-    } catch (e) {
-      console.error('Error saving projects', e)
+    } catch (error) {
+      console.error('Error saving projects', error)
+      await logError('project-store:saveProjects', error, {
+        projectCount: projects.length,
+      })
     }
   },
 

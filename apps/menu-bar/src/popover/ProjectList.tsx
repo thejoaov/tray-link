@@ -9,6 +9,7 @@ import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../.
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
 import Alert from '../modules/Alert'
 import { defaultUserPreferences } from '../modules/Storage'
+import { logError } from '../services/errorLogger'
 import {
   getEditorOptions,
   getTerminalOptions,
@@ -49,25 +50,37 @@ export const ProjectList = () => {
     loadProjects()
     loadPreferences()
       .then(setPreferences)
-      .catch(() => {})
+      .catch((error) => {
+        void logError('project-list:initial-loadPreferences', error)
+      })
 
     const preferencesSubscription = subscribePreferencesChange(() => {
       loadPreferences()
         .then(setPreferences)
-        .catch(() => {})
+        .catch((error) => {
+          void logError('project-list:preferences-subscription-loadPreferences', error)
+        })
     })
 
     const removeSubscription = subscribeProjectRemoveConfirm(async (payload) => {
-      if (payload.deleteFromDisk) {
-        const removed = await removeFromDisk(payload.path)
-        if (!removed) {
-          Alert.alert(t('deleteFailed'), t('couldNotDeleteFromDisk', { path: payload.path }))
-          return
+      try {
+        if (payload.deleteFromDisk) {
+          const removed = await removeFromDisk(payload.path)
+          if (!removed) {
+            Alert.alert(t('deleteFailed'), t('couldNotDeleteFromDisk', { path: payload.path }))
+            return
+          }
         }
-      }
 
-      await projectStore.removeProject(payload.id)
-      await loadProjects()
+        await projectStore.removeProject(payload.id)
+        await loadProjects()
+      } catch (error) {
+        await logError('project-list:removeSubscription', error, {
+          projectId: payload.id,
+          path: payload.path,
+          deleteFromDisk: payload.deleteFromDisk,
+        })
+      }
     })
 
     return () => {
@@ -83,7 +96,9 @@ export const ProjectList = () => {
       loadProjects()
       loadPreferences()
         .then(setPreferences)
-        .catch(() => {})
+        .catch((error) => {
+          void logError('project-list:focus-loadPreferences', error)
+        })
     }, []),
   )
 
@@ -91,8 +106,9 @@ export const ProjectList = () => {
     try {
       const data = await projectStore.getProjects()
       setProjects(data.sort((a, b) => a.position - b.position))
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      console.error(error)
+      await logError('project-list:loadProjects', error)
     } finally {
       setLoading(false)
     }
@@ -115,8 +131,11 @@ export const ProjectList = () => {
         await projectStore.addProject(newProject)
         await loadProjects()
       }
-    } catch (e) {
-      console.error('Error adding project:', e)
+    } catch (error) {
+      console.error('Error adding project:', error)
+      await logError('project-list:handleAddProject', error, {
+        projectsLength: projects.length,
+      })
     }
   }
 

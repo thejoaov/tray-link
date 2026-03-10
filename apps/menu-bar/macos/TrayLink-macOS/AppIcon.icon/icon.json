@@ -1,6 +1,6 @@
 {
   "fill": {
-    "linear-gradient": ["gray:0.12685,1.00000", "display-p3:0.60000,0.60000,0.60000,1.00000"]
+    "linear-gradient": ["display-p3:0.05882,0.09020,0.16471,1.00000", "display-p3:0.11765,0.22745,0.37255,1.00000"]
   },
   "groups": [
     {
@@ -10,22 +10,22 @@
           "glass": false,
           "hidden": false,
           "image-name": "tlink 2.png",
-          "name": "tlink 2",
+          "name": "TrayLink",
           "position": {
-            "scale": 0.82,
-            "translation-in-points": [14, 0]
+            "scale": 1.08,
+            "translation-in-points": [0, 0]
           }
         }
       ],
       "lighting": "individual",
       "shadow": {
         "kind": "neutral",
-        "opacity": 0.5
+        "opacity": 0.18
       },
-      "specular": true,
+      "specular": false,
       "translucency": {
-        "enabled": true,
-        "value": 0.5
+        "enabled": false,
+        "value": 0
       }
     }
   ],

@@ -1,4 +1,5 @@
 import React, { createElement, ErrorInfo, FunctionComponent, PropsWithChildren } from 'react'
+import { logError } from '../services/errorLogger'
 
 export type FallbackProps = {
   error?: Error
@@ -27,9 +28,16 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    const serializedErrorInfo = JSON.stringify(errorInfo)
+
     this.setState({
       error,
-      errorInfo: JSON.stringify(errorInfo),
+      errorInfo: serializedErrorInfo,
+    })
+
+    void logError('react-error-boundary', error, {
+      errorInfo,
+      serializedErrorInfo,
     })
   }
 

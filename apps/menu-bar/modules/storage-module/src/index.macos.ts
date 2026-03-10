@@ -6,6 +6,8 @@ type StorageModuleType = {
   removeItem: (key: string) => Promise<boolean>
   getAllKeys: () => Promise<string[]>
   clear: () => Promise<boolean>
+  appendErrorLog: (entryJson: string) => Promise<boolean>
+  getErrorLogPath: () => Promise<string>
 }
 
 const NativeStorage = requireNativeModule<StorageModuleType>('Storage')
@@ -28,4 +30,12 @@ export function getAllKeys(): Promise<string[]> {
 
 export function clear(): Promise<boolean> {
   return NativeStorage.clear()
+}
+
+export function appendErrorLog(entryJson: string): Promise<boolean> {
+  return NativeStorage.appendErrorLog(entryJson)
+}
+
+export function getErrorLogPath(): Promise<string> {
+  return NativeStorage.getErrorLogPath()
 }
