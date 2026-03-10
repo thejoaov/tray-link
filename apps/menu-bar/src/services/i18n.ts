@@ -47,6 +47,7 @@ type TranslationKey =
   | 'openWithTerminal'
   | 'reload'
   | 'reloadToolList'
+  | 'advanced'
   | 'migrateLegacyData'
   | 'migrationPreviewFound'
   | 'migrationPreviewNone'
@@ -101,6 +102,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openWithTerminal: 'Open with terminal',
     reload: 'Reload',
     reloadToolList: 'Reload editors and terminals',
+    advanced: 'Advanced',
     migrateLegacyData: 'Migrate legacy data',
     migrationPreviewFound: 'Legacy data found: {{projects}} projects',
     migrationPreviewNone: 'No legacy data found',
@@ -154,6 +156,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openWithTerminal: 'Abrir com terminal',
     reload: 'Recarregar',
     reloadToolList: 'Recarregar lista de editores e terminais',
+    advanced: 'Avançado',
     migrateLegacyData: 'Migrar dados legados',
     migrationPreviewFound: 'Dados legados encontrados: {{projects}} projetos',
     migrationPreviewNone: 'Nenhum dado legado encontrado',
@@ -207,6 +210,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openWithTerminal: 'Abrir con terminal',
     reload: 'Recargar',
     reloadToolList: 'Recargar lista de editores y terminales',
+    advanced: 'Avanzado',
     migrateLegacyData: 'Migrar datos legados',
     migrationPreviewFound: 'Datos heredados encontrados: {{projects}} proyectos',
     migrationPreviewNone: 'No se encontraron datos heredados',
