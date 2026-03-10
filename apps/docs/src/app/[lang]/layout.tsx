@@ -14,7 +14,7 @@ const { provider } = defineI18nUI(i18n, {
       displayName: 'English',
     },
     pt: {
-      displayName: 'Português',
+      displayName: 'Português (Brasil)',
       search: 'Pesquisar',
     },
     es: {

@@ -539,8 +539,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
     },
   }
 
-  const { lang = 'en' } = await params
-  const locale = (['en', 'pt', 'es'].includes(lang) ? lang : 'en') as Locale
+  const { lang = 'pt' } = await params
+  const locale = (['en', 'pt', 'es'].includes(lang) ? lang : 'pt') as Locale
   const copy = content[locale]
 
   return (
