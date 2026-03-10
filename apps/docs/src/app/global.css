@@ -1,3 +1,155 @@
-@import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
-@import 'fumadocs-ui/css/preset.css';
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+:root {
+  --color-site-black: #040404;
+  --color-site-black-soft: #0a0a0f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.16), transparent 30%),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(124, 58, 237, 0.14),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 25% 80%,
+      rgba(16, 185, 129, 0.1),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-site-black) 0%,
+      var(--color-site-black-soft) 100%
+    );
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.homepage-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-position: center;
+  background-size: 72px 72px;
+}
+
+.homepage-noise {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 3px 3px;
+  mask-image: radial-gradient(circle at center, black 34%, transparent 88%);
+}
+
+.homepage-orb {
+  position: absolute;
+  width: 26rem;
+  height: 26rem;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.5;
+  animation: homepage-float-orb 18s ease-in-out infinite;
+}
+
+.homepage-orb-blue {
+  background: radial-gradient(
+    circle,
+    rgba(37, 99, 235, 0.42) 0%,
+    rgba(37, 99, 235, 0.06) 58%,
+    transparent 74%
+  );
+}
+
+.homepage-orb-violet {
+  background: radial-gradient(
+    circle,
+    rgba(147, 51, 234, 0.36) 0%,
+    rgba(147, 51, 234, 0.06) 58%,
+    transparent 74%
+  );
+  animation-delay: -6s;
+}
+
+.homepage-orb-emerald {
+  background: radial-gradient(
+    circle,
+    rgba(16, 185, 129, 0.28) 0%,
+    rgba(16, 185, 129, 0.05) 58%,
+    transparent 74%
+  );
+  animation-delay: -11s;
+}
+
+.homepage-float {
+  animation: homepage-card-drift 8s ease-in-out infinite;
+}
+
+.homepage-fade-up {
+  animation: homepage-fade-up 900ms ease-out both;
+}
+
+@keyframes homepage-float-orb {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, 18px, 0) scale(1.08);
+  }
+}
+
+@keyframes homepage-card-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes homepage-fade-up {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 768px) {
+  .homepage-orb {
+    width: 18rem;
+    height: 18rem;
+    filter: blur(70px);
+  }
+
+  .homepage-grid {
+    background-size: 52px 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .homepage-orb,
+  .homepage-float,
+  .homepage-fade-up {
+    animation: none;
+  }
+}
