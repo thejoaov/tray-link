@@ -115,25 +115,22 @@ function TerminalCommand({
   command,
   copyLabel,
   copiedLabel,
-  commandLabel,
 }: {
   command: string
   copyLabel: string
   copiedLabel: string
-  commandLabel: string
 }) {
   const [checked, onClick] = useCopyButton(() => navigator.clipboard.writeText(command))
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 shadow-[0_0_30px_rgba(15,23,42,0.35)]">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+      <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="flex gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_14px_rgba(34,211,238,0.9)]" />
             <span className="h-2.5 w-2.5 rounded-full bg-violet-400 shadow-[0_0_14px_rgba(167,139,250,0.9)]" />
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,0.9)]" />
           </div>
-          <p className="text-xs uppercase tracking-[0.24em] text-white/45">{commandLabel}</p>
         </div>
 
         <button
@@ -153,7 +150,7 @@ function TerminalCommand({
         </button>
       </div>
 
-      <div className="px-4 py-4">
+      <div className="px-4 pb-4">
         <div className="overflow-x-auto rounded-2xl border border-white/8 bg-black/35 px-4 py-4 font-mono text-sm leading-7 text-white/82">
           {command.split('\n').map((line, index) => (
             <div key={`${line}-${index}`} className="flex gap-3 whitespace-pre">
@@ -177,7 +174,6 @@ export function InstallTerminals({
   downloadLabel,
   downloadingLabel,
   instructionsLabel,
-  commandLabel,
   assetNotFoundLabel,
 }: {
   eyebrow: string
@@ -189,7 +185,6 @@ export function InstallTerminals({
   downloadLabel: string
   downloadingLabel: string
   instructionsLabel: string
-  commandLabel: string
   assetNotFoundLabel: string
 }) {
   const [selectedMethodId, setSelectedMethodId] = useState(methods[0]?.id)
@@ -371,12 +366,7 @@ export function InstallTerminals({
             </div>
 
             {selectedMethod.command ? (
-              <TerminalCommand
-                command={selectedMethod.command}
-                copyLabel={copyLabel}
-                copiedLabel={copiedLabel}
-                commandLabel={commandLabel}
-              />
+              <TerminalCommand command={selectedMethod.command} copyLabel={copyLabel} copiedLabel={copiedLabel} />
             ) : null}
           </div>
         </div>

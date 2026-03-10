@@ -2,6 +2,9 @@ import { ArrowRight, Github, MonitorCog, Rocket, ShieldCheck, Sparkles, Workflow
 import Link from 'next/link'
 import { type InstallMethodOption, InstallTerminals } from '@/components/home/install-terminals'
 
+export const dynamic = 'force-static'
+export const revalidate = 3600
+
 const repoUrl = 'https://github.com/thejoaov/tray-link'
 const latestReleaseApiUrl = 'https://api.github.com/repos/thejoaov/tray-link/releases/latest'
 
@@ -203,7 +206,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       finalTitle: 'Bring a premium operating layer to your developer workflow.',
       finalDescription:
         'Start with the docs, explore the repository, and shape a faster everyday experience around your local projects with both the desktop app and CLI.',
-      finalCta: 'Get started now',
+      finalCta: 'Get started',
     },
     pt: {
       announcement: 'Feito para times de engenharia que se movem rápido',
@@ -367,7 +370,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       finalTitle: 'Leve uma camada operacional premium para o seu fluxo de desenvolvimento.',
       finalDescription:
         'Comece pela documentação, explore o repositório e monte uma experiência diária mais rápida ao redor dos seus projetos locais com o app desktop e a CLI.',
-      finalCta: 'Começar agora',
+      finalCta: 'Documentação',
     },
     es: {
       announcement: 'Hecho para equipos de ingeniería que avanzan rápido',
@@ -556,7 +559,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               {copy.announcement}
             </div>
 
-            <div className="flex flex-col gap-10 min-[600px]:grid min-[600px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] min-[600px]:items-start xl:grid-cols-[minmax(0,1.02fr)_minmax(0,1.18fr)] xl:items-end">
+            <div className="flex flex-col gap-10 min-[600px]:grid min-[600px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] min-[600px]:items-start xl:grid-cols-[minmax(0,1.02fr)_minmax(0,1.18fr)] xl:items-start">
               <div>
                 <h1 className="max-w-3xl text-5xl font-semibold tracking-[-0.06em] text-white sm:text-6xl lg:text-7xl">
                   {copy.headline}
@@ -604,7 +607,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 downloadLabel={copy.downloadLabel}
                 downloadingLabel={copy.downloadingLabel}
                 instructionsLabel={copy.instructionsLabel}
-                commandLabel={copy.commandLabel}
                 assetNotFoundLabel={copy.assetNotFoundLabel}
               />
             </div>
@@ -697,8 +699,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       </section>
 
       <section className="relative px-4 pb-20 pt-8 sm:px-6 lg:px-8 lg:pb-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="homepage-fade-up relative overflow-hidden rounded-[2.2rem] border border-white/14 bg-[linear-gradient(135deg,rgba(8,8,10,0.96),rgba(13,18,30,0.94))] px-6 py-10 shadow-[0_0_120px_rgba(15,23,42,0.55)] backdrop-blur-2xl sm:px-10 lg:px-14 lg:py-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="homepage-fade-up relative w-full overflow-hidden rounded-[2.2rem] border border-white/14 bg-[linear-gradient(135deg,rgba(8,8,10,0.96),rgba(13,18,30,0.94))] px-6 py-10 shadow-[0_0_120px_rgba(15,23,42,0.55)] backdrop-blur-2xl sm:px-10 lg:px-14 lg:py-14">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.2),transparent_24%),radial-gradient(circle_at_80%_30%,rgba(139,92,246,0.16),transparent_24%),radial-gradient(circle_at_60%_90%,rgba(16,185,129,0.12),transparent_24%)]" />
             <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
@@ -709,10 +711,10 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 <p className="mt-4 text-base leading-8 text-white/64">{copy.finalDescription}</p>
               </div>
 
-              <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <Link
                   href={`/${locale}/docs`}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-cyan-400/40 bg-linear-to-r from-cyan-400 via-blue-500 to-violet-500 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_36px_rgba(59,130,246,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_48px_rgba(96,165,250,0.42)]"
+                  className="inline-flex w-fit shrink-0 self-start whitespace-nowrap items-center justify-center gap-2 rounded-full border border-cyan-400/40 bg-linear-to-r from-cyan-400 via-blue-500 to-violet-500 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_36px_rgba(59,130,246,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_48px_rgba(96,165,250,0.42)]"
                 >
                   {copy.finalCta}
                   <ArrowRight className="h-4 w-4" />
@@ -721,7 +723,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                   href={repoUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/14 bg-white/6 px-7 py-3.5 text-sm font-medium text-white/84 backdrop-blur-xl transition-all duration-300 hover:border-white/24 hover:bg-white/10 hover:text-white"
+                  className="inline-flex w-fit shrink-0 self-start whitespace-nowrap items-center justify-center gap-2 rounded-full border border-white/14 bg-white/6 px-7 py-3.5 text-sm font-medium text-white/84 backdrop-blur-xl transition-all duration-300 hover:border-white/24 hover:bg-white/10 hover:text-white"
                 >
                   <Github className="h-4 w-4" />
                   {copy.secondaryCta}

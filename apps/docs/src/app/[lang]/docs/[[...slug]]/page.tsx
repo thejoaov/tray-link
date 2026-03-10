@@ -7,6 +7,10 @@ import { gitConfig } from '@/lib/layout.shared'
 import { getPageImage, source } from '@/lib/source'
 import { getMDXComponents } from '@/mdx-components'
 
+export const dynamic = 'force-static'
+export const dynamicParams = false
+export const revalidate = 3600
+
 export default async function Page(props: { params: Promise<{ lang: string; slug?: string[] }> }) {
   const params = await props.params
   const page = source.getPage(params.slug, params.lang)
