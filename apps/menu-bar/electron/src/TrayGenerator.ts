@@ -90,9 +90,8 @@ export default class TrayGenerator {
             // Keep in sync with menu-bar/src/windows/index.ts
             title: 'Settings',
             windowStyle: {
-              titlebarAppearsTransparent: true,
-              height: 580,
-              width: 500,
+              height: 640,
+              width: 600,
             },
           })
         },

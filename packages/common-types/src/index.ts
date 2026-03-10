@@ -38,6 +38,7 @@ export interface Settings {
   defaultEditor: string | null
   defaultTerminal: string | null
   launchOnLogin: boolean
+  showAppIcons: boolean
   removeFromDiskByDefault: boolean
   customEditors: CustomTool[]
   customTerminals: CustomTool[]

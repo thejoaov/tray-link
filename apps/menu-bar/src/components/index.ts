@@ -1,4 +1,7 @@
+export { AppIcon } from './AppIcon'
 export { default as Button } from './Button'
 export { default as Checkbox } from './Checkbox'
+export { ScrollView } from './ScrollView'
+export { Switch } from './Switch'
 export { Text, TextInput } from './Text'
 export { Divider, Row, Spacer, View } from './View'

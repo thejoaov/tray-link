@@ -13,6 +13,8 @@ type TranslationKey =
   | 'defaultEditor'
   | 'defaultTerminal'
   | 'systemDefault'
+  | 'openOnStartup'
+  | 'showAppIcons'
   | 'deleteFilesFromDiskByDefault'
   | 'addCustomEditor'
   | 'addCustomTerminal'
@@ -45,6 +47,7 @@ type TranslationKey =
   | 'openWithTerminal'
   | 'reload'
   | 'reloadToolList'
+  | 'advanced'
   | 'migrateLegacyData'
   | 'migrationPreviewFound'
   | 'migrationPreviewNone'
@@ -65,6 +68,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     defaultEditor: 'Default editor',
     defaultTerminal: 'Default terminal',
     systemDefault: 'System default',
+    openOnStartup: 'Open on startup',
+    showAppIcons: 'Show real app icons',
     deleteFilesFromDiskByDefault: 'Delete files from disk by default',
     addCustomEditor: 'Add custom editor',
     addCustomTerminal: 'Add custom terminal',
@@ -97,6 +102,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openWithTerminal: 'Open with terminal',
     reload: 'Reload',
     reloadToolList: 'Reload editors and terminals',
+    advanced: 'Advanced',
     migrateLegacyData: 'Migrate legacy data',
     migrationPreviewFound: 'Legacy data found: {{projects}} projects',
     migrationPreviewNone: 'No legacy data found',
@@ -116,6 +122,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     defaultEditor: 'Editor padrão',
     defaultTerminal: 'Terminal padrão',
     systemDefault: 'Padrão do sistema',
+    openOnStartup: 'Abrir na inicialização',
+    showAppIcons: 'Mostrar ícones reais dos apps',
     deleteFilesFromDiskByDefault: 'Excluir arquivos do disco por padrão',
     addCustomEditor: 'Adicionar editor personalizado',
     addCustomTerminal: 'Adicionar terminal personalizado',
@@ -148,6 +156,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openWithTerminal: 'Abrir com terminal',
     reload: 'Recarregar',
     reloadToolList: 'Recarregar lista de editores e terminais',
+    advanced: 'Avançado',
     migrateLegacyData: 'Migrar dados legados',
     migrationPreviewFound: 'Dados legados encontrados: {{projects}} projetos',
     migrationPreviewNone: 'Nenhum dado legado encontrado',
@@ -167,6 +176,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     defaultEditor: 'Editor predeterminado',
     defaultTerminal: 'Terminal predeterminado',
     systemDefault: 'Predeterminado del sistema',
+    openOnStartup: 'Abrir al iniciar',
+    showAppIcons: 'Mostrar iconos reales de las apps',
     deleteFilesFromDiskByDefault: 'Eliminar archivos del disco por defecto',
     addCustomEditor: 'Agregar editor personalizado',
     addCustomTerminal: 'Agregar terminal personalizado',
@@ -199,6 +210,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openWithTerminal: 'Abrir con terminal',
     reload: 'Recargar',
     reloadToolList: 'Recargar lista de editores y terminales',
+    advanced: 'Avanzado',
     migrateLegacyData: 'Migrar datos legados',
     migrationPreviewFound: 'Datos heredados encontrados: {{projects}} proyectos',
     migrationPreviewNone: 'No se encontraron datos heredados',

@@ -1,7 +1,8 @@
 import { CustomTool } from '@tray-link/common-types'
-import { EmitterSubscription } from 'react-native'
-import { fileExists, which } from '../../modules/shell-utils/src'
+import { EmitterSubscription, Platform } from 'react-native'
+import { fileExists, getFileIconDataUrl, which } from '../../modules/shell-utils/src'
 import { DeviceEventEmitter } from '../modules/DeviceEventEmitter'
+import MenuBarModule from '../modules/MenuBarModule'
 import {
   defaultUserPreferences,
   getUserPreferences,
@@ -21,6 +22,8 @@ export type ToolOption = {
   label: string
   command: string
   slug: string
+  iconName?: 'code-slash-outline' | 'terminal-outline'
+  iconPath?: string | null
 }
 
 type DiscoverableTool = {
@@ -28,7 +31,70 @@ type DiscoverableTool = {
   command: string
   binary?: string
   commonFilepaths?: string[]
+  iconBasenames?: string[]
   alwaysAvailable?: boolean
+}
+
+const toFileUri = (filepath: string): string => {
+  if (filepath.startsWith('file://')) {
+    return filepath
+  }
+
+  return `file://${filepath}`
+}
+
+const stripAppExtension = (name: string): string => name.replace(/\.app$/i, '')
+
+const unique = (values: Array<string | null | undefined>): string[] => {
+  return [...new Set(values.filter((value): value is string => Boolean(value)))]
+}
+
+const resolveIconCandidatePaths = (tool: DiscoverableTool, filepath: string): string[] => {
+  const appName = stripAppExtension(filepath.split('/').pop() ?? '')
+  const normalized = appName.replace(/\s+/g, '')
+  const iconBasenames = unique([
+    ...(tool.iconBasenames ?? []),
+    appName,
+    normalized,
+    `${normalized}2`,
+    'AppIcon',
+    'Electron',
+    'app',
+  ])
+
+  return iconBasenames.flatMap((baseName) => [
+    `${filepath}/Contents/Resources/${baseName}.icns`,
+    `${filepath}/Contents/Resources/${baseName}.png`,
+  ])
+}
+
+const resolveIconPath = async (tool: DiscoverableTool): Promise<string | null> => {
+  for (const filepath of tool.commonFilepaths ?? []) {
+    if (Platform.OS === 'web') {
+      const iconDataUrl = await getFileIconDataUrl(filepath)
+      if (iconDataUrl) {
+        return iconDataUrl
+      }
+    }
+
+    if (filepath.endsWith('.png') || filepath.endsWith('.ico') || filepath.endsWith('.icns')) {
+      if (await fileExists(filepath)) {
+        return toFileUri(filepath)
+      }
+    }
+
+    if (filepath.endsWith('.app')) {
+      const candidatePaths = resolveIconCandidatePaths(tool, filepath)
+
+      for (const candidate of candidatePaths) {
+        if (await fileExists(candidate)) {
+          return toFileUri(candidate)
+        }
+      }
+    }
+  }
+
+  return null
 }
 
 const EDITOR_CANDIDATES: DiscoverableTool[] = [
@@ -38,10 +104,12 @@ const EDITOR_CANDIDATES: DiscoverableTool[] = [
     binary: 'code',
     commonFilepaths: [
       '/Applications/Visual Studio Code.app',
+      '/Applications/Visual Studio Code - OSS.app',
       '/usr/share/code/bin/code',
       'C:\\Program Files\\Microsoft VS Code\\Code.exe',
       'C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe',
     ],
+    iconBasenames: ['Code', 'AppIcon', 'Visual Studio Code'],
   },
   {
     label: 'Visual Studio Code Insiders',
@@ -137,15 +205,18 @@ const EDITOR_CANDIDATES: DiscoverableTool[] = [
     command: 'open -a "Android Studio"',
     commonFilepaths: [
       '/Applications/Android Studio.app',
+      '/Applications/Android Studio Preview.app',
       '/usr/share/android-studio/bin/studio.sh',
       'C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe',
     ],
+    iconBasenames: ['studio', 'studio64', 'AndroidStudio', 'AppIcon'],
   },
   {
     label: 'Xcode',
     command: 'xed -b',
     binary: 'xed',
     commonFilepaths: ['/Applications/Xcode.app'],
+    iconBasenames: ['Xcode', 'AppIcon'],
   },
   {
     label: 'Geany',
@@ -173,6 +244,7 @@ const TERMINAL_CANDIDATES: DiscoverableTool[] = [
     command: 'open -a iTerm',
     binary: 'iterm',
     commonFilepaths: ['/Applications/iTerm.app'],
+    iconBasenames: ['iTerm2', 'iTerm'],
   },
   {
     label: 'Warp',
@@ -221,8 +293,13 @@ export const loadPreferences = async (): Promise<UserPreferences> => {
   return { ...defaultUserPreferences, ...stored }
 }
 
+const syncLaunchOnLoginPreference = async (preferences: UserPreferences): Promise<void> => {
+  await MenuBarModule.setLoginItemEnabled(Boolean(preferences.launchOnLogin))
+}
+
 export const persistPreferences = async (next: UserPreferences): Promise<void> => {
   await saveUserPreferences(next)
+  await syncLaunchOnLoginPreference(next)
   DeviceEventEmitter.emit(PREFERENCES_CHANGED_EVENT)
 }
 
@@ -232,6 +309,8 @@ export const persistPreferences = async (next: UserPreferences): Promise<void> =
  */
 export const initializePreferences = async (): Promise<void> => {
   await migratePreferencesFromMMKV()
+  const preferences = await loadPreferences()
+  await syncLaunchOnLoginPreference(preferences)
   await initializeToolOptions()
 }
 
@@ -266,13 +345,23 @@ const isToolInstalled = async (tool: DiscoverableTool): Promise<boolean> => {
   return false
 }
 
-const discoverTools = async (candidates: DiscoverableTool[]): Promise<ToolOption[]> => {
+const discoverTools = async (
+  candidates: DiscoverableTool[],
+  iconName: ToolOption['iconName'],
+): Promise<ToolOption[]> => {
   const discovered: ToolOption[] = []
 
   for (const tool of candidates) {
     const installed = await isToolInstalled(tool)
     if (installed) {
-      discovered.push({ label: tool.label, command: tool.command, slug: generateSlug(tool.label) })
+      const iconPath = await resolveIconPath(tool)
+      discovered.push({
+        label: tool.label,
+        command: tool.command,
+        slug: generateSlug(tool.label),
+        iconName,
+        iconPath,
+      })
     }
   }
 
@@ -282,8 +371,8 @@ const discoverTools = async (candidates: DiscoverableTool[]): Promise<ToolOption
 export const reloadToolOptions = async () => {
   try {
     const [editors, terminals] = await Promise.all([
-      discoverTools(EDITOR_CANDIDATES),
-      discoverTools(TERMINAL_CANDIDATES),
+      discoverTools(EDITOR_CANDIDATES, 'code-slash-outline'),
+      discoverTools(TERMINAL_CANDIDATES, 'terminal-outline'),
     ])
 
     discoveredEditorOptions = dedupeOptions(editors)
@@ -307,6 +396,8 @@ export const getEditorOptions = (customEditors: CustomTool[] = []): ToolOption[]
     label: item.name,
     command: item.command,
     slug: generateSlug(item.name),
+    iconName: 'code-slash-outline' as const,
+    iconPath: null,
   }))
   return dedupeOptions([...discoveredEditorOptions, ...custom])
 }
@@ -316,6 +407,8 @@ export const getTerminalOptions = (customTerminals: CustomTool[] = []): ToolOpti
     label: item.name,
     command: item.command,
     slug: generateSlug(item.name),
+    iconName: 'terminal-outline' as const,
+    iconPath: null,
   }))
   return dedupeOptions([...discoveredTerminalOptions, ...custom])
 }

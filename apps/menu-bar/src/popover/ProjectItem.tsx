@@ -3,6 +3,7 @@ import { Project } from '@tray-link/common-types'
 import React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
+import { AppIcon } from '../components'
 import { Text } from '../components/Text'
 
 type Props = {
@@ -14,8 +15,18 @@ type Props = {
   onRemove: () => void
   onToggleContextMenu: () => void
   contextMenuOpen?: boolean
-  editorOptions: Array<{ label: string; command: string }>
-  terminalOptions: Array<{ label: string; command: string }>
+  editorOptions: Array<{
+    label: string
+    command: string
+    iconName?: 'code-slash-outline' | 'terminal-outline'
+    iconPath?: string | null
+  }>
+  terminalOptions: Array<{
+    label: string
+    command: string
+    iconName?: 'code-slash-outline' | 'terminal-outline'
+    iconPath?: string | null
+  }>
   onOpenWithEditor: (command: string) => void
   onOpenWithTerminal: (command: string) => void
   labels: {
@@ -120,6 +131,13 @@ export const ProjectItem = ({
                 style={styles.contextActionButton}
                 onPress={() => onOpenWithEditor(option.command)}
               >
+                <AppIcon
+                  uri={option.iconPath ?? ''}
+                  style={styles.contextActionIconImage}
+                  fallback={
+                    <Ionicons name={option.iconName ?? 'code-slash-outline'} size={12} color="var(--text-color)" />
+                  }
+                />
                 <Text style={styles.contextActionText}>{option.label}</Text>
               </TouchableOpacity>
             ))}
@@ -133,6 +151,13 @@ export const ProjectItem = ({
                 style={styles.contextActionButton}
                 onPress={() => onOpenWithTerminal(option.command)}
               >
+                <AppIcon
+                  uri={option.iconPath ?? ''}
+                  style={styles.contextActionIconImage}
+                  fallback={
+                    <Ionicons name={option.iconName ?? 'terminal-outline'} size={12} color="var(--text-color)" />
+                  }
+                />
                 <Text style={styles.contextActionText}>{option.label}</Text>
               </TouchableOpacity>
             ))}
@@ -207,10 +232,18 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   contextActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
     backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  contextActionIconImage: {
+    width: 16,
+    height: 16,
+    borderRadius: 4,
   },
   contextActionText: {
     fontSize: 11,

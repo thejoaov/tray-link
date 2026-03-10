@@ -27,7 +27,15 @@ export const FluentProvider = ({ children, style }: { children: ReactElement; st
 export const withFluentProvider = <P extends object>(WrappedComponent: ComponentType<P>) => {
   const WithFluentProvider = (props: P) => {
     return (
-      <FluentProvider style={{ display: 'flex', width: '100%' }}>
+      <FluentProvider
+        style={{
+          display: 'flex',
+          width: '100%',
+          height: '100%',
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
         <WrappedComponent {...props} />
       </FluentProvider>
     )

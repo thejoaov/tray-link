@@ -7,6 +7,7 @@ export type UserPreferences = Settings
 
 export const defaultUserPreferences: UserPreferences = {
   launchOnLogin: false,
+  showAppIcons: false,
   locale: 'en',
   defaultEditor: null,
   defaultTerminal: null,

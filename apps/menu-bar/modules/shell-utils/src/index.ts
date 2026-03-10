@@ -8,6 +8,7 @@ type ShellUtilsModuleType = {
   openInFinder: (path: string) => Promise<boolean>
   which: (binary: string) => Promise<string | null>
   fileExists: (path: string) => Promise<boolean>
+  getFileIconDataUrl: (path: string) => Promise<string | null>
   loadLegacyTrayLinkData: () => Promise<Record<string, unknown> | null>
   removeFromDisk: (path: string) => Promise<boolean>
   isCliInstalled: () => Promise<boolean>
@@ -34,6 +35,7 @@ if (isElectron) {
       openInFinder: async () => false,
       which: async () => null,
       fileExists: async () => false,
+      getFileIconDataUrl: async () => null,
       loadLegacyTrayLinkData: async () => null,
       removeFromDisk: async () => false,
       isCliInstalled: async () => false,
@@ -61,6 +63,10 @@ export function which(binary: string): Promise<string | null> {
 
 export function fileExists(path: string): Promise<boolean> {
   return ShellUtilsModule.fileExists(path)
+}
+
+export function getFileIconDataUrl(path: string): Promise<string | null> {
+  return ShellUtilsModule.getFileIconDataUrl(path)
 }
 
 export function loadLegacyTrayLinkData(): Promise<Record<string, unknown> | null> {
