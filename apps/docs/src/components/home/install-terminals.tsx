@@ -5,6 +5,9 @@ import { buttonVariants } from 'fumadocs-ui/components/ui/button'
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button'
 import { Check, Copy, Download, TerminalSquare } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import type { IconType } from 'react-icons'
+import { FaWindows } from 'react-icons/fa6'
+import { SiApple, SiDebian, SiDotnet, SiFedora, SiHomebrew, SiMacos } from 'react-icons/si'
 import { cn } from '@/lib/cn'
 
 export type InstallMethodOption = {
@@ -41,6 +44,26 @@ const MATRIX_ROWS = [
   '> matching release asset patterns',
   '████████████████████████████████████',
 ] as const
+
+const installMethodIcons: Record<string, IconType> = {
+  'homebrew-macos': SiHomebrew,
+  'linux-fedora': SiFedora,
+  'linux-debian': SiDebian,
+  'macos-intel': SiMacos,
+  'macos-arm64': SiApple,
+  'windows-setup': FaWindows,
+  'windows-nuget': SiDotnet,
+}
+
+function InstallMethodIcon({ methodId, size = 16 }: { methodId: string; size?: number }) {
+  const Icon = installMethodIcons[methodId]
+
+  if (!Icon) {
+    return null
+  }
+
+  return <Icon size={size} className="shrink-0" aria-hidden />
+}
 
 function patternToRegex(pattern: string) {
   const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -290,12 +313,13 @@ export function InstallTerminals({
               type="button"
               onClick={() => setSelectedMethodId(method.id)}
               className={cn(
-                'rounded-full border px-3 py-2 text-left text-xs font-medium tracking-[0.16em] uppercase transition-all duration-300',
+                'inline-flex items-center gap-2 rounded-full border px-3 py-2 text-left text-xs font-medium tracking-[0.16em] uppercase transition-all duration-300',
                 selectedMethod.id === method.id
                   ? 'border-cyan-300/55 bg-cyan-400/12 text-white shadow-[0_0_24px_rgba(34,211,238,0.16)]'
                   : 'border-white/10 bg-white/5 text-white/56 hover:border-white/20 hover:bg-white/10 hover:text-white/82',
               )}
             >
+              <InstallMethodIcon methodId={method.id} />
               {method.label}
             </button>
           ))}
@@ -319,7 +343,10 @@ export function InstallTerminals({
 
           <div className="flex flex-col gap-4 border-b border-white/10 px-5 py-5 min-[600px]:flex-row min-[600px]:items-start min-[600px]:justify-between">
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-[0.24em] text-cyan-300/85">{selectedMethod.label}</p>
+              <p className="flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-cyan-300/85">
+                <InstallMethodIcon methodId={selectedMethod.id} size={18} />
+                <span>{selectedMethod.label}</span>
+              </p>
               <p className="mt-2 text-sm leading-7 text-white/62">{selectedMethod.description}</p>
             </div>
 
