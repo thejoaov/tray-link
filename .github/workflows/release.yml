@@ -109,7 +109,7 @@ jobs:
               -d @ai_payload.json > ai_response.json
 
             jq -r '[.candidates[0].content.parts[]?.text] | join("\n") // empty' ai_response.json \
-              | sed -E '/^```[[:alpha:]-]*[[:space:]]*$/d; /^```[[:space:]]*$/d' \
+              | sed -E '/^[[:space:]]*```[[:alpha:]-]*[[:space:]]*$/d; /^[[:space:]]*```[[:space:]]*$/d' \
               | awk 'BEGIN { started = 0 } { if (started || $0 !~ /^[[:space:]]*$/) { started = 1; print } }' \
               > release_notes.md
           fi
