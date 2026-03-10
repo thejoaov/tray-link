@@ -1,9 +1,10 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { buttonVariants } from 'fumadocs-ui/components/ui/button'
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button'
 import { Check, Copy, Download, TerminalSquare } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/cn'
 
 export type InstallMethodOption = {
@@ -24,6 +25,23 @@ type GithubLatestRelease = {
   }>
 }
 
+type GithubLatestReleaseVersion = {
+  tag: string
+  version: string
+  assets: GithubLatestRelease['assets']
+}
+
+const VERSION_PLACEHOLDER = '{version}'
+
+const MATRIX_ROWS = [
+  '01110100 01110010 01100001 01111001 00101101 01101100 01101001 01101110 01101011',
+  '$ syncing latest release metadata...',
+  '> resolving github tag_name',
+  '> compiling platform install commands',
+  '> matching release asset patterns',
+  '████████████████████████████████████',
+] as const
+
 function patternToRegex(pattern: string) {
   const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -38,6 +56,59 @@ function triggerBrowserDownload(url: string) {
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()
+}
+
+function methodNeedsResolvedVersion(method: InstallMethodOption) {
+  return [method.filename, method.assetPattern, method.command].some((value) => value?.includes(VERSION_PLACEHOLDER))
+}
+
+function replaceVersionPlaceholder(value: string | undefined, version?: string) {
+  if (!value || !version) {
+    return value
+  }
+
+  return value.replaceAll(VERSION_PLACEHOLDER, version)
+}
+
+async function fetchLatestReleaseVersion() {
+  const response = await fetch('/api/github/latest-release')
+
+  if (!response.ok) {
+    throw new Error('latest release version request failed')
+  }
+
+  return (await response.json()) as GithubLatestReleaseVersion
+}
+
+function TerminalMatrixLoader() {
+  return (
+    <div className="relative flex h-full min-h-88 flex-col overflow-hidden rounded-3xl border border-emerald-400/10 bg-black/95 px-5 py-5 font-mono text-xs text-emerald-300/70 shadow-[0_0_40px_rgba(16,185,129,0.08)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.12),transparent_42%),linear-gradient(180deg,rgba(16,185,129,0.08),transparent_35%,rgba(16,185,129,0.04))]" />
+      <div className="absolute inset-x-0 top-0 h-16 animate-[pulse_1.8s_ease-in-out_infinite] bg-[linear-gradient(180deg,rgba(52,211,153,0.18),transparent)]" />
+      <div className="absolute inset-y-0 left-0 w-px bg-emerald-300/10" />
+
+      <div className="relative flex items-center gap-2 border-b border-emerald-400/10 pb-3 text-[11px] uppercase tracking-[0.28em] text-emerald-200/72">
+        <span className="inline-flex h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_14px_rgba(52,211,153,0.7)]" />
+        <span>Terminal Sync</span>
+      </div>
+
+      <div className="relative mt-4 space-y-3">
+        {MATRIX_ROWS.map((row, index) => (
+          <p
+            key={`${row}-${index}`}
+            className="animate-pulse whitespace-pre-wrap break-all leading-6"
+            style={{ animationDelay: `${index * 140}ms` }}
+          >
+            {row}
+          </p>
+        ))}
+      </div>
+
+      <div className="relative mt-auto pt-4 text-[11px] uppercase tracking-[0.22em] text-emerald-200/46">
+        Preparing version-aligned install instructions
+      </div>
+    </div>
+  )
 }
 
 function TerminalCommand({
@@ -124,7 +195,51 @@ export function InstallTerminals({
   const [selectedMethodId, setSelectedMethodId] = useState(methods[0]?.id)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
-  const selectedMethod = methods.find((method) => method.id === selectedMethodId) ?? methods[0]
+  const [showVersionLoadingOverlay, setShowVersionLoadingOverlay] = useState(false)
+
+  const requiresVersionData = useMemo(() => methods.some((method) => methodNeedsResolvedVersion(method)), [methods])
+
+  const { data: latestReleaseVersion, isLoading: isVersionLoading } = useQuery({
+    queryKey: ['github-latest-release-version'],
+    queryFn: fetchLatestReleaseVersion,
+    enabled: requiresVersionData,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+  })
+
+  const resolvedMethods = useMemo(() => {
+    if (!requiresVersionData || !latestReleaseVersion?.version) {
+      return methods
+    }
+
+    return methods.map((method) => ({
+      ...method,
+      filename: replaceVersionPlaceholder(method.filename, latestReleaseVersion.version),
+      assetPattern: replaceVersionPlaceholder(method.assetPattern, latestReleaseVersion.version),
+      command: replaceVersionPlaceholder(method.command, latestReleaseVersion.version),
+    }))
+  }, [latestReleaseVersion?.version, methods, requiresVersionData])
+
+  const selectedMethod = resolvedMethods.find((method) => method.id === selectedMethodId) ?? resolvedMethods[0]
+
+  useEffect(() => {
+    if (!requiresVersionData) {
+      return
+    }
+
+    if (isVersionLoading) {
+      setShowVersionLoadingOverlay(true)
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      setShowVersionLoadingOverlay(false)
+    }, 450)
+
+    return () => {
+      window.clearTimeout(timeout)
+    }
+  }, [isVersionLoading, requiresVersionData])
 
   if (!selectedMethod) return null
 
@@ -137,17 +252,12 @@ export function InstallTerminals({
     setIsDownloading(true)
 
     try {
-      const response = await fetch(selectedMethod.releaseUrl, {
-        headers: {
-          Accept: 'application/vnd.github+json',
-        },
-      })
+      const release = latestReleaseVersion
 
-      if (!response.ok) {
-        throw new Error('latest release request failed')
+      if (!release) {
+        throw new Error('latest release version request failed')
       }
 
-      const release = (await response.json()) as GithubLatestRelease
       const matcher = patternToRegex(selectedMethod.assetPattern)
       const asset = release.assets.find((item) => matcher.test(item.name))
 
@@ -167,6 +277,7 @@ export function InstallTerminals({
   return (
     <div className="homepage-float relative w-full rounded-4xl border border-white/12 bg-white/7 p-6 shadow-[0_0_80px_rgba(15,23,42,0.65)] backdrop-blur-2xl">
       <div className="absolute inset-0 rounded-4xl bg-[linear-gradient(135deg,rgba(59,130,246,0.16),rgba(139,92,246,0.1)_50%,rgba(16,185,129,0.12))]" />
+
       <div className="relative space-y-5 min-[600px]:space-y-6">
         <div className="rounded-3xl border border-white/10 bg-black/30 px-5 py-4">
           <div className="flex items-center gap-3 text-cyan-300">
@@ -195,7 +306,22 @@ export function InstallTerminals({
           ))}
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/30">
+        <div
+          className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30"
+          aria-busy={isVersionLoading}
+        >
+          {showVersionLoadingOverlay ? (
+            <div
+              aria-hidden
+              className={cn(
+                'pointer-events-none absolute inset-0 z-10 transition-opacity duration-500',
+                isVersionLoading ? 'opacity-100' : 'opacity-0',
+              )}
+            >
+              <TerminalMatrixLoader />
+            </div>
+          ) : null}
+
           <div className="flex flex-col gap-4 border-b border-white/10 px-5 py-5 min-[600px]:flex-row min-[600px]:items-start min-[600px]:justify-between">
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.24em] text-cyan-300/85">{selectedMethod.label}</p>
@@ -206,7 +332,7 @@ export function InstallTerminals({
               <button
                 type="button"
                 onClick={handleDownload}
-                disabled={isDownloading}
+                disabled={isDownloading || isVersionLoading}
                 className={cn(
                   buttonVariants({
                     color: 'secondary',

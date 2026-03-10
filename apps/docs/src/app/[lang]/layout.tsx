@@ -1,6 +1,7 @@
 import { defineI18nUI } from 'fumadocs-ui/i18n'
 import { RootProvider } from 'fumadocs-ui/provider/next'
 import { Inter } from 'next/font/google'
+import { QueryProvider } from '@/components/providers/query-provider'
 import { i18n } from '@/lib/i18n'
 
 const inter = Inter({
@@ -34,7 +35,9 @@ export default async function Layout({
 
   return (
     <div className={inter.className}>
-      <RootProvider i18n={provider(lang)}>{children}</RootProvider>
+      <QueryProvider>
+        <RootProvider i18n={provider(lang)}>{children}</RootProvider>
+      </QueryProvider>
     </div>
   )
 }

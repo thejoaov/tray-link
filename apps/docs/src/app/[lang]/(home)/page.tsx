@@ -22,7 +22,6 @@ type LocalizedContent = {
   downloadLabel: string
   downloadingLabel: string
   assetNotFoundLabel: string
-  filePatternLabel: string
   instructionsLabel: string
   commandLabel: string
   featureEyebrow: string
@@ -78,9 +77,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           label: 'Linux Fedora',
           description:
             'Download the RPM package from the latest GitHub release and install it with your system package manager.',
-          // TODO: Version fetched
           filename: `tray-link-{version}-1.x86_64.rpm`,
-          // TODO: Version fetched
           assetPattern: `tray-link-{version}-1.x86_64.rpm`,
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -88,7 +85,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Install the downloaded package with rpm.',
             'Launch Tray Link from your applications menu or system tray after installation.',
           ],
-          // TODO: Version fetched
           command: 'sudo rpm -i tray-link-{version}-1.x86_64.rpm',
         },
         {
@@ -96,9 +92,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           label: 'Linux Debian',
           description:
             'Download the DEB package from the latest GitHub release and install it on Debian or Ubuntu-based systems.',
-          // TODO: Version fetched
           filename: 'tray-link_{version}_amd64.deb',
-          // TODO: Version fetched
           assetPattern: 'tray-link_{version}_amd64.deb',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -106,7 +100,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Install the downloaded package with dpkg.',
             'Open Tray Link from your applications menu or system tray after installation.',
           ],
-          // TODO: Version fetched
           command: 'sudo dpkg -i tray-link_{version}_amd64.deb',
         },
         {
@@ -128,9 +121,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           id: 'macos-arm64',
           label: 'macOS (Apple Silicon)',
           description: 'Use the dedicated Apple Silicon ZIP package if you want the manual install flow on arm64 Macs.',
-          // TODO: Version fetched
           filename: 'Tray.Link-darwin-arm64-{version}.zip',
-          // TODO: Version fetched
           assetPattern: 'Tray.Link-darwin-arm64-{version}.zip',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -139,16 +130,13 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'If macOS blocks first launch, run the xattr command shown in the terminal panel.',
           ],
           command:
-            // TODO: Version fetched
             "unzip Tray.Link-darwin-arm64-{version}.zip\ncp -R 'Tray Link.app' /Applications/\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app",
         },
         {
           id: 'windows-setup',
           label: 'Windows',
           description: 'Use the installer package for the standard Windows installation flow.',
-          // TODO: Version fetched
           filename: 'Tray.Link-{version}.Setup.exe',
-          // TODO: Version fetched
           assetPattern: 'Tray.Link-{version}.Setup.exe',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -161,9 +149,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           id: 'windows-nuget',
           label: 'Windows (NuGet)',
           description: 'Use the full NuGet package if you prefer that distribution format on Windows.',
-          // TODO: Version fetched
           filename: 'TrayLink-{version}-full.nupkg',
-          // TODO: Version fetched
           assetPattern: 'TrayLink-{version}-full.nupkg',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -178,7 +164,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       downloadLabel: 'Download latest',
       downloadingLabel: 'Downloading...',
       assetNotFoundLabel: 'Could not find the expected file in the latest release.',
-      filePatternLabel: 'Download file',
       instructionsLabel: 'Instructions',
       commandLabel: 'Terminal commands',
       featureEyebrow: 'Product experience',
@@ -252,9 +237,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           label: 'Linux Fedora',
           description:
             'Baixe o pacote RPM na release mais recente do GitHub e instale com o gerenciador de pacotes do sistema.',
-          // TODO: Version fetched
           filename: 'tray-link-{version}-1.x86_64.rpm',
-          // TODO: Version fetched
           assetPattern: 'tray-link-{version}-1.x86_64.rpm',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -262,16 +245,13 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Instale o pacote baixado com rpm.',
             'Abra o Tray Link pelo menu de aplicativos ou system tray após a instalação.',
           ],
-          // TODO: Version fetched
           command: 'sudo rpm -i tray-link-{version}-1.x86_64.rpm',
         },
         {
           id: 'linux-debian',
           label: 'Linux Debian',
           description: 'Baixe o pacote DEB na release mais recente do GitHub e instale em sistemas Debian ou Ubuntu.',
-          // TODO: Version fetched
           filename: 'tray-link_{version}_amd64.deb',
-          // TODO: Version fetched
           assetPattern: 'tray-link_{version}_amd64.deb',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -279,7 +259,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Instale o pacote baixado com dpkg.',
             'Abra o Tray Link pelo menu de aplicativos ou system tray após a instalação.',
           ],
-          // TODO: Version fetched
           command: 'sudo dpkg -i tray-link_{version}_amd64.deb',
         },
         {
@@ -301,9 +280,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           id: 'macos-arm64',
           label: 'MacOS (Apple Silicon)',
           description: 'Use o ZIP dedicado para Apple Silicon se você quiser o fluxo manual em Macs arm64.',
-          // TODO: Version fetched
           filename: 'Tray.Link-darwin-arm64-{version}.zip',
-          // TODO: Version fetched
           assetPattern: 'Tray.Link-darwin-arm64-{version}.zip',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -312,16 +289,13 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Se o macOS bloquear a primeira abertura, rode o comando xattr mostrado no terminal.',
           ],
           command:
-            // TODO: Version fetched
             "unzip Tray.Link-darwin-arm64-{version}.zip\ncp -R 'Tray Link.app' /Applications/\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app",
         },
         {
           id: 'windows-setup',
           label: 'Windows',
           description: 'Use o instalador padrão para o fluxo normal de instalação no Windows.',
-          // TODO: Version fetched
           filename: 'Tray.Link-{version}.Setup.exe',
-          // TODO: Version fetched
           assetPattern: 'Tray.Link-{version}.Setup.exe',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -334,9 +308,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           id: 'windows-nuget',
           label: 'Windows (NuGet)',
           description: 'Use o pacote NuGet completo se você preferir esse formato de distribuição no Windows.',
-          // TODO: Version fetched
           filename: 'TrayLink-{version}-full.nupkg',
-          // TODO: Version fetched
           assetPattern: 'TrayLink-{version}-full.nupkg',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -351,7 +323,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       downloadLabel: 'Baixar última versão',
       downloadingLabel: 'Baixando...',
       assetNotFoundLabel: 'Não foi possível encontrar o arquivo esperado na release mais recente.',
-      filePatternLabel: 'Arquivo para baixar',
       instructionsLabel: 'Instruções',
       commandLabel: 'Comandos de terminal',
       featureEyebrow: 'Experiência do produto',
@@ -430,9 +401,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           label: 'Linux Fedora',
           description:
             'Descarga el paquete RPM desde la latest release de GitHub e instálalo con el gestor de paquetes del sistema.',
-          // TODO: Version fetched
           filename: 'tray-link-{version}-1.x86_64.rpm',
-          // TODO: Version fetched
           assetPattern: 'tray-link-{version}-1.x86_64.rpm',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -440,7 +409,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Instala el paquete descargado con rpm.',
             'Abre Tray Link desde tu menú de aplicaciones o system tray después de la instalación.',
           ],
-          // TODO: Version fetched
           command: 'sudo rpm -i tray-link-{version}-1.x86_64.rpm',
         },
         {
@@ -448,9 +416,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           label: 'Linux Debian',
           description:
             'Descarga el paquete DEB desde la latest release de GitHub e instálalo en sistemas Debian o Ubuntu.',
-          // TODO: Version fetched
           filename: 'tray-link_{version}_amd64.deb',
-          // TODO: Version fetched
           assetPattern: 'tray-link_{version}_amd64.deb',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -458,7 +424,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Instala el paquete descargado con dpkg.',
             'Abre Tray Link desde tu menú de aplicaciones o system tray después de la instalación.',
           ],
-          // TODO: Version fetched
           command: 'sudo dpkg -i tray-link_{version}_amd64.deb',
         },
         {
@@ -480,9 +445,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           id: 'macos-arm64',
           label: 'MacOS (Apple Silicon)',
           description: 'Usa el ZIP dedicado para Apple Silicon si quieres el flujo manual en Macs arm64.',
-          // TODO: Version fetched
           filename: 'Tray.Link-darwin-arm64-{version}.zip',
-          // TODO: Version fetched
           assetPattern: 'Tray.Link-darwin-arm64-{version}.zip',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -491,16 +454,13 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Si macOS bloquea el primer inicio, ejecuta el comando xattr mostrado en el panel del terminal.',
           ],
           command:
-            // TODO: Version fetched
             "unzip Tray.Link-darwin-arm64-{version}.zip\ncp -R 'Tray Link.app' /Applications/\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app",
         },
         {
           id: 'windows-setup',
           label: 'Windows',
           description: 'Usa el instalador estándar para el flujo normal de instalación en Windows.',
-          // TODO: Version fetched
           filename: 'Tray.Link-{version}.Setup.exe',
-          // TODO: Version fetched
           assetPattern: 'Tray.Link-{version}.Setup.exe',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -513,9 +473,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           id: 'windows-nuget',
           label: 'Windows (NuGet)',
           description: 'Usa el paquete NuGet completo si prefieres ese formato de distribución en Windows.',
-          // TODO: Version fetched
           filename: 'TrayLink-{version}-full.nupkg',
-          // TODO: Version fetched
           assetPattern: 'TrayLink-{version}-full.nupkg',
           releaseUrl: latestReleaseApiUrl,
           steps: [
@@ -530,7 +488,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
       downloadLabel: 'Descargar última versión',
       downloadingLabel: 'Descargando...',
       assetNotFoundLabel: 'No se pudo encontrar el archivo esperado en la latest release.',
-      filePatternLabel: 'Archivo para descargar',
       instructionsLabel: 'Instrucciones',
       commandLabel: 'Comandos de terminal',
       featureEyebrow: 'Experiencia del producto',
@@ -577,13 +534,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         'Empieza con la documentación, explora el repositorio y construye una experiencia diaria más rápida alrededor de tus proyectos locales con la app de escritorio y la CLI.',
       finalCta: 'Empezar ahora',
     },
-  }
-
-  const _fetchLatestReleaseTag = async () => {
-    // Fetch with github api token
-    const response = await fetch(latestReleaseApiUrl)
-    const data = await response.json()
-    return data.tag_name
   }
 
   const { lang = 'en' } = await params

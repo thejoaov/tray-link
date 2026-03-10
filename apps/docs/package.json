@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@takumi-rs/image-response": "^0.69.5",
+    "@tanstack/react-query": "^5.90.21",
     "fumadocs-core": "16.6.9",
     "fumadocs-mdx": "14.2.9",
     "fumadocs-ui": "16.6.9",
