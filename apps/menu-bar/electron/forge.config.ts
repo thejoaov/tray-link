@@ -89,17 +89,17 @@ const config: ForgeConfig = {
         },
         {
           entry: './src/preload.ts',
-          config: 'vite.preload.config.ts',
+          config: 'vite.preload.config.mts',
         },
         {
           entry: '../../cli/src/index.ts',
-          config: 'vite.cli.config.ts',
+          config: 'vite.cli.config.mts',
         },
       ],
       renderer: [
         {
           name: 'main_window',
-          config: 'vite.renderer.config.ts',
+          config: 'vite.renderer.config.mts',
         },
       ],
     }),

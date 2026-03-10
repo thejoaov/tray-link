@@ -23,11 +23,14 @@ export default defineConfig(({ mode }) => ({
           viteStaticCopy({
             targets: [
               {
-                src: './dist/**/*',
-                dest: 'renderer/',
+                src: './dist/_expo/static/js/web/*',
+                dest: '../renderer/main_window/_expo/static/js/web',
+              },
+              {
+                src: './dist/assets/**/*',
+                dest: '../renderer/main_window/assets',
               },
             ],
-            structured: true,
           }),
         ]
       : []),

@@ -1,6 +1,8 @@
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
 
+declare const MAIN_WINDOW_VITE_NAME: string
+
 import { WindowOptions, WindowStyleMask, WindowsManagerType } from '../../../src/modules/WindowManager/types'
 
 const _windowsMap: { [key: string]: BrowserWindow } = {}
@@ -40,7 +42,10 @@ const openWindow = async (moduleName: string, options: WindowOptions) => {
       window.webContents.openDevTools({ mode: 'detach' })
       await window.loadURL(`http://localhost:8081?moduleName=${moduleName}`)
     } else {
-      await window.loadURL(`file://${path.join(__dirname, `./renderer/dist/index.html?moduleName=${moduleName}`)}`)
+      const windowHtmlPath = path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+      await window.loadFile(windowHtmlPath, {
+        query: { moduleName },
+      })
     }
   }
 
