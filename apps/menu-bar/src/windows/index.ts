@@ -12,22 +12,37 @@ export const WindowsList = [
   {
     name: 'Settings',
     component: Settings,
-    options: { title: 'Settings', width: 400, height: 680, resizable: false },
+    options: { title: 'Settings', width: 400, height: 500, resizable: false },
   },
   {
     name: 'CustomEditorWindow',
     component: CustomEditorWindow,
-    options: { title: i18n.t('addCustomEditor'), width: 420, height: 360, resizable: false },
+    options: {
+      title: i18n.t('addCustomEditor'),
+      width: 420,
+      height: 360,
+      resizable: false,
+    },
   },
   {
     name: 'CustomTerminalWindow',
     component: CustomTerminalWindow,
-    options: { title: i18n.t('addCustomTerminal'), width: 420, height: 360, resizable: false },
+    options: {
+      title: i18n.t('addCustomTerminal'),
+      width: 420,
+      height: 360,
+      resizable: false,
+    },
   },
   {
     name: 'RemoveProjectWindow',
     component: RemoveProjectWindow,
-    options: { title: i18n.t('removeProjectTitle'), width: 420, height: 260, resizable: false },
+    options: {
+      title: i18n.t('removeProjectTitle'),
+      width: 420,
+      height: 260,
+      resizable: false,
+    },
   },
 ]
 

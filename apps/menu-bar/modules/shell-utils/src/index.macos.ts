@@ -23,6 +23,10 @@ export function fileExists(path: string): Promise<boolean> {
   return ShellUtilsModule.fileExists(path)
 }
 
+export function getFileIconDataUrl(_path: string): Promise<string | null> {
+  return Promise.resolve(null)
+}
+
 export function loadLegacyTrayLinkData(): Promise<Record<string, unknown> | null> {
   return ShellUtilsModule.loadLegacyTrayLinkData()
 }

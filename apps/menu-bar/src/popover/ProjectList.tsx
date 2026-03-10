@@ -30,8 +30,20 @@ export const ProjectList = () => {
   const [editMode, setEditMode] = useState(false)
   const [contextMenuProjectId, setContextMenuProjectId] = useState<string | null>(null)
   const [preferences, setPreferences] = useState(defaultUserPreferences)
-  const editorOptions = getEditorOptions(preferences.customEditors)
-  const terminalOptions = getTerminalOptions(preferences.customTerminals)
+  const editorOptions = useMemo(
+    () =>
+      getEditorOptions(preferences.customEditors).map((option) =>
+        preferences.showAppIcons ? option : { ...option, iconPath: null },
+      ),
+    [preferences.customEditors, preferences.showAppIcons],
+  )
+  const terminalOptions = useMemo(
+    () =>
+      getTerminalOptions(preferences.customTerminals).map((option) =>
+        preferences.showAppIcons ? option : { ...option, iconPath: null },
+      ),
+    [preferences.customTerminals, preferences.showAppIcons],
+  )
 
   useEffect(() => {
     loadProjects()

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { StyleSheet, TouchableOpacity } from 'react-native'
 import { installCli, isCliInstalled, uninstallCli } from '../../modules/shell-utils/src'
 import Analytics, { AnalyticsEvent } from '../analytics'
-import { Checkbox, Divider, Row, Text, View } from '../components'
+import { Divider, Row, ScrollView, Switch, Text, View } from '../components'
 import { Linking } from '../modules/Linking'
 import { defaultUserPreferences, UserPreferences } from '../modules/Storage'
 import { getLegacyMigrationPreview, hasLegacyMigrationCompleted, runLegacyMigration } from '../services/legacyMigration'
@@ -117,7 +117,7 @@ export const Settings = () => {
   }, [legacyMigrationDone])
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
       <Text style={styles.sectionTitle}>{t('settings')}</Text>
 
       <View border="light" rounded="medium" style={styles.box}>
@@ -196,11 +196,28 @@ export const Settings = () => {
 
         <Divider />
 
-        <Row align="center" justify="start" style={styles.boxItem}>
-          <Checkbox
+        <Row align="center" justify="between" style={styles.boxItem}>
+          <Text style={styles.itemLabel}>{t('openOnStartup')}</Text>
+          <Switch
+            value={preferences.launchOnLogin}
+            onValueChange={(value) => updatePreference('launchOnLogin', value)}
+          />
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
+          <Text style={styles.itemLabel}>{t('showAppIcons')}</Text>
+          <Switch value={preferences.showAppIcons} onValueChange={(value) => updatePreference('showAppIcons', value)} />
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
+          <Text style={styles.itemLabel}>{t('deleteFilesFromDiskByDefault')}</Text>
+          <Switch
             value={preferences.removeFromDiskByDefault}
             onValueChange={(value) => updatePreference('removeFromDiskByDefault', value)}
-            label={t('deleteFilesFromDiskByDefault')}
           />
         </Row>
       </View>
@@ -329,15 +346,20 @@ export const Settings = () => {
           <Text style={styles.releaseButtonText}>Releases</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
+    minHeight: 0,
+  },
+  scrollContent: {
+    flexGrow: 1,
     padding: 16,
     paddingTop: 12,
+    paddingBottom: 16,
   },
   sectionTitle: {
     fontSize: 14,
@@ -406,7 +428,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   footer: {
-    marginTop: 'auto',
+    marginTop: 20,
     paddingTop: 14,
     alignItems: 'center',
     gap: 4,

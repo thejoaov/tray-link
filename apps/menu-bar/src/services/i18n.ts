@@ -13,6 +13,8 @@ type TranslationKey =
   | 'defaultEditor'
   | 'defaultTerminal'
   | 'systemDefault'
+  | 'openOnStartup'
+  | 'showAppIcons'
   | 'deleteFilesFromDiskByDefault'
   | 'addCustomEditor'
   | 'addCustomTerminal'
@@ -65,6 +67,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     defaultEditor: 'Default editor',
     defaultTerminal: 'Default terminal',
     systemDefault: 'System default',
+    openOnStartup: 'Open on startup',
+    showAppIcons: 'Show real app icons',
     deleteFilesFromDiskByDefault: 'Delete files from disk by default',
     addCustomEditor: 'Add custom editor',
     addCustomTerminal: 'Add custom terminal',
@@ -116,6 +120,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     defaultEditor: 'Editor padrão',
     defaultTerminal: 'Terminal padrão',
     systemDefault: 'Padrão do sistema',
+    openOnStartup: 'Abrir na inicialização',
+    showAppIcons: 'Mostrar ícones reais dos apps',
     deleteFilesFromDiskByDefault: 'Excluir arquivos do disco por padrão',
     addCustomEditor: 'Adicionar editor personalizado',
     addCustomTerminal: 'Adicionar terminal personalizado',
@@ -167,6 +173,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     defaultEditor: 'Editor predeterminado',
     defaultTerminal: 'Terminal predeterminado',
     systemDefault: 'Predeterminado del sistema',
+    openOnStartup: 'Abrir al iniciar',
+    showAppIcons: 'Mostrar iconos reales de las apps',
     deleteFilesFromDiskByDefault: 'Eliminar archivos del disco por defecto',
     addCustomEditor: 'Agregar editor personalizado',
     addCustomTerminal: 'Agregar terminal personalizado',

@@ -1,4 +1,5 @@
 import { exec } from 'child_process'
+import { app } from 'electron'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
@@ -104,6 +105,22 @@ export const ShellUtilsMain = {
       return fs.existsSync(path)
     } catch {
       return false
+    }
+  },
+  getFileIconDataUrl: async (targetPath: string) => {
+    try {
+      if (!fs.existsSync(targetPath)) {
+        return null
+      }
+
+      const icon = await app.getFileIcon(targetPath, { size: 'small' })
+      if (icon.isEmpty()) {
+        return null
+      }
+
+      return icon.toDataURL()
+    } catch {
+      return null
     }
   },
   loadLegacyTrayLinkData: async () => {

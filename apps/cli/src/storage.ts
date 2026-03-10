@@ -102,6 +102,7 @@ const defaultPreferences: Settings = {
   defaultEditor: null,
   defaultTerminal: null,
   launchOnLogin: false,
+  showAppIcons: false,
   removeFromDiskByDefault: false,
   customEditors: [],
   customTerminals: [],

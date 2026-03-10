@@ -28,7 +28,7 @@ const linuxOptions: LinuxOptions = {
 
 const config: ForgeConfig = {
   packagerConfig: {
-    icon: './assets/images/icon-windows',
+    icon: '../../../assets/icon',
     executableName: 'tray-link',
     name: 'Tray Link',
     extraResource: './assets',
