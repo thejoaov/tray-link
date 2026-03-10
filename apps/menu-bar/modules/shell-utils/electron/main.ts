@@ -39,14 +39,12 @@ function createWrapperScript(): string {
   const isWindows = process.platform === 'win32'
 
   if (isWindows) {
-    // Windows batch wrapper — uses node from PATH at runtime
     const wrapperPath = path.join(wrapperDir, `${CLI_BINARY_NAME}.cmd`)
     const content = `@echo off\r\nnode "${cliJs}" %*\r\n`
     fs.writeFileSync(wrapperPath, content, { encoding: 'utf8' })
     return wrapperPath
   }
 
-  // Unix shell wrapper — resolves node at runtime from user's PATH
   const wrapperPath = path.join(wrapperDir, CLI_BINARY_NAME)
   const content = [
     '#!/bin/sh',
@@ -62,6 +60,104 @@ function createWrapperScript(): string {
   ].join('\n')
   fs.writeFileSync(wrapperPath, content, { mode: 0o755, encoding: 'utf8' })
   return wrapperPath
+}
+
+function getBundleResourceIconCandidates(appPath: string, iconName?: string | null): string[] {
+  const resourcesDir = path.join(appPath, 'Contents', 'Resources')
+  const normalizedIconName = iconName ? iconName.replace(/\.icns$/i, '') : null
+  const basenames = [normalizedIconName, 'AppIcon', 'app', path.basename(appPath, '.app')].filter(
+    (value): value is string => Boolean(value),
+  )
+
+  return [
+    ...new Set(
+      basenames.flatMap((basename) => [
+        path.join(resourcesDir, `${basename}.icns`),
+        path.join(resourcesDir, `${basename}.png`),
+      ]),
+    ),
+  ]
+}
+
+function toDataUrl(mimeType: string, buffer: Buffer): string {
+  return `data:${mimeType};base64,${buffer.toString('base64')}`
+}
+
+async function getImageFileDataUrl(iconPath: string): Promise<string | null> {
+  try {
+    const extension = path.extname(iconPath).toLowerCase()
+
+    if (extension === '.png') {
+      return toDataUrl('image/png', fs.readFileSync(iconPath))
+    }
+
+    if (extension === '.icns') {
+      const outputPath = path.join(
+        os.tmpdir(),
+        `tray-link-icon-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}.png`,
+      )
+
+      try {
+        await execAsync(
+          `sips -s format png "${iconPath.replace(/"/g, '\\"')}" --out "${outputPath.replace(/"/g, '\\"')}"`,
+        )
+        if (!fs.existsSync(outputPath)) {
+          return null
+        }
+
+        return toDataUrl('image/png', fs.readFileSync(outputPath))
+      } finally {
+        if (fs.existsSync(outputPath)) {
+          fs.rmSync(outputPath, { force: true })
+        }
+      }
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+async function getMacOSBundleIconName(appPath: string): Promise<string | null> {
+  const plistPath = path.join(appPath, 'Contents', 'Info.plist')
+  if (!fs.existsSync(plistPath)) {
+    return null
+  }
+
+  try {
+    const { stdout } = await execAsync(`plutil -convert json -o - "${plistPath.replace(/"/g, '\\"')}"`)
+    const plist = JSON.parse(stdout) as {
+      CFBundleIconFile?: string
+      CFBundleIconName?: string
+    }
+
+    return plist.CFBundleIconFile || plist.CFBundleIconName || null
+  } catch {
+    return null
+  }
+}
+
+async function getMacOSBundleIconDataUrl(appPath: string): Promise<string | null> {
+  try {
+    const iconName = await getMacOSBundleIconName(appPath)
+    const candidates = getBundleResourceIconCandidates(appPath, iconName)
+
+    for (const candidate of candidates) {
+      if (!fs.existsSync(candidate)) {
+        continue
+      }
+
+      const dataUrl = await getImageFileDataUrl(candidate)
+      if (dataUrl) {
+        return dataUrl
+      }
+    }
+  } catch {
+    return null
+  }
+
+  return null
 }
 
 export const ShellUtilsMain = {
@@ -111,6 +207,13 @@ export const ShellUtilsMain = {
     try {
       if (!fs.existsSync(targetPath)) {
         return null
+      }
+
+      if (process.platform === 'darwin' && targetPath.endsWith('.app')) {
+        const bundleIcon = await getMacOSBundleIconDataUrl(targetPath)
+        if (bundleIcon) {
+          return bundleIcon
+        }
       }
 
       const icon = await app.getFileIcon(targetPath, { size: 'small' })
