@@ -15,7 +15,7 @@
     },
     "apps/cli": {
       "name": "@tray-link/cli",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "dependencies": {
         "@clack/prompts": "^1.1.0",
         "@tray-link/common-types": "workspace:*",
@@ -35,6 +35,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@takumi-rs/image-response": "^0.69.5",
+        "@tanstack/react-query": "^5.90.21",
         "fumadocs-core": "16.6.9",
         "fumadocs-mdx": "14.2.9",
         "fumadocs-ui": "16.6.9",
@@ -42,6 +43,7 @@
         "next": "16.1.6",
         "react": "19.1.4",
         "react-dom": "19.1.4",
+        "react-icons": "^5.6.0",
         "tailwind-merge": "^3.5.0",
         "zod": "^4",
       },
@@ -58,7 +60,7 @@
     },
     "apps/menu-bar": {
       "name": "@tray-link/menu-bar",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "dependencies": {
         "@expo/metro-runtime": "~6.1.2",
         "@expo/styleguide-native": "^1.0.1",
@@ -106,7 +108,7 @@
     },
     "apps/menu-bar/electron": {
       "name": "@tray-link/electron",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "dependencies": {
         "@tray-link/common-types": "workspace:*",
         "@tray-link/rn-electron-modules": "workspace:*",
@@ -134,22 +136,22 @@
     },
     "apps/menu-bar/modules/file-picker": {
       "name": "file-picker",
-      "version": "2.1.1",
+      "version": "2.1.5",
     },
     "apps/menu-bar/modules/menu-bar": {
       "name": "menu-bar",
-      "version": "2.1.1",
+      "version": "2.1.5",
     },
     "apps/menu-bar/modules/shell-utils": {
       "name": "shell-utils",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "dependencies": {
         "expo-modules-core": "*",
       },
     },
     "apps/menu-bar/modules/storage-module": {
       "name": "storage-module",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "dependencies": {
         "electron-store": "^11.0.2",
         "expo-modules-core": "*",
@@ -157,14 +159,14 @@
     },
     "packages/common-types": {
       "name": "@tray-link/common-types",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "devDependencies": {
         "typescript": "^5.9.3",
       },
     },
     "packages/rn-electron-modules": {
       "name": "@tray-link/rn-electron-modules",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "devDependencies": {
         "electron": "33.2.0",
         "electron-store": "^11.0.2",
@@ -173,7 +175,7 @@
     },
     "packages/tray-shared": {
       "name": "@tray-link/tray-shared",
-      "version": "2.1.1",
+      "version": "2.1.5",
       "dependencies": {
         "@tray-link/common-types": "workspace:*",
         "execa": "^9.6.1",
@@ -1114,6 +1116,10 @@
     "@takumi-rs/image-response": ["@takumi-rs/image-response@0.69.5", "", { "dependencies": { "@takumi-rs/core": "0.69.5", "@takumi-rs/helpers": "0.69.5", "@takumi-rs/wasm": "0.69.5" } }, "sha512-tjB9KbgADO9elXaVkhNK0BK65yIt52AqvD44BR0K4Hq/pPET2iyzvMyR5gEMZ0/m6PQMBXE8mOiMq2JyJPR/DQ=="],
 
     "@takumi-rs/wasm": ["@takumi-rs/wasm@0.69.5", "", {}, "sha512-mUVYgJs235H3UDMhpiNCAZDOMc1yDoLYj6Mu7sUhWjJ1+p/W4fVFiB5F8ZQ7dZ+jZXquiQCIUdDnc2EjnoDo5g=="],
+
+    "@tanstack/query-core": ["@tanstack/query-core@5.90.20", "", {}, "sha512-OMD2HLpNouXEfZJWcKeVKUgQ5n+n3A2JFmBaScpNDUqSrQSjiveC7dKMe53uJUg1nDG16ttFPz2xfilz6i2uVg=="],
+
+    "@tanstack/react-query": ["@tanstack/react-query@5.90.21", "", { "dependencies": { "@tanstack/query-core": "5.90.20" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-0Lu6y5t+tvlTJMTO7oh5NSpJfpg/5D41LlThfepTixPYkJ0sE2Jj0m0f6yYqujBwIXlId87e234+MxG3D3g7kg=="],
 
     "@tootallnate/once": ["@tootallnate/once@2.0.0", "", {}, "sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A=="],
 
@@ -2700,6 +2706,8 @@
     "react-dom": ["react-dom@19.1.4", "", { "dependencies": { "scheduler": "^0.26.0" }, "peerDependencies": { "react": "^19.1.4" } }, "sha512-s2868ab/xo2SI6H4106A7aFI8Mrqa4xC6HZT/pBzYyQ3cBLqa88hu47xYD8xf+uECleN698Awn7RCWlkTiKnqQ=="],
 
     "react-i18next": ["react-i18next@15.7.4", "", { "dependencies": { "@babel/runtime": "^7.27.6", "html-parse-stringify": "^3.0.1" }, "peerDependencies": { "i18next": ">= 23.4.0", "react": ">= 16.8.0", "typescript": "^5" }, "optionalPeers": ["typescript"] }, "sha512-nyU8iKNrI5uDJch0z9+Y5XEr34b0wkyYj3Rp+tfbahxtlswxSCjcUL9H0nqXo9IR3/t5Y5PKIA3fx3MfUyR9Xw=="],
+
+    "react-icons": ["react-icons@5.6.0", "", { "peerDependencies": { "react": "*" } }, "sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA=="],
 
     "react-is": ["react-is@18.3.1", "", {}, "sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg=="],
 
