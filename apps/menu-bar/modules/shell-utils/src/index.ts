@@ -6,6 +6,7 @@ type ShellUtilsModuleType = {
   openInEditor: (path: string, editorCommand: string) => Promise<boolean>
   openInTerminal: (path: string, terminalCommand: string) => Promise<boolean>
   openInFinder: (path: string) => Promise<boolean>
+  openPathWithSystem: (path: string) => Promise<boolean>
   which: (binary: string) => Promise<string | null>
   fileExists: (path: string) => Promise<boolean>
   getFileIconDataUrl: (path: string) => Promise<string | null>
@@ -34,6 +35,7 @@ if (isElectron) {
       openInEditor: async () => false,
       openInTerminal: async () => false,
       openInFinder: async () => false,
+      openPathWithSystem: async () => false,
       which: async () => null,
       fileExists: async () => false,
       getFileIconDataUrl: async () => null,
@@ -57,6 +59,10 @@ export function openInTerminal(path: string, terminalCommand: string): Promise<b
 
 export function openInFinder(path: string): Promise<boolean> {
   return ShellUtilsModule.openInFinder(path)
+}
+
+export function openPathWithSystem(path: string): Promise<boolean> {
+  return ShellUtilsModule.openPathWithSystem(path)
 }
 
 export function which(binary: string): Promise<string | null> {

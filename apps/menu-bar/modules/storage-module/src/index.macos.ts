@@ -8,6 +8,7 @@ type StorageModuleType = {
   clear: () => Promise<boolean>
   appendErrorLog: (entryJson: string) => Promise<boolean>
   getErrorLogPath: () => Promise<string>
+  getConfigPath: () => Promise<string>
 }
 
 const NativeStorage = requireNativeModule<StorageModuleType>('Storage')
@@ -38,4 +39,8 @@ export function appendErrorLog(entryJson: string): Promise<boolean> {
 
 export function getErrorLogPath(): Promise<string> {
   return NativeStorage.getErrorLogPath()
+}
+
+export function getConfigPath(): Promise<string> {
+  return NativeStorage.getConfigPath()
 }

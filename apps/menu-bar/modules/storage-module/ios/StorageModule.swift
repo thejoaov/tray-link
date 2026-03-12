@@ -7,8 +7,47 @@ public class StorageModule: Module {
     return "\(home)/Library/Application Support/TrayLink"
   }
 
+  private func legacySupportDirectories() -> [String] {
+    let home = FileManager.default.homeDirectoryForCurrentUser.path
+    return [
+      "\(home)/Library/Application Support/tray-link",
+      "\(home)/Library/Application Support/Tray Link"
+    ]
+  }
+
   private func configPath() -> String {
     return "\(supportDirectory())/config.json"
+  }
+
+  private func resolveReadableConfigPath() -> String {
+    let preferredPath = configPath()
+    if FileManager.default.fileExists(atPath: preferredPath) {
+      return preferredPath
+    }
+
+    for directory in legacySupportDirectories() {
+      let candidate = "\(directory)/config.json"
+      if FileManager.default.fileExists(atPath: candidate) {
+        return candidate
+      }
+    }
+
+    return preferredPath
+  }
+
+  private func migrateLegacyConfigIfNeeded() {
+    let preferredPath = configPath()
+    if FileManager.default.fileExists(atPath: preferredPath) {
+      return
+    }
+
+    let legacyPath = resolveReadableConfigPath()
+    if legacyPath == preferredPath || !FileManager.default.fileExists(atPath: legacyPath) {
+      return
+    }
+
+    ensureSupportDirectory()
+    try? FileManager.default.copyItem(atPath: legacyPath, toPath: preferredPath)
   }
 
   private func errorLogPath() -> String {
@@ -56,7 +95,8 @@ public class StorageModule: Module {
   }
 
   private func readConfig() -> [String: Any] {
-    let path = configPath()
+    migrateLegacyConfigIfNeeded()
+    let path = resolveReadableConfigPath()
     guard FileManager.default.fileExists(atPath: path),
           let data = FileManager.default.contents(atPath: path),
           let json = try? JSONSerialization.jsonObject(with: data, options: []),
@@ -180,6 +220,11 @@ public class StorageModule: Module {
 
     AsyncFunction("getErrorLogPath") { () -> String in
       return self.errorLogPath()
+    }
+
+    AsyncFunction("getConfigPath") { () -> String in
+      self.migrateLegacyConfigIfNeeded()
+      return self.configPath()
     }
   }
 }

@@ -12,6 +12,9 @@ type TranslationKey =
   | 'language'
   | 'defaultEditor'
   | 'defaultTerminal'
+  | 'openConfigFile'
+  | 'openConfigFileDescription'
+  | 'openConfigFileFailed'
   | 'systemDefault'
   | 'openOnStartup'
   | 'showAppIcons'
@@ -84,6 +87,9 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     language: 'Language',
     defaultEditor: 'Default editor',
     defaultTerminal: 'Default terminal',
+    openConfigFile: 'Open config.json',
+    openConfigFileDescription: 'Open the shared config file in your editor or default app',
+    openConfigFileFailed: 'Could not open config.json.',
     systemDefault: 'System default',
     openOnStartup: 'Open on startup',
     showAppIcons: 'Show real app icons',
@@ -155,6 +161,9 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     language: 'Idioma',
     defaultEditor: 'Editor padrão',
     defaultTerminal: 'Terminal padrão',
+    openConfigFile: 'Abrir config.json',
+    openConfigFileDescription: 'Abrir o arquivo de configuração compartilhado no editor ou app padrão',
+    openConfigFileFailed: 'Não foi possível abrir o config.json.',
     systemDefault: 'Padrão do sistema',
     openOnStartup: 'Abrir na inicialização',
     showAppIcons: 'Mostrar ícones reais dos apps',
@@ -226,6 +235,9 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     language: 'Idioma',
     defaultEditor: 'Editor predeterminado',
     defaultTerminal: 'Terminal predeterminado',
+    openConfigFile: 'Abrir config.json',
+    openConfigFileDescription: 'Abrir el archivo de configuración compartido en tu editor o app predeterminada',
+    openConfigFileFailed: 'No se pudo abrir config.json.',
     systemDefault: 'Predeterminado del sistema',
     openOnStartup: 'Abrir al iniciar',
     showAppIcons: 'Mostrar iconos reales de las apps',

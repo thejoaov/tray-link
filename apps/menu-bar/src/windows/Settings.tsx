@@ -3,9 +3,17 @@ import { Picker } from '@react-native-picker/picker'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import { installCli, isCliInstalled, uninstallCli } from '../../modules/shell-utils/src'
+import {
+  installCli,
+  isCliInstalled,
+  openInEditor,
+  openPathWithSystem,
+  uninstallCli,
+} from '../../modules/shell-utils/src'
+import { getConfigPath } from '../../modules/storage-module/src'
 import Analytics, { AnalyticsEvent } from '../analytics'
 import { Divider, Row, ScrollView, Switch, Text, View } from '../components'
+import Alert from '../modules/Alert'
 import { Linking } from '../modules/Linking'
 import { defaultUserPreferences, UserPreferences } from '../modules/Storage'
 import {
@@ -64,6 +72,7 @@ const getUpdaterStatusMessage = (updaterState: AppUpdaterState, t: ReturnType<ty
 export const Settings = () => {
   const { t } = useTranslation()
   const [preferences, setPreferences] = useState<UserPreferences>(defaultUserPreferences)
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false)
   const [reloadingTools, setReloadingTools] = useState(false)
   const [toolsVersion, setToolsVersion] = useState(0)
   const [toolsReady, setToolsReady] = useState(false)
@@ -87,6 +96,10 @@ export const Settings = () => {
   )
 
   const updatePreference = async <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
+    if (!preferencesLoaded) {
+      return
+    }
+
     const next = { ...preferences, [key]: value }
     setPreferences(next)
     await persistPreferences(next)
@@ -95,14 +108,20 @@ export const Settings = () => {
   useEffect(() => {
     // Load preferences asynchronously on mount
     loadPreferences()
-      .then(setPreferences)
+      .then((loadedPreferences) => {
+        setPreferences(loadedPreferences)
+        setPreferencesLoaded(true)
+      })
       .catch((e) => {
         Analytics.track(AnalyticsEvent.ERROR, { error: String(e) })
       })
 
     const subscription = subscribePreferencesChange(() => {
       loadPreferences()
-        .then(setPreferences)
+        .then((loadedPreferences) => {
+          setPreferences(loadedPreferences)
+          setPreferencesLoaded(true)
+        })
         .catch((e) => {
           Analytics.track(AnalyticsEvent.ERROR, { error: String(e) })
         })
@@ -157,6 +176,22 @@ export const Settings = () => {
   const canInstallUpdate =
     updaterState.isSupported && updaterState.status === 'available' && Boolean(updaterState.downloadUrl)
 
+  const handleOpenConfigFile = async () => {
+    try {
+      const configPath = await getConfigPath()
+      const opened = preferences.defaultEditor
+        ? (await openInEditor(configPath, preferences.defaultEditor)) || (await openPathWithSystem(configPath))
+        : await openPathWithSystem(configPath)
+
+      if (!opened) {
+        Alert.alert(t('settings'), t('openConfigFileFailed'))
+      }
+    } catch (error) {
+      Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+      Alert.alert(t('settings'), t('openConfigFileFailed'))
+    }
+  }
+
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
       <Text style={styles.sectionTitle}>{t('settings')}</Text>
@@ -168,6 +203,7 @@ export const Settings = () => {
           <Picker
             selectedValue={preferences.locale}
             onValueChange={(value) => updatePreference('locale', value)}
+            enabled={preferencesLoaded}
             style={styles.picker}
           >
             {LOCALE_OPTIONS.map((option) => (
@@ -184,10 +220,10 @@ export const Settings = () => {
             <Picker
               selectedValue={preferences.defaultEditor}
               onValueChange={(value) => {
-                if (!toolsReady) return
+                if (!toolsReady || !preferencesLoaded) return
                 updatePreference('defaultEditor', value)
               }}
-              enabled={toolsReady}
+              enabled={toolsReady && preferencesLoaded}
               style={styles.picker}
             >
               <Picker.Item label={t('systemDefault')} value={null} />
@@ -214,10 +250,10 @@ export const Settings = () => {
             <Picker
               selectedValue={preferences.defaultTerminal}
               onValueChange={(value) => {
-                if (!toolsReady) return
+                if (!toolsReady || !preferencesLoaded) return
                 updatePreference('defaultTerminal', value)
               }}
-              enabled={toolsReady}
+              enabled={toolsReady && preferencesLoaded}
               style={styles.picker}
             >
               <Picker.Item label={t('systemDefault')} value={null} />
@@ -238,9 +274,27 @@ export const Settings = () => {
         <Divider />
 
         <Row align="center" justify="between" style={styles.boxItem}>
+          <View style={styles.itemTextContainer}>
+            <Text style={styles.itemLabel}>{t('openConfigFile')}</Text>
+            <Text style={styles.itemDescription}>{t('openConfigFileDescription')}</Text>
+          </View>
+          <TouchableOpacity
+            accessibilityLabel={t('openConfigFile')}
+            onPress={handleOpenConfigFile}
+            style={styles.button}
+          >
+            <Ionicons name="document-text-outline" size={14} color="var(--text-color)" />
+            <Text style={styles.buttonText}>{t('openConfigFile')}</Text>
+          </TouchableOpacity>
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
           <Text style={styles.itemLabel}>{t('openOnStartup')}</Text>
           <Switch
             value={preferences.launchOnLogin}
+            disabled={!preferencesLoaded}
             onValueChange={(value) => updatePreference('launchOnLogin', value)}
           />
         </Row>
@@ -249,7 +303,11 @@ export const Settings = () => {
 
         <Row align="center" justify="between" style={styles.boxItem}>
           <Text style={styles.itemLabel}>{t('showAppIcons')}</Text>
-          <Switch value={preferences.showAppIcons} onValueChange={(value) => updatePreference('showAppIcons', value)} />
+          <Switch
+            value={preferences.showAppIcons}
+            disabled={!preferencesLoaded}
+            onValueChange={(value) => updatePreference('showAppIcons', value)}
+          />
         </Row>
 
         <Divider />
@@ -258,6 +316,7 @@ export const Settings = () => {
           <Text style={styles.itemLabel}>{t('deleteFilesFromDiskByDefault')}</Text>
           <Switch
             value={preferences.removeFromDiskByDefault}
+            disabled={!preferencesLoaded}
             onValueChange={(value) => updatePreference('removeFromDiskByDefault', value)}
           />
         </Row>

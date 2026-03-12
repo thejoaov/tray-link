@@ -10,6 +10,7 @@ type StorageModuleType = {
   clear: () => Promise<boolean>
   appendErrorLog: (entryJson: string) => Promise<boolean>
   getErrorLogPath: () => Promise<string>
+  getConfigPath: () => Promise<string>
 }
 
 let StorageModule: StorageModuleType
@@ -28,6 +29,7 @@ if (isElectron) {
     clear: async () => false,
     appendErrorLog: async () => false,
     getErrorLogPath: async () => '',
+    getConfigPath: async () => '',
   }
 }
 
@@ -57,4 +59,8 @@ export function appendErrorLog(entryJson: string): Promise<boolean> {
 
 export function getErrorLogPath(): Promise<string> {
   return StorageModule.getErrorLogPath()
+}
+
+export function getConfigPath(): Promise<string> {
+  return StorageModule.getConfigPath()
 }

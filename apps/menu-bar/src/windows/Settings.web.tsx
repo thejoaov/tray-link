@@ -3,9 +3,17 @@ import { Picker } from '@react-native-picker/picker'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import { installCli, isCliInstalled, uninstallCli } from '../../modules/shell-utils/src'
+import {
+  installCli,
+  isCliInstalled,
+  openInEditor,
+  openPathWithSystem,
+  uninstallCli,
+} from '../../modules/shell-utils/src'
+import { getConfigPath } from '../../modules/storage-module/src'
 import Analytics, { AnalyticsEvent } from '../analytics'
 import { Divider, Row, ScrollView, Switch, Text, View } from '../components'
+import Alert from '../modules/Alert'
 import { Linking } from '../modules/Linking'
 import { defaultUserPreferences, UserPreferences } from '../modules/Storage'
 import {
@@ -157,6 +165,22 @@ export const Settings = () => {
   const canInstallUpdate =
     updaterState.isSupported && updaterState.status === 'available' && Boolean(updaterState.downloadUrl)
 
+  const handleOpenConfigFile = async () => {
+    try {
+      const configPath = await getConfigPath()
+      const opened = preferences.defaultEditor
+        ? (await openInEditor(configPath, preferences.defaultEditor)) || (await openPathWithSystem(configPath))
+        : await openPathWithSystem(configPath)
+
+      if (!opened) {
+        Alert.alert(t('settings'), t('openConfigFileFailed'))
+      }
+    } catch (error) {
+      Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+      Alert.alert(t('settings'), t('openConfigFileFailed'))
+    }
+  }
+
   return (
     <View style={styles.root}>
       <ScrollView contentContainerStyle={styles.scrollContent} indicatorStyle="black">
@@ -234,6 +258,23 @@ export const Settings = () => {
                 <Ionicons name="add" size={16} color="var(--text-color)" />
               </TouchableOpacity>
             </Row>
+          </Row>
+
+          <Divider />
+
+          <Row align="center" justify="between" style={styles.boxItem}>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemLabel}>{t('openConfigFile')}</Text>
+              <Text style={styles.itemDescription}>{t('openConfigFileDescription')}</Text>
+            </View>
+            <TouchableOpacity
+              accessibilityLabel={t('openConfigFile')}
+              onPress={handleOpenConfigFile}
+              style={styles.button}
+            >
+              <Ionicons name="document-text-outline" size={14} color="var(--text-color)" />
+              <Text style={styles.buttonText}>{t('openConfigFile')}</Text>
+            </TouchableOpacity>
           </Row>
 
           <Divider />

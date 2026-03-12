@@ -1,5 +1,4 @@
 import { requireNativeModule } from 'expo-modules-core'
-import { NativeModules } from 'react-native'
 
 const ShellUtilsModule = requireNativeModule('ShellUtils')
 
@@ -13,6 +12,10 @@ export function openInTerminal(path: string, terminalCommand: string): Promise<b
 
 export function openInFinder(path: string): Promise<boolean> {
   return ShellUtilsModule.openInFinder(path)
+}
+
+export function openPathWithSystem(path: string): Promise<boolean> {
+  return ShellUtilsModule.openPathWithSystem(path)
 }
 
 export function which(binary: string): Promise<string | null> {
