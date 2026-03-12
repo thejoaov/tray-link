@@ -38,8 +38,15 @@ const normalizeStoreShape = (store: StoreShape): StoreShape => {
 
 const writeStoreToDisk = (store: StoreShape) => {
   const storePath = getStorePath()
-  fs.mkdirSync(path.dirname(storePath), { recursive: true })
-  fs.writeFileSync(storePath, JSON.stringify(store, undefined, '\t') + '\n', 'utf8')
+  const directory = path.dirname(storePath)
+  const tempPath = path.join(directory, `${STORE_FILE_NAME}.tmp`)
+  fs.mkdirSync(directory, { recursive: true })
+
+  const serialized = JSON.stringify(store, undefined, '\t') + '\n'
+  JSON.parse(serialized)
+  fs.writeFileSync(tempPath, serialized, 'utf8')
+  JSON.parse(fs.readFileSync(tempPath, 'utf8'))
+  fs.renameSync(tempPath, storePath)
 }
 
 const readStoreFromDisk = (): StoreShape => {

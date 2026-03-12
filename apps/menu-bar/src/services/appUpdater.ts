@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noControlCharactersInRegex: false positive */
 import { EmitterSubscription, Platform } from 'react-native'
 import { installAppUpdate } from '../../modules/shell-utils/src'
 import { getItem, setItem } from '../../modules/storage-module/src'
@@ -44,6 +45,21 @@ type Listener = (state: AppUpdaterState) => void
 
 const listeners = new Set<Listener>()
 
+function sanitizePersistedText(value: string | null | undefined): string | null {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const sanitized = value
+    .replace(/\u0000/g, '')
+    .replace(/[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+    .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/g, '\uFFFD')
+    .replace(/(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '\uFFFD')
+    .trim()
+
+  return sanitized.length > 0 ? sanitized : null
+}
+
 let initializePromise: Promise<void> | null = null
 let checkPromise: Promise<AppUpdaterState> | null = null
 let autoCheckTimer: ReturnType<typeof setTimeout> | null = null
@@ -71,15 +87,30 @@ function setState(next: Partial<AppUpdaterState>) {
 
 function toPersistedState(value: AppUpdaterState): PersistedUpdaterState {
   return {
-    lastCheckedAt: value.lastCheckedAt,
-    latestVersion: value.latestVersion,
-    releaseNotes: value.releaseNotes,
-    releasePageUrl: value.releasePageUrl,
+    lastCheckedAt: sanitizePersistedText(value.lastCheckedAt),
+    latestVersion: sanitizePersistedText(value.latestVersion),
+    releaseNotes: sanitizePersistedText(value.releaseNotes),
+    releasePageUrl: sanitizePersistedText(value.releasePageUrl),
+  }
+}
+
+function serializePersistedState(value: AppUpdaterState): string {
+  const persisted = toPersistedState(value)
+
+  try {
+    const serialized = JSON.stringify(persisted)
+    JSON.parse(serialized)
+    return serialized
+  } catch {
+    return JSON.stringify({
+      ...persisted,
+      releaseNotes: null,
+    } satisfies PersistedUpdaterState)
   }
 }
 
 async function persistState() {
-  await setItem(UPDATE_STATE_STORAGE_KEY, JSON.stringify(toPersistedState(state)))
+  await setItem(UPDATE_STATE_STORAGE_KEY, serializePersistedState(state))
 }
 
 async function hydrateState() {
