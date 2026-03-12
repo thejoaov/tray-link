@@ -16,7 +16,8 @@ jobs:
     permissions:
       contents: write
     env:
-      CASK_NAME: tray-link
+      NATIVE_CASK_NAME: tray-link
+      ELECTRON_CASK_NAME: tray-link-electron
       HOMEBREW_TAP_REPO: thejoaov/homebrew-tap
     steps:
       - name: Checkout source repo (for tags)
@@ -38,80 +39,6 @@ jobs:
           fi
 
           echo "release_tag=${latest_tag}" >> "$GITHUB_OUTPUT"
-
-      - name: Resolve macOS zip asset
-        id: release_asset
-        env:
-          RELEASE_TAG: ${{ steps.latest_tag.outputs.release_tag }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          release_json=$(gh api \
-            -H "Accept: application/vnd.github+json" \
-            "/repos/${{ github.repository }}/releases/tags/${RELEASE_TAG}")
-
-          echo "Available release assets for ${RELEASE_TAG}:"
-          echo "$release_json" | jq -r '.assets[].name' || true
-
-          asset_name=$(echo "$release_json" | jq -r '
-            .assets[]
-            | select(.name | test("(?i)tray[-_. ]?link[-_. ]?macos[-_. ]?universal"))
-            | select(.name | test("(?i)\\.zip$"))
-            | .name
-          ' | head -n1)
-
-          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
-            asset_name=$(echo "$release_json" | jq -r '
-              .assets[]
-              | select(.name | test("(?i)darwin"))
-              | select(.name | test("(?i)\\.zip$"))
-              | .name
-            ' | head -n1)
-          fi
-
-          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
-            asset_name=$(echo "$release_json" | jq -r '
-              .assets[]
-              | select(.name | test("(?i)(mac|darwin|osx|universal)"))
-              | select(.name | test("(?i)\\.(zip|dmg|pkg)$"))
-              | .name
-            ' | head -n1)
-          fi
-
-          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
-            asset_name=$(echo "$release_json" | jq -r '
-              .assets[]
-              | select(.name | test("(?i)\\.(zip|dmg|pkg)$"))
-              | select(.name | test("(?i)^source code") | not)
-              | .name
-            ' | head -n1)
-          fi
-
-          if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
-            echo "Could not find a macOS installer asset (.zip/.dmg/.pkg) in release ${RELEASE_TAG}."
-            echo "Release assets were:"
-            echo "$release_json" | jq -r '.assets[].name' || true
-            exit 1
-          fi
-
-          asset_url=$(echo "$release_json" | jq -r --arg name "$asset_name" '
-            .assets[]
-            | select(.name == $name)
-            | .browser_download_url
-          ')
-
-          echo "Selected installer asset: ${asset_name}"
-
-          echo "asset_name=${asset_name}" >> "$GITHUB_OUTPUT"
-          echo "asset_url=${asset_url}" >> "$GITHUB_OUTPUT"
-
-      - name: Download asset and calculate SHA256
-        id: checksum
-        run: |
-          set -euo pipefail
-          curl -L "${{ steps.release_asset.outputs.asset_url }}" -o release.zip
-          echo "sha256=$(shasum -a 256 release.zip | awk '{print $1}')" >> "$GITHUB_OUTPUT"
 
       - name: Resolve release version
         id: release_version
@@ -137,21 +64,128 @@ jobs:
           token: ${{ secrets.PAT }}
           path: homebrew-tap
 
-      - name: Update Cask file
+      - name: Update Cask files
+        env:
+          RELEASE_TAG: ${{ steps.latest_tag.outputs.release_tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
           version="${{ steps.release_version.outputs.version }}"
-          cask_file="homebrew-tap/Casks/${CASK_NAME}.rb"
+          tap_casks_dir="homebrew-tap/Casks"
 
-          if [ ! -f "$cask_file" ]; then
-            echo "Missing cask file: $cask_file"
-            exit 1
-          fi
+          release_json=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${{ github.repository }}/releases/tags/${RELEASE_TAG}")
 
-          perl -0pi -e "s/version\s+\"[^\"]+\"/version \"${version}\"/" "$cask_file"
-          perl -0pi -e "s#sha256\s+\"[^\"]+\"#sha256 \"${{ steps.checksum.outputs.sha256 }}\"#" "$cask_file"
-          perl -0pi -e "s#url\s+\"[^\"]+\"#url \"${{ steps.release_asset.outputs.asset_url }}\"#" "$cask_file"
+          echo "Available release assets for ${RELEASE_TAG}:"
+          echo "$release_json" | jq -r '.assets[].name' || true
+
+          resolve_asset_name() {
+            local target="$1"
+            local asset_name=""
+
+            if [ "$target" = "native" ]; then
+              asset_name=$(echo "$release_json" | jq -r '
+                .assets[]
+                | select(.name | test("(?i)tray[-_. ]?link[-_. ]?macos[-_. ]?universal"))
+                | select(.name | test("(?i)\\.zip$"))
+                | .name
+              ' | head -n1)
+            else
+              asset_name=$(echo "$release_json" | jq -r '
+                .assets[]
+                | select(.name | test("(?i)tray[-_. ]?link"))
+                | select(.name | test("(?i)darwin"))
+                | select(.name | test("(?i)\\.zip$"))
+                | select(.name | test("(?i)tray[-_. ]?link[-_. ]?macos[-_. ]?universal") | not)
+                | .name
+              ' | head -n1)
+
+              if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
+                asset_name=$(echo "$release_json" | jq -r '
+                  .assets[]
+                  | select(.name | test("(?i)darwin"))
+                  | select(.name | test("(?i)\\.zip$"))
+                  | select(.name | test("(?i)tray[-_. ]?link[-_. ]?macos[-_. ]?universal") | not)
+                  | .name
+                ' | head -n1)
+              fi
+            fi
+
+            if [ -z "${asset_name}" ] || [ "${asset_name}" = "null" ]; then
+              echo "Could not resolve ${target} macOS asset in release ${RELEASE_TAG}."
+              exit 1
+            fi
+
+            printf '%s\n' "$asset_name"
+          }
+
+          resolve_asset_url() {
+            local asset_name="$1"
+
+            echo "$release_json" | jq -r --arg name "$asset_name" '
+              .assets[]
+              | select(.name == $name)
+              | .browser_download_url
+            '
+          }
+
+          resolve_asset_sha256() {
+            local asset_url="$1"
+            local target_file="$2"
+
+            curl -L "$asset_url" -o "$target_file"
+            shasum -a 256 "$target_file" | awk '{print $1}'
+          }
+
+          write_cask_file() {
+            local cask_name="$1"
+            local asset_url="$2"
+            local sha256="$3"
+            local arch_requirement="${4:-}"
+            local cask_file="${tap_casks_dir}/${cask_name}.rb"
+
+            {
+              printf '%s\n' \
+                "cask \"${cask_name}\" do" \
+                "  version \"${version}\"" \
+                "  sha256 \"${sha256}\"" \
+                "" \
+                "  url \"${asset_url}\"" \
+                "  name \"Tray Link\"" \
+                "  desc \"Manage your projects from the system tray\"" \
+                "  homepage \"https://github.com/thejoaov/tray-link\""
+
+              if [ -n "$arch_requirement" ]; then
+                printf '\n%s\n' "  depends_on arch: :${arch_requirement}"
+              fi
+
+              printf '\n%s\n' \
+                "  app \"Tray Link.app\"" \
+                "" \
+                "  zap trash: [" \
+                "    \"~/Library/Application Support/Tray Link\"," \
+                "    \"~/Library/Preferences/com.thejoaov.tray-link.plist\"," \
+                "    \"~/Library/Caches/com.thejoaov.tray-link\"," \
+                "  ]" \
+                "end"
+            } > "$cask_file"
+          }
+
+          mkdir -p "$tap_casks_dir"
+
+          native_asset_name=$(resolve_asset_name "native")
+          native_asset_url=$(resolve_asset_url "$native_asset_name")
+          native_sha256=$(resolve_asset_sha256 "$native_asset_url" native-release.zip)
+          echo "Selected native macOS asset: ${native_asset_name}"
+          write_cask_file "${NATIVE_CASK_NAME}" "$native_asset_url" "$native_sha256"
+
+          electron_asset_name=$(resolve_asset_name "electron")
+          electron_asset_url=$(resolve_asset_url "$electron_asset_name")
+          electron_sha256=$(resolve_asset_sha256 "$electron_asset_url" electron-release.zip)
+          echo "Selected Electron macOS asset: ${electron_asset_name}"
+          write_cask_file "${ELECTRON_CASK_NAME}" "$electron_asset_url" "$electron_sha256" "arm64"
 
       - name: Commit and push to Homebrew tap
         run: |
@@ -161,12 +195,12 @@ jobs:
           git config user.name "thejoaov"
           git config user.email "thejoaov@users.noreply.github.com"
 
-          git add "Casks/${CASK_NAME}.rb"
+          git add "Casks/${NATIVE_CASK_NAME}.rb" "Casks/${ELECTRON_CASK_NAME}.rb"
 
           if git diff --cached --quiet; then
             echo "No cask changes to commit"
             exit 0
           fi
 
-          git commit -m "chore(cask): ${CASK_NAME} ${{ steps.release_version.outputs.version }}"
+          git commit -m "chore(cask): sync macOS casks ${{ steps.release_version.outputs.version }}"
           git push origin main
