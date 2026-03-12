@@ -42,6 +42,7 @@ export interface Settings {
   launchOnLogin: boolean
   showAppIcons: boolean
   removeFromDiskByDefault: boolean
+  hasInstalledCli: boolean
   customEditors: CustomTool[]
   customTerminals: CustomTool[]
 }

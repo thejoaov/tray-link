@@ -64,6 +64,7 @@ type TranslationKey =
   | 'invalidValues'
   | 'cli'
   | 'installCli'
+  | 'reinstallCli'
   | 'uninstallCli'
   | 'cliInstalled'
   | 'cliNotInstalled'
@@ -139,6 +140,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     invalidValues: 'Invalid values',
     cli: 'CLI',
     installCli: 'Install',
+    reinstallCli: 'Reinstall',
     uninstallCli: 'Uninstall',
     cliInstalled: 'tlink command is available in your terminal',
     cliNotInstalled: 'Install tlink to use from any terminal',
@@ -213,6 +215,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     invalidValues: 'Valores inválidos',
     cli: 'CLI',
     installCli: 'Instalar',
+    reinstallCli: 'Reinstalar',
     uninstallCli: 'Desinstalar',
     cliInstalled: 'O comando tlink está disponível no seu terminal',
     cliNotInstalled: 'Instale o tlink para usar em qualquer terminal',
@@ -287,6 +290,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     invalidValues: 'Valores inválidos',
     cli: 'CLI',
     installCli: 'Instalar',
+    reinstallCli: 'Reinstalar',
     uninstallCli: 'Desinstalar',
     cliInstalled: 'El comando tlink está disponible en tu terminal',
     cliNotInstalled: 'Instala tlink para usar desde cualquier terminal',

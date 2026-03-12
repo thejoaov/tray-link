@@ -3,13 +3,7 @@ import { Picker } from '@react-native-picker/picker'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import {
-  installCli,
-  isCliInstalled,
-  openInEditor,
-  openPathWithSystem,
-  uninstallCli,
-} from '../../modules/shell-utils/src'
+import { installCli, isCliInstalled, openInEditor, openPathWithSystem } from '../../modules/shell-utils/src'
 import { getConfigPath } from '../../modules/storage-module/src'
 import Analytics, { AnalyticsEvent } from '../analytics'
 import { Divider, Row, ScrollView, Switch, Text, View } from '../components'
@@ -170,6 +164,18 @@ export const Settings = () => {
       })
   }, [legacyMigrationDone])
 
+  useEffect(() => {
+    if (!preferencesLoaded || preferences.hasInstalledCli || !cliInstalled) {
+      return
+    }
+
+    const next = { ...preferences, hasInstalledCli: true }
+    setPreferences(next)
+    persistPreferences(next).catch((error) => {
+      Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+    })
+  }, [cliInstalled, preferences, preferencesLoaded])
+
   const updaterStatusMessage = getUpdaterStatusMessage(updaterState, t)
   const isCheckingUpdates = updaterState.status === 'checking'
   const isInstallingUpdate = updaterState.status === 'installing' || updaterState.status === 'installed'
@@ -327,24 +333,22 @@ export const Settings = () => {
       <View border="light" rounded="medium" style={styles.box}>
         <Row align="center" justify="between" style={styles.boxItem}>
           <View style={styles.itemTextContainer}>
-            <Text style={styles.itemLabel}>{t(cliInstalled ? 'uninstallCli' : 'installCli')} CLI</Text>
+            <Text style={styles.itemLabel}>{t(preferences.hasInstalledCli ? 'reinstallCli' : 'installCli')} CLI</Text>
             <Text style={styles.itemDescription}>{cliInstalled ? t('cliInstalled') : t('cliNotInstalled')}</Text>
           </View>
           <TouchableOpacity
-            accessibilityLabel={cliInstalled ? t('uninstallCli') : t('installCli')}
+            accessibilityLabel={t(preferences.hasInstalledCli ? 'reinstallCli' : 'installCli')}
             disabled={installingCli}
             onPress={async () => {
               setInstallingCli(true)
               try {
-                if (cliInstalled) {
-                  const result = await uninstallCli()
-                  if (result.success) {
-                    setCliInstalled(false)
-                  }
-                } else {
-                  const result = await installCli()
-                  if (result.success) {
-                    setCliInstalled(true)
+                const result = await installCli()
+                if (result.success) {
+                  setCliInstalled(true)
+                  if (!preferences.hasInstalledCli) {
+                    const next = { ...preferences, hasInstalledCli: true }
+                    setPreferences(next)
+                    await persistPreferences(next)
                   }
                 }
               } finally {
@@ -353,12 +357,8 @@ export const Settings = () => {
             }}
             style={[styles.button, installingCli && styles.buttonDisabled]}
           >
-            <Ionicons
-              name={cliInstalled ? 'close-circle-outline' : 'terminal-outline'}
-              size={14}
-              color="var(--text-color)"
-            />
-            <Text style={styles.buttonText}>{t(cliInstalled ? 'uninstallCli' : 'installCli')}</Text>
+            <Ionicons name="terminal-outline" size={14} color="var(--text-color)" />
+            <Text style={styles.buttonText}>{t(preferences.hasInstalledCli ? 'reinstallCli' : 'installCli')}</Text>
           </TouchableOpacity>
         </Row>
       </View>

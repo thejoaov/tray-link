@@ -12,6 +12,7 @@ export const defaultUserPreferences: UserPreferences = {
   defaultEditor: null,
   defaultTerminal: null,
   removeFromDiskByDefault: false,
+  hasInstalledCli: false,
   customEditors: [],
   customTerminals: [],
 }
