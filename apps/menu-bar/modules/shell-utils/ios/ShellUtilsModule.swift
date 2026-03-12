@@ -54,6 +54,64 @@ private func loadLegacyTrayLinkConfigData() -> [String: Any]? {
   return nil
 }
 
+private func getCliBinaryNameForCurrentArch() -> String {
+  #if arch(arm64)
+  return "tlink-arm64"
+  #else
+  return "tlink-x64"
+  #endif
+}
+
+private func getCliWrapperDirectoryURL() -> URL {
+  return FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".tray-link", isDirectory: true)
+}
+
+private func getCliWrapperURL() -> URL {
+  return getCliWrapperDirectoryURL().appendingPathComponent("tlink")
+}
+
+private func getBundledCliBinaryURL() -> URL {
+  return Bundle.main.bundleURL
+    .appendingPathComponent("Contents", isDirectory: true)
+    .appendingPathComponent("Resources", isDirectory: true)
+    .appendingPathComponent(getCliBinaryNameForCurrentArch())
+}
+
+private func createCliWrapper() throws -> URL {
+  let fileManager = FileManager.default
+  let wrapperDirectoryURL = getCliWrapperDirectoryURL()
+  let wrapperURL = getCliWrapperURL()
+  let binaryName = getCliBinaryNameForCurrentArch()
+  let homeDirectory = fileManager.homeDirectoryForCurrentUser.path
+  let candidates = Array(
+    Set([
+      getBundledCliBinaryURL().path,
+      "/Applications/Tray Link.app/Contents/Resources/\(binaryName)",
+      "\(homeDirectory)/Applications/Tray Link.app/Contents/Resources/\(binaryName)",
+    ])
+  )
+
+  try fileManager.createDirectory(at: wrapperDirectoryURL, withIntermediateDirectories: true)
+
+  let candidateList = candidates.map(shellEscape).joined(separator: " ")
+  let content = [
+    "#!/bin/sh",
+    "for candidate in \(candidateList); do",
+    "  if [ -x \"$candidate\" ]; then",
+    "    exec \"$candidate\" \"$@\"",
+    "  fi",
+    "done",
+    "echo \"Tray Link CLI binary not found. Open Tray Link and install the CLI again.\" >&2",
+    "exit 1",
+    "",
+  ].joined(separator: "\n")
+
+  try content.write(to: wrapperURL, atomically: true, encoding: .utf8)
+  try fileManager.setAttributes([.posixPermissions: NSNumber(value: Int(0o755))], ofItemAtPath: wrapperURL.path)
+
+  return wrapperURL
+}
+
 public class ShellUtilsModule: Module {
   public func definition() -> ModuleDefinition {
     Name("ShellUtils")
@@ -130,26 +188,14 @@ public class ShellUtilsModule: Module {
 
     AsyncFunction("installCli") { () -> [String: Any] in
       do {
-        guard let bundlePath = Bundle.main.resourceURL else {
-          return ["success": false, "error": "Cannot locate app bundle"]
-        }
-
-        // Determine architecture-specific binary name
-        #if arch(arm64)
-        let binaryName = "tlink-arm64"
-        #else
-        let binaryName = "tlink-x64"
-        #endif
-
-        let cliBinary = bundlePath.appendingPathComponent(binaryName)
+        let cliBinary = getBundledCliBinaryURL()
         guard FileManager.default.fileExists(atPath: cliBinary.path) else {
           return ["success": false, "error": "CLI binary not found in bundle"]
         }
 
+        let wrapperPath = try createCliWrapper().path
         let symlinkPath = "/usr/local/bin/tlink"
-
-        // Use osascript for admin privileges
-        let cmd = "ln -sf \\\"\(cliBinary.path)\\\" \\\"\(symlinkPath)\\\""
+        let cmd = "ln -sf \\\"\(wrapperPath)\\\" \\\"\(symlinkPath)\\\""
         let script = "do shell script \"\(cmd)\" with administrator privileges"
         let appleScript = NSAppleScript(source: script)
         var errorDict: NSDictionary?
@@ -166,20 +212,26 @@ public class ShellUtilsModule: Module {
 
     AsyncFunction("uninstallCli") { () -> [String: Any] in
       let symlinkPath = "/usr/local/bin/tlink"
+      let wrapperPath = getCliWrapperURL().path
+      let wrapperDirectoryPath = getCliWrapperDirectoryURL().path
 
-      guard FileManager.default.fileExists(atPath: symlinkPath) else {
-        return ["success": true]
+      if FileManager.default.fileExists(atPath: symlinkPath) {
+        let cmd = "rm -f \\\"\(symlinkPath)\\\""
+        let script = "do shell script \"\(cmd)\" with administrator privileges"
+        let appleScript = NSAppleScript(source: script)
+        var errorDict: NSDictionary?
+        appleScript?.executeAndReturnError(&errorDict)
+
+        if let errorDict = errorDict {
+          let errorMessage = errorDict[NSAppleScript.errorMessage] as? String ?? "Unknown error"
+          return ["success": false, "error": errorMessage]
+        }
       }
 
-      let cmd = "rm -f \\\"\(symlinkPath)\\\""
-      let script = "do shell script \"\(cmd)\" with administrator privileges"
-      let appleScript = NSAppleScript(source: script)
-      var errorDict: NSDictionary?
-      appleScript?.executeAndReturnError(&errorDict)
+      try? FileManager.default.removeItem(atPath: wrapperPath)
 
-      if let errorDict = errorDict {
-        let errorMessage = errorDict[NSAppleScript.errorMessage] as? String ?? "Unknown error"
-        return ["success": false, "error": errorMessage]
+      if let contents = try? FileManager.default.contentsOfDirectory(atPath: wrapperDirectoryPath), contents.isEmpty {
+        try? FileManager.default.removeItem(atPath: wrapperDirectoryPath)
       }
 
       return ["success": true]
