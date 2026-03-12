@@ -1,6 +1,7 @@
 import { registerMainModules } from '@tray-link/rn-electron-modules'
 import { app, BrowserWindow, protocol } from 'electron'
 import started from 'electron-squirrel-startup'
+import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import { MainModules } from '../modules/mainRegistry'
@@ -43,6 +44,94 @@ if (!gotTheLock) {
   app.quit()
 }
 
+const sanitizeCorruptedElectronStore = () => {
+  const userDataPath = app.getPath('userData')
+  const storePath = path.join(userDataPath, 'config.json')
+
+  if (!fs.existsSync(storePath)) {
+    return
+  }
+
+  try {
+    JSON.parse(fs.readFileSync(storePath, 'utf8'))
+  } catch (error) {
+    const backupPath = path.join(userDataPath, `config.corrupted-${Date.now()}.json`)
+    fs.renameSync(storePath, backupPath)
+    console.error(`[ElectronMain] Backed up corrupted config store to ${backupPath}.`, error)
+  }
+}
+
+const parseJSONStringValueIfNeeded = (value: unknown): unknown => {
+  if (typeof value !== 'string') {
+    return value
+  }
+
+  try {
+    return JSON.parse(value)
+  } catch {
+    return value
+  }
+}
+
+const readJsonObject = (targetPath: string): Record<string, unknown> | null => {
+  if (!fs.existsSync(targetPath)) {
+    return null
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(targetPath, 'utf8')) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
+const loadLegacyProjects = (): unknown[] => {
+  const home = app.getPath('home')
+  const candidates = [
+    path.join(home, 'Library', 'Application Support', 'tray-link', 'config.json'),
+    path.join(home, 'Library', 'Application Support', 'Tray Link', 'config.json'),
+    path.join(home, 'Library', 'Application Support', 'vs-tray', 'config.json'),
+  ]
+
+  for (const candidate of candidates) {
+    const data = readJsonObject(candidate)
+    if (!data) {
+      continue
+    }
+
+    const projects = parseJSONStringValueIfNeeded(data.projects)
+    if (Array.isArray(projects) && projects.length > 0) {
+      return projects
+    }
+  }
+
+  return []
+}
+
+const restoreProjectsIfNeeded = () => {
+  const storePath = path.join(app.getPath('userData'), 'config.json')
+  const current = readJsonObject(storePath) ?? {}
+  const currentProjects = parseJSONStringValueIfNeeded(current.projects)
+
+  if (Array.isArray(currentProjects) && currentProjects.length > 0) {
+    return
+  }
+
+  const legacyProjects = loadLegacyProjects()
+  if (!legacyProjects.length) {
+    return
+  }
+
+  const next = {
+    ...current,
+    projects: legacyProjects,
+  }
+
+  fs.mkdirSync(path.dirname(storePath), { recursive: true })
+  fs.writeFileSync(storePath, JSON.stringify(next, undefined, '\t') + '\n', 'utf8')
+  console.error(`[ElectronMain] Restored ${legacyProjects.length} projects from legacy config into ${storePath}.`)
+}
+
 const createMainWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 380,
@@ -75,6 +164,9 @@ const createMainWindow = () => {
 }
 
 app.on('ready', () => {
+  sanitizeCorruptedElectronStore()
+  restoreProjectsIfNeeded()
+
   registerMainModules(MainModules)
 
   const mainWindow = createMainWindow()

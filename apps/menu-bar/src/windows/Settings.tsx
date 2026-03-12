@@ -8,6 +8,13 @@ import Analytics, { AnalyticsEvent } from '../analytics'
 import { Divider, Row, ScrollView, Switch, Text, View } from '../components'
 import { Linking } from '../modules/Linking'
 import { defaultUserPreferences, UserPreferences } from '../modules/Storage'
+import {
+  AppUpdaterState,
+  checkForUpdates,
+  getUpdaterState,
+  installLatestUpdate,
+  subscribeUpdater,
+} from '../services/appUpdater'
 import { getLegacyMigrationPreview, hasLegacyMigrationCompleted, runLegacyMigration } from '../services/legacyMigration'
 import {
   getEditorOptions,
@@ -30,6 +37,30 @@ const REPOSITORY_URL = 'https://github.com/thejoaov/tray-link'
 const RELEASES_URL = 'https://github.com/thejoaov/tray-link/releases'
 const CREATOR_URL = 'https://github.com/thejoaov'
 
+const getUpdaterStatusMessage = (updaterState: AppUpdaterState, t: ReturnType<typeof useTranslation>['t']) => {
+  if (!updaterState.isSupported) {
+    return t('updaterUnsupported')
+  }
+
+  switch (updaterState.status) {
+    case 'checking':
+      return t('updaterChecking')
+    case 'upToDate':
+      return t('updaterUpToDate')
+    case 'available':
+      return t('updaterAvailable', { version: updaterState.latestVersion ?? '' })
+    case 'installing':
+      return t('updaterInstalling')
+    case 'installed':
+      return t('updaterInstalled')
+    case 'error':
+      return t('updaterError', { error: updaterState.error ?? 'Unknown error' })
+    case 'idle':
+    default:
+      return updaterState.lastCheckedAt ? t('updaterUpToDate') : t('checkForUpdates')
+  }
+}
+
 export const Settings = () => {
   const { t } = useTranslation()
   const [preferences, setPreferences] = useState<UserPreferences>(defaultUserPreferences)
@@ -41,6 +72,7 @@ export const Settings = () => {
   const [legacyProjectsPreviewCount, setLegacyProjectsPreviewCount] = useState(0)
   const [cliInstalled, setCliInstalled] = useState(false)
   const [installingCli, setInstallingCli] = useState(false)
+  const [updaterState, setUpdaterState] = useState<AppUpdaterState>(getUpdaterState())
 
   const editorOptions = useMemo(
     () => getEditorOptions(preferences.customEditors),
@@ -101,8 +133,11 @@ export const Settings = () => {
       .then(setCliInstalled)
       .catch(() => setCliInstalled(false))
 
+    const updaterSubscription = subscribeUpdater(setUpdaterState)
+
     return () => {
       subscription.remove()
+      updaterSubscription.remove()
     }
   }, [])
 
@@ -115,6 +150,12 @@ export const Settings = () => {
         setLegacyProjectsPreviewCount(0)
       })
   }, [legacyMigrationDone])
+
+  const updaterStatusMessage = getUpdaterStatusMessage(updaterState, t)
+  const isCheckingUpdates = updaterState.status === 'checking'
+  const isInstallingUpdate = updaterState.status === 'installing' || updaterState.status === 'installed'
+  const canInstallUpdate =
+    updaterState.isSupported && updaterState.status === 'available' && Boolean(updaterState.downloadUrl)
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -263,6 +304,68 @@ export const Settings = () => {
         </Row>
       </View>
 
+      <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('updates')}</Text>
+
+      <View border="light" rounded="medium" style={styles.box}>
+        <Row align="center" justify="between" style={styles.boxItem}>
+          <View style={styles.itemTextContainer}>
+            <Text style={styles.itemLabel}>{t('currentVersion')}</Text>
+            <Text style={styles.itemDescription}>{updaterState.currentVersion}</Text>
+          </View>
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
+          <View style={styles.itemTextContainer}>
+            <Text style={styles.itemLabel}>{t('latestVersion')}</Text>
+            <Text style={styles.itemDescription}>{updaterState.latestVersion ?? '—'}</Text>
+          </View>
+        </Row>
+
+        <Divider />
+
+        <View style={styles.boxItem}>
+          <View style={styles.itemTextContainer}>
+            <Text style={styles.itemLabel}>{t('updates')}</Text>
+            <Text style={styles.itemDescription}>{updaterStatusMessage}</Text>
+          </View>
+          <View style={styles.updaterActionsRow}>
+            <TouchableOpacity
+              accessibilityLabel={t('checkForUpdates')}
+              disabled={isCheckingUpdates || isInstallingUpdate}
+              onPress={async () => {
+                try {
+                  await checkForUpdates()
+                } catch (error) {
+                  Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+                }
+              }}
+              style={[styles.button, (isCheckingUpdates || isInstallingUpdate) && styles.buttonDisabled]}
+            >
+              <Ionicons name="refresh" size={14} color="var(--text-color)" />
+              <Text style={styles.buttonText}>{t('checkForUpdates')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              accessibilityLabel={t('installUpdate')}
+              disabled={!canInstallUpdate || isInstallingUpdate}
+              onPress={async () => {
+                try {
+                  await installLatestUpdate()
+                } catch (error) {
+                  Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+                }
+              }}
+              style={[styles.button, (!canInstallUpdate || isInstallingUpdate) && styles.buttonDisabled]}
+            >
+              <Ionicons name="download-outline" size={14} color="var(--text-color)" />
+              <Text style={styles.buttonText}>{t('installUpdate')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
       <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('advanced') || 'Advanced'}</Text>
 
       <View border="light" rounded="medium" style={styles.box}>
@@ -380,6 +483,7 @@ const styles = StyleSheet.create({
   },
   itemTextContainer: {
     flex: 1,
+    minWidth: 0,
     paddingRight: 16,
     justifyContent: 'center',
   },
@@ -414,6 +518,7 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-start',
     gap: 6,
     borderRadius: 6,
     paddingHorizontal: 12,
@@ -424,8 +529,15 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   buttonText: {
+    flexShrink: 1,
     fontSize: 12,
     fontWeight: '600',
+  },
+  updaterActionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
   },
   footer: {
     marginTop: 20,

@@ -46,3 +46,7 @@ export function installCli(): Promise<{ success: boolean; error?: string }> {
 export function uninstallCli(): Promise<{ success: boolean; error?: string }> {
   return ShellUtilsModule.uninstallCli()
 }
+
+export function installAppUpdate(downloadUrl: string): Promise<{ success: boolean; error?: string }> {
+  return ShellUtilsModule.installAppUpdate(downloadUrl)
+}

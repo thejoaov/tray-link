@@ -370,4 +370,10 @@ export const ShellUtilsMain = {
       return { success: false, error: message }
     }
   },
+  installAppUpdate: async (): Promise<{ success: boolean; error?: string }> => {
+    return {
+      success: false,
+      error: 'In-app updates are only supported on the native macOS build',
+    }
+  },
 }

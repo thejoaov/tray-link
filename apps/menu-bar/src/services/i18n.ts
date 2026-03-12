@@ -65,6 +65,18 @@ type TranslationKey =
   | 'cliInstalled'
   | 'cliNotInstalled'
   | 'cliInstallError'
+  | 'updates'
+  | 'checkForUpdates'
+  | 'installUpdate'
+  | 'currentVersion'
+  | 'latestVersion'
+  | 'updaterUnsupported'
+  | 'updaterChecking'
+  | 'updaterUpToDate'
+  | 'updaterAvailable'
+  | 'updaterInstalling'
+  | 'updaterInstalled'
+  | 'updaterError'
 
 export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -125,6 +137,18 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     cliInstalled: 'tlink command is available in your terminal',
     cliNotInstalled: 'Install tlink to use from any terminal',
     cliInstallError: 'Failed to install CLI: {{error}}',
+    updates: 'Updates',
+    checkForUpdates: 'Check for updates',
+    installUpdate: 'Install update',
+    currentVersion: 'Current version',
+    latestVersion: 'Latest version',
+    updaterUnsupported: 'In-app updates are only available on the native macOS build.',
+    updaterChecking: 'Checking for updates…',
+    updaterUpToDate: 'Tray Link is up to date.',
+    updaterAvailable: 'Version {{version}} is available to install.',
+    updaterInstalling: 'Installing update… Tray Link will restart when ready.',
+    updaterInstalled: 'Update installed. Tray Link will restart now.',
+    updaterError: 'Update failed: {{error}}',
   },
   pt: {
     settings: 'Configurações',
@@ -184,6 +208,18 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     cliInstalled: 'O comando tlink está disponível no seu terminal',
     cliNotInstalled: 'Instale o tlink para usar em qualquer terminal',
     cliInstallError: 'Falha ao instalar CLI: {{error}}',
+    updates: 'Atualizações',
+    checkForUpdates: 'Verificar atualizações',
+    installUpdate: 'Instalar atualização',
+    currentVersion: 'Versão atual',
+    latestVersion: 'Versão mais recente',
+    updaterUnsupported: 'As atualizações no app estão disponíveis apenas no build nativo do macOS.',
+    updaterChecking: 'Verificando atualizações…',
+    updaterUpToDate: 'O Tray Link já está atualizado.',
+    updaterAvailable: 'A versão {{version}} está disponível para instalar.',
+    updaterInstalling: 'Instalando atualização… O Tray Link será reiniciado quando estiver pronto.',
+    updaterInstalled: 'Atualização instalada. O Tray Link será reiniciado agora.',
+    updaterError: 'Falha na atualização: {{error}}',
   },
   es: {
     settings: 'Configuración',
@@ -243,6 +279,18 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     cliInstalled: 'El comando tlink está disponible en tu terminal',
     cliNotInstalled: 'Instala tlink para usar desde cualquier terminal',
     cliInstallError: 'Error al instalar CLI: {{error}}',
+    updates: 'Actualizaciones',
+    checkForUpdates: 'Buscar actualizaciones',
+    installUpdate: 'Instalar actualización',
+    currentVersion: 'Versión actual',
+    latestVersion: 'Última versión',
+    updaterUnsupported: 'Las actualizaciones dentro de la app solo están disponibles en la build nativa de macOS.',
+    updaterChecking: 'Buscando actualizaciones…',
+    updaterUpToDate: 'Tray Link ya está actualizado.',
+    updaterAvailable: 'La versión {{version}} está disponible para instalar.',
+    updaterInstalling: 'Instalando actualización… Tray Link se reiniciará cuando esté listo.',
+    updaterInstalled: 'Actualización instalada. Tray Link se reiniciará ahora.',
+    updaterError: 'Error de actualización: {{error}}',
   },
 }
 

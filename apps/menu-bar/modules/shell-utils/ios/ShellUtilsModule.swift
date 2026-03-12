@@ -112,6 +112,117 @@ private func createCliWrapper() throws -> URL {
   return wrapperURL
 }
 
+private func appleScriptStringLiteral(_ value: String) -> String {
+  return "\"" + value
+    .replacingOccurrences(of: "\\", with: "\\\\")
+    .replacingOccurrences(of: "\"", with: "\\\"") + "\""
+}
+
+private func downloadFile(from url: URL, to destination: URL) throws {
+  let semaphore = DispatchSemaphore(value: 0)
+  var downloadError: Error?
+
+  let task = URLSession.shared.downloadTask(with: url) { temporaryURL, _, error in
+    defer {
+      semaphore.signal()
+    }
+
+    if let error = error {
+      downloadError = error
+      return
+    }
+
+    guard let temporaryURL = temporaryURL else {
+      downloadError = NSError(domain: "TrayLinkUpdater", code: 1, userInfo: [
+        NSLocalizedDescriptionKey: "Download finished without a file"
+      ])
+      return
+    }
+
+    do {
+      if FileManager.default.fileExists(atPath: destination.path) {
+        try FileManager.default.removeItem(at: destination)
+      }
+      try FileManager.default.moveItem(at: temporaryURL, to: destination)
+    } catch {
+      downloadError = error
+    }
+  }
+
+  task.resume()
+  semaphore.wait()
+
+  if let downloadError = downloadError {
+    throw downloadError
+  }
+}
+
+private func unzipArchive(zipURL: URL, destinationURL: URL) throws {
+  if FileManager.default.fileExists(atPath: destinationURL.path) {
+    try FileManager.default.removeItem(at: destinationURL)
+  }
+
+  try FileManager.default.createDirectory(at: destinationURL, withIntermediateDirectories: true)
+
+  let task = Process()
+  task.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+  task.arguments = ["-x", "-k", zipURL.path, destinationURL.path]
+  try task.run()
+  task.waitUntilExit()
+
+  if task.terminationStatus != 0 {
+    throw NSError(domain: "TrayLinkUpdater", code: 2, userInfo: [
+      NSLocalizedDescriptionKey: "Could not extract update archive"
+    ])
+  }
+}
+
+private func findAppBundle(in directory: URL) -> URL? {
+  if directory.pathExtension == "app" {
+    return directory
+  }
+
+  guard let enumerator = FileManager.default.enumerator(at: directory, includingPropertiesForKeys: nil) else {
+    return nil
+  }
+
+  for case let fileURL as URL in enumerator {
+    if fileURL.pathExtension == "app" {
+      return fileURL
+    }
+  }
+
+  return nil
+}
+
+private func createInstallerScript(sourceAppURL: URL, targetAppURL: URL, currentProcessId: Int32) throws -> URL {
+  let scriptURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("tray-link-update-\(UUID().uuidString).sh")
+  let script = """
+#!/bin/sh
+set -e
+while kill -0 \(currentProcessId) 2>/dev/null; do
+  sleep 1
+done
+rm -rf \(shellEscape(targetAppURL.path))
+ditto \(shellEscape(sourceAppURL.path)) \(shellEscape(targetAppURL.path))
+xattr -dr com.apple.quarantine \(shellEscape(targetAppURL.path)) >/dev/null 2>&1 || true
+open \(shellEscape(targetAppURL.path))
+"""
+
+  try script.write(to: scriptURL, atomically: true, encoding: .utf8)
+  try FileManager.default.setAttributes([.posixPermissions: NSNumber(value: Int(0o755))], ofItemAtPath: scriptURL.path)
+  return scriptURL
+}
+
+private func scheduleInstaller(scriptURL: URL) -> String? {
+  let command = "nohup /bin/sh \(shellEscape(scriptURL.path)) >/dev/null 2>&1 &"
+  let source = "do shell script \(appleScriptStringLiteral(command)) with administrator privileges"
+  let appleScript = NSAppleScript(source: source)
+  var errorDict: NSDictionary?
+  appleScript?.executeAndReturnError(&errorDict)
+  return errorDict?[NSAppleScript.errorMessage] as? String
+}
+
 public class ShellUtilsModule: Module {
   public func definition() -> ModuleDefinition {
     Name("ShellUtils")
@@ -235,6 +346,42 @@ public class ShellUtilsModule: Module {
       }
 
       return ["success": true]
+    }
+
+    AsyncFunction("installAppUpdate") { (downloadUrl: String) -> [String: Any] in
+      guard let url = URL(string: downloadUrl) else {
+        return ["success": false, "error": "Invalid download URL"]
+      }
+
+      do {
+        let tempRoot = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("tray-link-update-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: tempRoot, withIntermediateDirectories: true)
+
+        let zipURL = tempRoot.appendingPathComponent("update.zip")
+        let extractedURL = tempRoot.appendingPathComponent("extracted")
+
+        try downloadFile(from: url, to: zipURL)
+        try unzipArchive(zipURL: zipURL, destinationURL: extractedURL)
+
+        guard let appBundleURL = findAppBundle(in: extractedURL) else {
+          return ["success": false, "error": "Could not find the application bundle in the downloaded archive"]
+        }
+
+        let targetAppURL = URL(fileURLWithPath: "/Applications").appendingPathComponent(Bundle.main.bundleURL.lastPathComponent)
+        let installerScriptURL = try createInstallerScript(
+          sourceAppURL: appBundleURL,
+          targetAppURL: targetAppURL,
+          currentProcessId: getpid()
+        )
+
+        if let installError = scheduleInstaller(scriptURL: installerScriptURL) {
+          return ["success": false, "error": installError]
+        }
+
+        return ["success": true]
+      } catch {
+        return ["success": false, "error": error.localizedDescription]
+      }
     }
   }
 }

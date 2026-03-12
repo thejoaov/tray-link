@@ -14,6 +14,7 @@ type ShellUtilsModuleType = {
   isCliInstalled: () => Promise<boolean>
   installCli: () => Promise<{ success: boolean; error?: string }>
   uninstallCli: () => Promise<{ success: boolean; error?: string }>
+  installAppUpdate: (downloadUrl: string) => Promise<{ success: boolean; error?: string }>
 }
 
 let ShellUtilsModule: ShellUtilsModuleType
@@ -41,6 +42,7 @@ if (isElectron) {
       isCliInstalled: async () => false,
       installCli: async () => ({ success: false, error: 'Not available' }),
       uninstallCli: async () => ({ success: false, error: 'Not available' }),
+      installAppUpdate: async () => ({ success: false, error: 'Not available' }),
     }
   }
 }
@@ -87,4 +89,8 @@ export function installCli(): Promise<{ success: boolean; error?: string }> {
 
 export function uninstallCli(): Promise<{ success: boolean; error?: string }> {
   return ShellUtilsModule.uninstallCli()
+}
+
+export function installAppUpdate(downloadUrl: string): Promise<{ success: boolean; error?: string }> {
+  return ShellUtilsModule.installAppUpdate(downloadUrl)
 }

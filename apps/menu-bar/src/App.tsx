@@ -9,6 +9,7 @@ import Popover from './popover'
 import { ErrorBoundary, FallbackProps } from './popover/ErrorBoundary'
 import { FluentProvider } from './providers/FluentProvider'
 import { ThemeProvider } from './providers/ThemeProvider'
+import { initializeUpdater } from './services/appUpdater'
 import { installGlobalErrorLogging, logError } from './services/errorLogger'
 import { subscribeLanguageSync, syncI18nLanguageFromPreferences } from './services/i18n'
 import { initializePreferences } from './services/preferences'
@@ -36,6 +37,9 @@ function App(props: Props = { isDevWindow: false }) {
     })
     initializePreferences().catch((error) => {
       void logError('app:initializePreferences', error)
+    })
+    initializeUpdater().catch((error) => {
+      void logError('app:initializeUpdater', error)
     })
     const languageSubscription = subscribeLanguageSync()
 

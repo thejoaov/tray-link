@@ -37,3 +37,19 @@ Finally, run the following command to start the app:
 ```bash
 bun macos
 ```
+
+## Updater architecture
+
+The native macOS build is the primary target for the in-app updater.
+
+- Release metadata is resolved from `https://api.github.com/repos/thejoaov/tray-link/releases/latest`
+- The app compares the bundled version against the latest GitHub release tag
+- The updater selects the macOS `.zip` asset, downloads it, extracts the `.app`, and prepares a privileged replacement into `/Applications`
+- After the replacement is scheduled, Tray Link exits and the updated app relaunches
+
+### Important constraints
+
+- Homebrew remains the canonical update path for Homebrew-managed installs
+- The in-app updater is intended for native macOS app installs outside Homebrew ownership
+- GitHub Releases remain the source of release notes and downloadable assets
+- Because the app is not signed/notarized yet, Gatekeeper/quarantine can still affect first launch behavior after installation

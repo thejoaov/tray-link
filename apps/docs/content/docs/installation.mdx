@@ -35,12 +35,18 @@ Download the latest version for your operating system and follow the platform-sp
     brew upgrade --cask tray-link
     ```
 
+    <Callout type="info" title="How updates work with Homebrew">
+      If you installed Tray Link with Homebrew, keep using `brew upgrade --cask tray-link` as the canonical update path. The in-app updater is intended for native macOS app installs outside Homebrew ownership.
+    </Callout>
+
     ### Manual Download
 
     1. Go to the [Releases](https://github.com/thejoaov/tray-link/releases) page
     2. Download the `Tray-Link-macOS-universal.zip` file
     3. Extract and move `Tray Link.app` to your **Applications** folder
     4. Open the app from your Applications folder
+
+    After installing manually, open **Settings → Updates** in Tray Link to check for a newer release and start the in-app update flow.
 
     ### macOS Signing Disclaimer
 
@@ -98,6 +104,16 @@ This creates a symlink to the `tlink` binary so it's available in your terminal.
 You can also uninstall the CLI from the same settings section.
 
 See the [CLI documentation](./cli) for usage details.
+
+## In-App Updates on macOS
+
+The native macOS build includes an in-app updater in **Settings → Updates**.
+
+- **Check for updates** fetches the latest published GitHub release metadata
+- **Install update** downloads the latest macOS `.zip`, prepares the replacement app, and restarts Tray Link
+- **Release notes** continue to live on the [GitHub Releases](https://github.com/thejoaov/tray-link/releases) page
+
+If the automatic install cannot finish on your machine, use the latest release asset or reinstall via Homebrew.
 
 ## Building from Source
 
