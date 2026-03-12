@@ -135,8 +135,15 @@ tlink open <project> [options]
 | `-t, --terminal [slug]` | Open in terminal. Optionally pass a slug to choose a specific terminal. |
 
 <Callout type="info">
-  When neither `-e` nor `-t` is provided, the project opens in **both** the default editor and the default terminal.
+  When neither `-e` nor `-t` is provided, the project opens in **both** the effective default editor and the effective default terminal.
 </Callout>
+
+The resolution order is:
+
+1. Explicit slug passed in the command
+2. Project-specific default
+3. Global default from Settings / `tlink config set`
+4. Platform fallback
 
 **Examples:**
 
@@ -175,8 +182,9 @@ tlink config list <type> [options]
 | Option | Description |
 | --- | --- |
 | `--detected` | Only show tools that are detected/installed on your system |
+| `-p, --project <project>` | Show the effective default in the context of a specific project |
 
-The current default is marked with `*` in the output.
+The current effective default is marked with `*` in the output. When `--project` is used, the `Source` column indicates whether the selected tool comes from the project override or the global default.
 
 **Examples:**
 
@@ -186,6 +194,10 @@ tlink config list editor
 
 # List only detected/installed terminals
 tlink config list terminal --detected
+
+# Show effective defaults for a specific project
+tlink config list editor --project my-app
+tlink config list terminal --project my-app
 ```
 
 ---
@@ -209,7 +221,9 @@ tlink config set <type> [slug] [options]
 
 | Option | Description |
 | --- | --- |
-| `-i, --interactive` | Choose interactively from detected tools |
+| `-i, --interactive` | Choose interactively from available tools |
+| `-p, --project <project>` | Set the default for a specific project |
+| `--clear` | Clear the current default in the selected scope |
 
 **Examples:**
 
@@ -219,6 +233,15 @@ tlink config set editor cursor
 
 # Set default terminal interactively
 tlink config set terminal -i
+
+# Set a project-specific editor default
+tlink config set editor cursor --project my-app
+
+# Set a project-specific terminal default
+tlink config set terminal warp --project my-app
+
+# Clear a project-specific override and fall back to the global default
+tlink config set editor --project my-app --clear
 ```
 
 ---

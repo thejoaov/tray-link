@@ -35,6 +35,11 @@ Haz clic en el **menú de puntos suspensivos** (⋯) de un proyecto para ver opc
 
 - **Abrir con \<editor\>** — elige entre cualquier editor detectado o personalizado
 - **Abrir con \<terminal\>** — elige entre cualquier terminal detectada o personalizada
+- **Seleccionar predeterminados** — cambia el menú al modo de selección de predeterminados por proyecto
+
+Cuando el modo de selección está activo, elegir un editor o terminal guarda esa herramienta como predeterminada solo para ese proyecto, en lugar de abrirla inmediatamente. El override seleccionado para el proyecto se marca con `*` en el menú. Si el proyecto no tiene override, Tray Link usa los valores predeterminados globales de Configuración.
+
+Si **Mostrar iconos reales de las apps** está habilitado en Configuración, los botones rápidos de editor y terminal en la lista de proyectos usan el ícono efectivo de la herramienta para ese proyecto.
 
 {/* // TODO: Inserir print do menu de contexto */}
 
@@ -68,9 +73,13 @@ Elige entre **English**, **Português** (Portugués de Brasil) y **Español**. E
 
 Selecciona qué editor se abre cuando haces clic en el ícono del editor en un proyecto. Tray Link detecta automáticamente los editores instalados en tu sistema.
 
+Este es el fallback global usado siempre que un proyecto no define su propio editor predeterminado.
+
 ### Terminal Predeterminada
 
 Selecciona qué terminal se abre cuando haces clic en el ícono del terminal en un proyecto. Tray Link detecta automáticamente las terminales instaladas en tu sistema.
+
+Este es el fallback global usado siempre que un proyecto no define su propia terminal predeterminada.
 
 ### Eliminar Archivos del Disco por Defecto
 

@@ -135,8 +135,15 @@ tlink open <projeto> [opções]
 | `-t, --terminal [slug]` | Abrir no terminal. Opcionalmente, passe um slug para escolher um terminal específico. |
 
 <Callout type="info">
-  Quando nem `-e` nem `-t` são informados, o projeto abre tanto no editor padrão quanto no terminal padrão.
+  Quando nem `-e` nem `-t` são informados, o projeto abre tanto no editor padrão efetivo quanto no terminal padrão efetivo.
 </Callout>
+
+A ordem de resolução é:
+
+1. Slug explícito passado no comando
+2. Padrão específico do projeto
+3. Padrão global vindo de Configurações / `tlink config set`
+4. Fallback da plataforma
 
 **Exemplos:**
 
@@ -175,8 +182,9 @@ tlink config list <tipo> [opções]
 | Opção | Descrição |
 | --- | --- |
 | `--detected` | Mostrar apenas ferramentas detectadas/instaladas no sistema |
+| `-p, --project <project>` | Mostrar o padrão efetivo no contexto de um projeto específico |
 
-O padrão atual é marcado com `*` na saída.
+O padrão efetivo atual é marcado com `*` na saída. Quando `--project` é usado, a coluna `Source` indica se a ferramenta selecionada vem do override do projeto ou do padrão global.
 
 **Exemplos:**
 
@@ -186,6 +194,10 @@ tlink config list editor
 
 # Listar apenas terminais detectados/instalados
 tlink config list terminal --detected
+
+# Mostrar os padrões efetivos de um projeto específico
+tlink config list editor --project my-app
+tlink config list terminal --project my-app
 ```
 
 ---
@@ -209,7 +221,9 @@ tlink config set <tipo> [slug] [opções]
 
 | Opção | Descrição |
 | --- | --- |
-| `-i, --interactive` | Escolher interativamente entre as ferramentas detectadas |
+| `-i, --interactive` | Escolher interativamente entre as ferramentas disponíveis |
+| `-p, --project <project>` | Definir o padrão para um projeto específico |
+| `--clear` | Limpar o padrão atual no escopo selecionado |
 
 **Exemplos:**
 
@@ -219,6 +233,15 @@ tlink config set editor cursor
 
 # Definir terminal padrão interativamente
 tlink config set terminal -i
+
+# Definir um editor padrão específico para um projeto
+tlink config set editor cursor --project my-app
+
+# Definir um terminal padrão específico para um projeto
+tlink config set terminal warp --project my-app
+
+# Limpar um override específico de projeto e voltar ao padrão global
+tlink config set editor --project my-app --clear
 ```
 
 ---

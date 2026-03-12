@@ -49,6 +49,7 @@ type TranslationKey =
   | 'moreActions'
   | 'openWithEditor'
   | 'openWithTerminal'
+  | 'selectProjectDefaults'
   | 'reload'
   | 'reloadToolList'
   | 'advanced'
@@ -108,6 +109,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     moreActions: 'More actions',
     openWithEditor: 'Open with editor',
     openWithTerminal: 'Open with terminal',
+    selectProjectDefaults: 'Select defaults',
     reload: 'Reload',
     reloadToolList: 'Reload editors and terminals',
     advanced: 'Advanced',
@@ -166,6 +168,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     moreActions: 'Mais ações',
     openWithEditor: 'Abrir com editor',
     openWithTerminal: 'Abrir com terminal',
+    selectProjectDefaults: 'Selecionar padrões',
     reload: 'Recarregar',
     reloadToolList: 'Recarregar lista de editores e terminais',
     advanced: 'Avançado',
@@ -224,6 +227,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     moreActions: 'Más acciones',
     openWithEditor: 'Abrir con editor',
     openWithTerminal: 'Abrir con terminal',
+    selectProjectDefaults: 'Seleccionar predeterminados',
     reload: 'Recargar',
     reloadToolList: 'Recargar lista de editores y terminales',
     advanced: 'Avanzado',

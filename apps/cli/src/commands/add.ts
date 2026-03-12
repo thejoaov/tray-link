@@ -26,6 +26,8 @@ export default new Command('add')
       updatedAt: new Date().toISOString(),
       position: Date.now(),
       isFavorite: false,
+      defaultEditor: null,
+      defaultTerminal: null,
       source: 'cli',
     })
 

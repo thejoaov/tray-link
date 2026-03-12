@@ -15,6 +15,7 @@ import {
   getTerminalOptions,
   loadPreferences,
   subscribePreferencesChange,
+  ToolOption,
 } from '../services/preferences'
 import { projectStore } from '../services/projectStore'
 import { setPendingProjectRemove, subscribeProjectRemoveConfirm } from '../services/removeProjectDialog'
@@ -34,6 +35,7 @@ export const ProjectList = () => {
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [contextMenuProjectId, setContextMenuProjectId] = useState<string | null>(null)
+  const [toolSelectionProjectId, setToolSelectionProjectId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [preferences, setPreferences] = useState(defaultUserPreferences)
   const editorOptions = useMemo(
@@ -49,6 +51,14 @@ export const ProjectList = () => {
         preferences.showAppIcons ? option : { ...option, iconPath: null },
       ),
     [preferences.customTerminals, preferences.showAppIcons],
+  )
+  const editorOptionsByCommand = useMemo(
+    () => new Map(editorOptions.map((option) => [option.command, option])),
+    [editorOptions],
+  )
+  const terminalOptionsByCommand = useMemo(
+    () => new Map(terminalOptions.map((option) => [option.command, option])),
+    [terminalOptions],
   )
   const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery])
   const filteredProjects = useMemo(() => {
@@ -143,6 +153,8 @@ export const ProjectList = () => {
           createdAt: now,
           updatedAt: now,
           isFavorite: false,
+          defaultEditor: null,
+          defaultTerminal: null,
         }
         await projectStore.addProject(newProject)
         await loadProjects()
@@ -155,17 +167,31 @@ export const ProjectList = () => {
     }
   }
 
+  const resolveEditorCommand = (project: Project) => {
+    return project.defaultEditor ?? preferences.defaultEditor ?? editorOptions[0]?.command ?? 'code'
+  }
+
+  const resolveTerminalCommand = (project: Project) => {
+    return project.defaultTerminal ?? preferences.defaultTerminal ?? terminalOptions[0]?.command ?? 'open -a Terminal'
+  }
+
+  const resolveEditorOption = (project: Project): ToolOption | null => {
+    return editorOptionsByCommand.get(resolveEditorCommand(project)) ?? null
+  }
+
+  const resolveTerminalOption = (project: Project): ToolOption | null => {
+    return terminalOptionsByCommand.get(resolveTerminalCommand(project)) ?? null
+  }
+
   const handleOpenEditor = async (project: Project) => {
-    const fallback = editorOptions[0]?.command ?? 'code'
-    const opened = await openInEditor(project.path, preferences.defaultEditor ?? fallback)
+    const opened = await openInEditor(project.path, resolveEditorCommand(project))
     if (!opened) {
       Alert.alert(t('invalidEditor'), t('invalidValues'))
     }
   }
 
   const handleOpenTerminal = async (project: Project) => {
-    const fallback = terminalOptions[0]?.command ?? 'open -a Terminal'
-    const opened = await openInTerminal(project.path, preferences.defaultTerminal ?? fallback)
+    const opened = await openInTerminal(project.path, resolveTerminalCommand(project))
     if (!opened) {
       Alert.alert(t('invalidTerminal'), t('invalidValues'))
     }
@@ -182,6 +208,7 @@ export const ProjectList = () => {
       return
     }
     setContextMenuProjectId(null)
+    setToolSelectionProjectId(null)
   }
 
   const handleOpenWithTerminal = async (project: Project, command: string) => {
@@ -191,6 +218,41 @@ export const ProjectList = () => {
       return
     }
     setContextMenuProjectId(null)
+    setToolSelectionProjectId(null)
+  }
+
+  const handleSetProjectEditorDefault = async (project: Project, command: string) => {
+    try {
+      await projectStore.updateProject({
+        ...project,
+        defaultEditor: command,
+        updatedAt: new Date().toISOString(),
+      })
+      await loadProjects()
+      setToolSelectionProjectId(null)
+    } catch (error) {
+      await logError('project-list:handleSetProjectEditorDefault', error, {
+        projectId: project.id,
+        command,
+      })
+    }
+  }
+
+  const handleSetProjectTerminalDefault = async (project: Project, command: string) => {
+    try {
+      await projectStore.updateProject({
+        ...project,
+        defaultTerminal: command,
+        updatedAt: new Date().toISOString(),
+      })
+      await loadProjects()
+      setToolSelectionProjectId(null)
+    } catch (error) {
+      await logError('project-list:handleSetProjectTerminalDefault', error, {
+        projectId: project.id,
+        command,
+      })
+    }
   }
 
   const handleMoveProject = async (index: number, direction: 'up' | 'down') => {
@@ -217,6 +279,19 @@ export const ProjectList = () => {
       deleteFromDiskDefault: preferences.removeFromDiskByDefault,
     })
     WindowsNavigator.open('RemoveProjectWindow')
+  }
+
+  const handleToggleContextMenu = (projectId: string) => {
+    const nextContextMenuProjectId = contextMenuProjectId === projectId ? null : projectId
+    setContextMenuProjectId(nextContextMenuProjectId)
+
+    if (nextContextMenuProjectId !== projectId || toolSelectionProjectId !== projectId) {
+      setToolSelectionProjectId(null)
+    }
+  }
+
+  const handleToggleProjectToolSelectionMode = (projectId: string) => {
+    setToolSelectionProjectId((current) => (current === projectId ? null : projectId))
   }
 
   if (loading) {
@@ -287,16 +362,24 @@ export const ProjectList = () => {
             onOpenTerminal={() => handleOpenTerminal(item)}
             onOpenFinder={() => handleOpenFinder(item)}
             onRemove={() => handleRequestRemove(item)}
-            onToggleContextMenu={() => setContextMenuProjectId((value) => (value === item.id ? null : item.id))}
+            onToggleContextMenu={() => handleToggleContextMenu(item.id)}
             contextMenuOpen={contextMenuProjectId === item.id}
             editorOptions={editorOptions}
             terminalOptions={terminalOptions}
+            editorQuickActionOption={resolveEditorOption(item)}
+            terminalQuickActionOption={resolveTerminalOption(item)}
             onOpenWithEditor={(command) => handleOpenWithEditor(item, command)}
             onOpenWithTerminal={(command) => handleOpenWithTerminal(item, command)}
+            onSelectProjectEditorDefault={(command) => handleSetProjectEditorDefault(item, command)}
+            onSelectProjectTerminalDefault={(command) => handleSetProjectTerminalDefault(item, command)}
+            toolSelectionMode={toolSelectionProjectId === item.id}
+            onToggleProjectToolSelectionMode={() => handleToggleProjectToolSelectionMode(item.id)}
             labels={{
               moreActions: t('moreActions'),
               openWithEditor: t('openWithEditor'),
               openWithTerminal: t('openWithTerminal'),
+              selectProjectDefaults: t('selectProjectDefaults'),
+              done: t('done'),
             }}
             editMode={editMode}
             onMoveUp={() => handleMoveFilteredProject(item.id, 'up')}

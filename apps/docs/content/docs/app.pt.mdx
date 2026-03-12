@@ -35,6 +35,11 @@ Clique no **menu de reticências** (⋯) em um projeto para ver opções adicion
 
 - **Abrir com \<editor\>** — escolha entre qualquer editor detectado ou personalizado
 - **Abrir com \<terminal\>** — escolha entre qualquer terminal detectado ou personalizado
+- **Selecionar padrões** — alterna o menu para o modo de seleção de padrão por projeto
+
+Quando o modo de seleção está ativo, escolher um editor ou terminal salva essa ferramenta como padrão apenas daquele projeto, em vez de abri-la imediatamente. O override selecionado para o projeto é marcado com `*` no menu. Se o projeto não tiver override, o Tray Link usa os padrões globais definidos em Configurações.
+
+Se **Mostrar ícones reais dos apps** estiver habilitado nas Configurações, os botões rápidos de editor e terminal na lista de projetos usam o ícone efetivo da ferramenta daquele projeto.
 
 {/* // TODO: Inserir print do menu de contexto */}
 
@@ -68,9 +73,13 @@ Escolha entre **English**, **Português** (Português do Brasil) e **Español** 
 
 Selecione qual editor abre quando você clica no ícone do editor em um projeto. O Tray Link detecta automaticamente os editores instalados no seu sistema.
 
+Esse é o fallback global usado sempre que um projeto não define seu próprio editor padrão.
+
 ### Terminal Padrão
 
 Selecione qual terminal abre quando você clica no ícone do terminal em um projeto. O Tray Link detecta automaticamente os terminais instalados no seu sistema.
+
+Esse é o fallback global usado sempre que um projeto não define seu próprio terminal padrão.
 
 ### Excluir Arquivos do Disco por Padrão
 

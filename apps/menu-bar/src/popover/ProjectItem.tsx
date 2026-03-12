@@ -6,6 +6,13 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { AppIcon } from '../components'
 import { Text } from '../components/Text'
 
+type ToolOption = {
+  label: string
+  command: string
+  iconName?: 'code-slash-outline' | 'terminal-outline'
+  iconPath?: string | null
+}
+
 type Props = {
   index: number
   project: Project
@@ -15,24 +22,22 @@ type Props = {
   onRemove: () => void
   onToggleContextMenu: () => void
   contextMenuOpen?: boolean
-  editorOptions: Array<{
-    label: string
-    command: string
-    iconName?: 'code-slash-outline' | 'terminal-outline'
-    iconPath?: string | null
-  }>
-  terminalOptions: Array<{
-    label: string
-    command: string
-    iconName?: 'code-slash-outline' | 'terminal-outline'
-    iconPath?: string | null
-  }>
+  editorOptions: ToolOption[]
+  terminalOptions: ToolOption[]
+  editorQuickActionOption?: ToolOption | null
+  terminalQuickActionOption?: ToolOption | null
   onOpenWithEditor: (command: string) => void
   onOpenWithTerminal: (command: string) => void
+  onSelectProjectEditorDefault: (command: string) => void
+  onSelectProjectTerminalDefault: (command: string) => void
+  toolSelectionMode?: boolean
+  onToggleProjectToolSelectionMode: () => void
   labels: {
     moreActions: string
     openWithEditor: string
     openWithTerminal: string
+    selectProjectDefaults: string
+    done: string
   }
   editMode?: boolean
   onMoveUp?: () => void
@@ -52,8 +57,14 @@ export const ProjectItem = ({
   contextMenuOpen = false,
   editorOptions,
   terminalOptions,
+  editorQuickActionOption,
+  terminalQuickActionOption,
   onOpenWithEditor,
   onOpenWithTerminal,
+  onSelectProjectEditorDefault,
+  onSelectProjectTerminalDefault,
+  toolSelectionMode = false,
+  onToggleProjectToolSelectionMode,
   labels,
   editMode = false,
   onMoveUp,
@@ -61,6 +72,23 @@ export const ProjectItem = ({
   canMoveUp,
   canMoveDown,
 }: Props) => {
+  const renderQuickActionIcon = (
+    option: ToolOption | null | undefined,
+    fallbackName: 'code-slash-outline' | 'terminal-outline',
+  ) => {
+    return (
+      <AppIcon
+        uri={option?.iconPath ?? ''}
+        style={styles.quickActionIconImage}
+        fallback={<Ionicons name={option?.iconName ?? fallbackName} size={14} color="var(--text-color)" />}
+      />
+    )
+  }
+
+  const renderOptionLabel = (label: string, selected: boolean) => {
+    return selected ? `${label} *` : label
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.info}>
@@ -85,10 +113,10 @@ export const ProjectItem = ({
       </View>
       <View style={styles.actions}>
         <TouchableOpacity accessibilityLabel="Open in editor" style={styles.button} onPress={onOpenEditor}>
-          <Ionicons name="code-slash-outline" size={14} color="var(--text-color)" />
+          {renderQuickActionIcon(editorQuickActionOption, 'code-slash-outline')}
         </TouchableOpacity>
         <TouchableOpacity accessibilityLabel="Open in terminal" style={styles.button} onPress={onOpenTerminal}>
-          <Ionicons name="terminal-outline" size={14} color="var(--text-color)" />
+          {renderQuickActionIcon(terminalQuickActionOption, 'terminal-outline')}
         </TouchableOpacity>
         <TouchableOpacity accessibilityLabel="Open in finder" style={styles.button} onPress={onOpenFinder}>
           <Ionicons name="folder-open-outline" size={14} color="var(--text-color)" />
@@ -123,13 +151,24 @@ export const ProjectItem = ({
 
       {contextMenuOpen ? (
         <View style={styles.contextMenu}>
+          <View style={styles.contextMenuHeader}>
+            <Text style={styles.contextMenuHeaderText}>{labels.moreActions}</Text>
+            <TouchableOpacity style={styles.contextModeButton} onPress={onToggleProjectToolSelectionMode}>
+              <Text style={styles.contextModeButtonText}>
+                {toolSelectionMode ? labels.done : labels.selectProjectDefaults}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.contextTitle}>{labels.openWithEditor}</Text>
           <View style={styles.contextActions}>
             {editorOptions.map((option) => (
               <TouchableOpacity
                 key={option.command}
                 style={styles.contextActionButton}
-                onPress={() => onOpenWithEditor(option.command)}
+                onPress={() =>
+                  toolSelectionMode ? onSelectProjectEditorDefault(option.command) : onOpenWithEditor(option.command)
+                }
               >
                 <AppIcon
                   uri={option.iconPath ?? ''}
@@ -138,7 +177,9 @@ export const ProjectItem = ({
                     <Ionicons name={option.iconName ?? 'code-slash-outline'} size={12} color="var(--text-color)" />
                   }
                 />
-                <Text style={styles.contextActionText}>{option.label}</Text>
+                <Text style={styles.contextActionText}>
+                  {renderOptionLabel(option.label, option.command === project.defaultEditor)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -149,7 +190,11 @@ export const ProjectItem = ({
               <TouchableOpacity
                 key={option.command}
                 style={styles.contextActionButton}
-                onPress={() => onOpenWithTerminal(option.command)}
+                onPress={() =>
+                  toolSelectionMode
+                    ? onSelectProjectTerminalDefault(option.command)
+                    : onOpenWithTerminal(option.command)
+                }
               >
                 <AppIcon
                   uri={option.iconPath ?? ''}
@@ -158,7 +203,9 @@ export const ProjectItem = ({
                     <Ionicons name={option.iconName ?? 'terminal-outline'} size={12} color="var(--text-color)" />
                   }
                 />
-                <Text style={styles.contextActionText}>{option.label}</Text>
+                <Text style={styles.contextActionText}>
+                  {renderOptionLabel(option.label, option.command === project.defaultTerminal)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -212,6 +259,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickActionIconImage: {
+    width: 14,
+    height: 14,
+    borderRadius: 4,
   },
   contextMenu: {
     marginTop: 10,
@@ -219,6 +273,29 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: 'rgba(255,255,255,0.08)',
     gap: 6,
+  },
+  contextMenuHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  contextMenuHeaderText: {
+    fontSize: 11,
+    fontWeight: '700',
+    opacity: 0.75,
+    color: 'var(--text-color)',
+  },
+  contextModeButton: {
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  contextModeButtonText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: 'var(--text-color)',
   },
   contextTitle: {
     fontSize: 11,

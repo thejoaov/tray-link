@@ -35,6 +35,11 @@ Click the **ellipsis menu** (⋯) on a project to see additional options:
 
 - **Open with \<editor\>** — choose from any detected or custom editor
 - **Open with \<terminal\>** — choose from any detected or custom terminal
+- **Select defaults** — switch the menu into project-default selection mode
+
+When selection mode is active, choosing an editor or terminal saves it as the default for that specific project instead of opening it immediately. The selected project override is marked with `*` in the menu. If a project has no override, Tray Link falls back to the global defaults from Settings.
+
+If **Show real app icons** is enabled in Settings, the quick editor and terminal buttons in the project list use the effective tool icon for that project.
 
 {/* // TODO: Inserir print do menu de contexto */}
 
@@ -68,9 +73,13 @@ Choose between **English**, **Português** (Brazilian Portuguese), and **Españo
 
 Select which editor opens when you click the editor icon on a project. Tray Link auto-detects installed editors on your system.
 
+This is the global fallback used whenever a project does not define its own default editor.
+
 ### Default Terminal
 
 Select which terminal opens when you click the terminal icon on a project. Tray Link auto-detects installed terminals on your system.
+
+This is the global fallback used whenever a project does not define its own default terminal.
 
 ### Delete Files from Disk by Default
 

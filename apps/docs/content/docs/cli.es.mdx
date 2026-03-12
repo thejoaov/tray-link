@@ -135,8 +135,15 @@ tlink open <proyecto> [opciones]
 | `-t, --terminal [slug]` | Abrir en la terminal. Opcionalmente, pasa un slug para elegir una terminal específica. |
 
 <Callout type="info">
-  Cuando no se proporcionan ni `-e` ni `-t`, el proyecto se abre tanto en el editor predeterminado como en la terminal predeterminada.
+  Cuando no se proporcionan ni `-e` ni `-t`, el proyecto se abre tanto en el editor predeterminado efectivo como en la terminal predeterminada efectiva.
 </Callout>
+
+El orden de resolución es:
+
+1. Slug explícito pasado en el comando
+2. Predeterminado específico del proyecto
+3. Predeterminado global desde Configuración / `tlink config set`
+4. Fallback de la plataforma
 
 **Ejemplos:**
 
@@ -175,8 +182,9 @@ tlink config list <tipo> [opciones]
 | Opción | Descripción |
 | --- | --- |
 | `--detected` | Mostrar solo herramientas detectadas/instaladas en el sistema |
+| `-p, --project <project>` | Mostrar el predeterminado efectivo en el contexto de un proyecto específico |
 
-El valor predeterminado actual está marcado con `*` en la salida.
+El predeterminado efectivo actual se marca con `*` en la salida. Cuando se usa `--project`, la columna `Source` indica si la herramienta seleccionada proviene del override del proyecto o del predeterminado global.
 
 **Ejemplos:**
 
@@ -186,6 +194,10 @@ tlink config list editor
 
 # Listar solo terminales detectadas/instaladas
 tlink config list terminal --detected
+
+# Mostrar los predeterminados efectivos de un proyecto específico
+tlink config list editor --project my-app
+tlink config list terminal --project my-app
 ```
 
 ---
@@ -209,7 +221,9 @@ tlink config set <tipo> [slug] [opciones]
 
 | Opción | Descripción |
 | --- | --- |
-| `-i, --interactive` | Elegir interactivamente entre las herramientas detectadas |
+| `-i, --interactive` | Elegir interactivamente entre las herramientas disponibles |
+| `-p, --project <project>` | Establecer el predeterminado para un proyecto específico |
+| `--clear` | Limpiar el predeterminado actual en el alcance seleccionado |
 
 **Ejemplos:**
 
@@ -219,6 +233,15 @@ tlink config set editor cursor
 
 # Establecer la terminal predeterminada interactivamente
 tlink config set terminal -i
+
+# Establecer un editor predeterminado específico para un proyecto
+tlink config set editor cursor --project my-app
+
+# Establecer una terminal predeterminada específica para un proyecto
+tlink config set terminal warp --project my-app
+
+# Limpiar un override específico del proyecto y volver al predeterminado global
+tlink config set editor --project my-app --clear
 ```
 
 ---

@@ -1,15 +1,26 @@
+import { CustomTool } from '@tray-link/common-types'
 import { editorList, generateSlug, terminalList } from '@tray-link/tray-shared'
 import { Command } from 'commander'
 import { openInEditor, openInTerminal } from '../shell'
 import { preferencesStore, projectStore } from '../storage'
 
-/** Returns a command string for the given slug (or null if not found). */
-function commandFromSlug(list: typeof editorList, slug: string): string | null {
+function commandFromSlug(
+  list: Array<{ name: string; command: string | null }>,
+  slug: string,
+  customTools: CustomTool[] = [],
+): string | null {
   for (const item of list) {
     if (item.command && generateSlug(item.name) === slug) {
       return item.command
     }
   }
+
+  for (const item of customTools) {
+    if (generateSlug(item.name) === slug) {
+      return item.command
+    }
+  }
+
   return null
 }
 
@@ -22,7 +33,6 @@ export default new Command('open')
     'Open in terminal. Optionally specify a slug (e.g. iterm). Omit slug to use default.',
   )
   .action(async (projectArg: string, options: { editor?: boolean | string; terminal?: boolean | string }) => {
-    // ── Resolve project ────────────────────────────────────────────────────
     const projects = await projectStore.getProjects()
     const project =
       projects.find((p) => p.id === projectArg) ||
@@ -35,31 +45,25 @@ export default new Command('open')
     }
 
     const prefs = preferencesStore.getPreferences()
-
-    // ── Determine what to open ─────────────────────────────────────────────
-    // When neither -e nor -t is passed, open both.
     const openEditorFlag = options.editor !== undefined
     const openTerminalFlag = options.terminal !== undefined
     const openBoth = !openEditorFlag && !openTerminalFlag
 
-    let editorErrors: string[] = []
-    let terminalErrors: string[] = []
+    const editorErrors: string[] = []
+    const terminalErrors: string[] = []
 
-    // ── Open in editor ─────────────────────────────────────────────────────
     if (openBoth || openEditorFlag) {
       let editorCommand: string | null = null
 
       if (typeof options.editor === 'string') {
-        // Specific editor requested by slug
-        editorCommand = commandFromSlug(editorList, options.editor)
+        editorCommand = commandFromSlug(editorList, options.editor, prefs.customEditors)
         if (!editorCommand) {
           console.error(`Error: no editor found with slug "${options.editor}"`)
           console.error('Run "tlink config list editor" to see available slugs.')
           process.exit(1)
         }
       } else {
-        // Use default from preferences
-        editorCommand = prefs.defaultEditor ?? 'code'
+        editorCommand = project.defaultEditor ?? prefs.defaultEditor ?? 'code'
       }
 
       try {
@@ -70,21 +74,19 @@ export default new Command('open')
       }
     }
 
-    // ── Open in terminal ───────────────────────────────────────────────────
     if (openBoth || openTerminalFlag) {
       let terminalCommand: string | null = null
 
       if (typeof options.terminal === 'string') {
-        // Specific terminal requested by slug
-        terminalCommand = commandFromSlug(terminalList, options.terminal)
+        terminalCommand = commandFromSlug(terminalList, options.terminal, prefs.customTerminals)
         if (!terminalCommand) {
           console.error(`Error: no terminal found with slug "${options.terminal}"`)
           console.error('Run "tlink config list terminal" to see available slugs.')
           process.exit(1)
         }
       } else {
-        // Use default from preferences
         terminalCommand =
+          project.defaultTerminal ??
           prefs.defaultTerminal ??
           (process.platform === 'darwin'
             ? 'open -a Terminal'
@@ -101,10 +103,9 @@ export default new Command('open')
       }
     }
 
-    // ── Report errors ──────────────────────────────────────────────────────
     if (editorErrors.length || terminalErrors.length) {
-      for (const e of [...editorErrors, ...terminalErrors]) {
-        console.error(e)
+      for (const error of [...editorErrors, ...terminalErrors]) {
+        console.error(error)
       }
       process.exit(1)
     }
