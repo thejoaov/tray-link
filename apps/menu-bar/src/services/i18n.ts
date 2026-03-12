@@ -21,8 +21,12 @@ type TranslationKey =
   | 'projects'
   | 'reorder'
   | 'done'
+  | 'searchProjects'
+  | 'clearSearch'
   | 'noProjectsYet'
+  | 'noProjectsFound'
   | 'clickToAddProject'
+  | 'adjustSearchOrAddProject'
   | 'removeProjectTitle'
   | 'deleteFilesFromDisk'
   | 'cancel'
@@ -76,8 +80,12 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     projects: 'Projects',
     reorder: 'Reorder',
     done: 'Done',
+    searchProjects: 'Search projects',
+    clearSearch: 'Clear search',
     noProjectsYet: 'No projects added yet.',
+    noProjectsFound: 'No projects found.',
     clickToAddProject: 'Click + to add a new project.',
+    adjustSearchOrAddProject: 'Try another search or add a new project.',
     removeProjectTitle: 'Remove project?',
     deleteFilesFromDisk: 'Delete files from disk',
     cancel: 'Cancel',
@@ -130,8 +138,12 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     projects: 'Projetos',
     reorder: 'Reordenar',
     done: 'Concluir',
+    searchProjects: 'Buscar projetos',
+    clearSearch: 'Limpar busca',
     noProjectsYet: 'Nenhum projeto adicionado ainda.',
+    noProjectsFound: 'Nenhum projeto encontrado.',
     clickToAddProject: 'Clique em + para adicionar um projeto.',
+    adjustSearchOrAddProject: 'Tente outra busca ou adicione um novo projeto.',
     removeProjectTitle: 'Remover projeto?',
     deleteFilesFromDisk: 'Excluir arquivos do disco',
     cancel: 'Cancelar',
@@ -184,8 +196,12 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     projects: 'Proyectos',
     reorder: 'Reordenar',
     done: 'Listo',
+    searchProjects: 'Buscar proyectos',
+    clearSearch: 'Limpiar búsqueda',
     noProjectsYet: 'Aún no hay proyectos agregados.',
+    noProjectsFound: 'No se encontraron proyectos.',
     clickToAddProject: 'Haz clic en + para agregar un proyecto.',
+    adjustSearchOrAddProject: 'Prueba otra búsqueda o agrega un nuevo proyecto.',
     removeProjectTitle: '¿Eliminar proyecto?',
     deleteFilesFromDisk: 'Eliminar archivos del disco',
     cancel: 'Cancelar',

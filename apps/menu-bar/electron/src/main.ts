@@ -10,6 +10,8 @@ import TrayGenerator from './TrayGenerator'
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string
 declare const MAIN_WINDOW_VITE_NAME: string
 
+const ELECTRON_WEB_DEV_SERVER_URL = 'http://localhost:8081'
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (process.platform === 'win32' && started) {
   app.quit()
@@ -59,7 +61,7 @@ const createMainWindow = () => {
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
+    mainWindow.loadURL(ELECTRON_WEB_DEV_SERVER_URL)
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`))
   }

@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { pickFolder } from '../../modules/file-picker'
 import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
@@ -24,12 +24,17 @@ import Footer from './Footer'
 import { ProjectItem } from './ProjectItem'
 import SectionHeader from './SectionHeader'
 
+const PROJECT_SEARCH_HEIGHT = 34
+const PROJECT_SEARCH_GAP = 12
+const FILTERED_PROJECT_LIST_HEIGHT = Math.max(PROJECT_LIST_HEIGHT - PROJECT_SEARCH_HEIGHT - PROJECT_SEARCH_GAP, 120)
+
 export const ProjectList = () => {
   const { t } = useTranslation()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [contextMenuProjectId, setContextMenuProjectId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [preferences, setPreferences] = useState(defaultUserPreferences)
   const editorOptions = useMemo(
     () =>
@@ -45,6 +50,17 @@ export const ProjectList = () => {
       ),
     [preferences.customTerminals, preferences.showAppIcons],
   )
+  const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery])
+  const filteredProjects = useMemo(() => {
+    if (!normalizedSearchQuery) {
+      return projects
+    }
+
+    return projects.filter((project) => {
+      const searchableText = `${project.name} ${project.path}`.toLocaleLowerCase()
+      return searchableText.includes(normalizedSearchQuery)
+    })
+  }, [normalizedSearchQuery, projects])
 
   useEffect(() => {
     loadProjects()
@@ -187,6 +203,12 @@ export const ProjectList = () => {
     setProjects(reordered.map((project, position) => ({ ...project, position })))
   }
 
+  const handleMoveFilteredProject = async (projectId: string, direction: 'up' | 'down') => {
+    const index = projects.findIndex((project) => project.id === projectId)
+    if (index < 0) return
+    await handleMoveProject(index, direction)
+  }
+
   const handleRequestRemove = (project: Project) => {
     setPendingProjectRemove({
       id: project.id,
@@ -224,14 +246,37 @@ export const ProjectList = () => {
           </View>
         }
       />
+      <View style={styles.searchContainer}>
+        <Ionicons name="search-outline" size={14} color="var(--text-color)" />
+        <TextInput
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder={t('searchProjects')}
+          placeholderTextColor="#8E8E93"
+          style={styles.searchInput}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {searchQuery ? (
+          <TouchableOpacity
+            accessibilityLabel={t('clearSearch')}
+            onPress={() => setSearchQuery('')}
+            style={styles.clearSearchButton}
+          >
+            <Ionicons name="close-circle" size={16} color="var(--text-color)" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
       <FlatList
-        data={projects}
+        data={filteredProjects}
         keyExtractor={(item) => item.id}
-        style={{ height: PROJECT_LIST_HEIGHT }}
+        style={{ height: FILTERED_PROJECT_LIST_HEIGHT }}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>{t('noProjectsYet')}</Text>
-            <Text style={styles.emptySubtext}>{t('clickToAddProject')}</Text>
+            <Text style={styles.emptyText}>{normalizedSearchQuery ? t('noProjectsFound') : t('noProjectsYet')}</Text>
+            <Text style={styles.emptySubtext}>
+              {normalizedSearchQuery ? t('adjustSearchOrAddProject') : t('clickToAddProject')}
+            </Text>
           </View>
         }
         renderItem={({ item, index }) => (
@@ -254,10 +299,10 @@ export const ProjectList = () => {
               openWithTerminal: t('openWithTerminal'),
             }}
             editMode={editMode}
-            onMoveUp={() => handleMoveProject(index, 'up')}
-            onMoveDown={() => handleMoveProject(index, 'down')}
-            canMoveUp={index > 0}
-            canMoveDown={index < projects.length - 1}
+            onMoveUp={() => handleMoveFilteredProject(item.id, 'up')}
+            onMoveDown={() => handleMoveFilteredProject(item.id, 'down')}
+            canMoveUp={projects.findIndex((project) => project.id === item.id) > 0}
+            canMoveDown={projects.findIndex((project) => project.id === item.id) < projects.length - 1}
           />
         )}
       />
@@ -280,6 +325,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  searchContainer: {
+    marginHorizontal: 16,
+    marginBottom: PROJECT_SEARCH_GAP,
+    height: PROJECT_SEARCH_HEIGHT,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  searchInput: {
+    flex: 1,
+    height: '100%',
+    fontSize: 13,
+    color: 'var(--text-color)',
+    paddingVertical: 0,
+    alignContent: 'center',
+    borderColor: 'none',
+    borderWidth: 0,
+  },
+  clearSearchButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   metaButtonText: {
     fontSize: 10,
