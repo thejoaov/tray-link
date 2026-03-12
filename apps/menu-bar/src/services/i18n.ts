@@ -74,6 +74,7 @@ type TranslationKey =
   | 'installUpdate'
   | 'currentVersion'
   | 'latestVersion'
+  | 'viewReleaseNotes'
   | 'updaterUnsupported'
   | 'updaterChecking'
   | 'updaterUpToDate'
@@ -150,7 +151,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     installUpdate: 'Install update',
     currentVersion: 'Current version',
     latestVersion: 'Latest version',
-    updaterUnsupported: 'In-app updates are only available on the native macOS build.',
+    viewReleaseNotes: 'View release',
+    updaterUnsupported: 'In-app updates are only available on macOS.',
     updaterChecking: 'Checking for updates…',
     updaterUpToDate: 'Tray Link is up to date.',
     updaterAvailable: 'Version {{version}} is available to install.',
@@ -225,7 +227,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     installUpdate: 'Instalar atualização',
     currentVersion: 'Versão atual',
     latestVersion: 'Versão mais recente',
-    updaterUnsupported: 'As atualizações no app estão disponíveis apenas no build nativo do macOS.',
+    viewReleaseNotes: 'Ver release',
+    updaterUnsupported: 'As atualizações no app estão disponíveis apenas no macOS.',
     updaterChecking: 'Verificando atualizações…',
     updaterUpToDate: 'O Tray Link já está atualizado.',
     updaterAvailable: 'A versão {{version}} está disponível para instalar.',
@@ -300,7 +303,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     installUpdate: 'Instalar actualización',
     currentVersion: 'Versión actual',
     latestVersion: 'Última versión',
-    updaterUnsupported: 'Las actualizaciones dentro de la app solo están disponibles en la build nativa de macOS.',
+    viewReleaseNotes: 'Ver release',
+    updaterUnsupported: 'Las actualizaciones dentro de la app solo están disponibles en macOS.',
     updaterChecking: 'Buscando actualizaciones…',
     updaterUpToDate: 'Tray Link ya está actualizado.',
     updaterAvailable: 'La versión {{version}} está disponible para instalar.',

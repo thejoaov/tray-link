@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/suspicious/noControlCharactersInRegex: false positive */
 import { EmitterSubscription, Platform } from 'react-native'
 import { installAppUpdate } from '../../modules/shell-utils/src'
 import { getItem, setItem } from '../../modules/storage-module/src'
@@ -7,6 +6,9 @@ import MenuBarModule from '../modules/MenuBarModule'
 const RELEASES_API_URL = 'https://api.github.com/repos/thejoaov/tray-link/releases/latest'
 const UPDATE_STATE_STORAGE_KEY = 'app-updater-state'
 const AUTO_CHECK_DELAY_MS = 4000
+const isElectron = Platform.OS === 'web'
+const isMacOS =
+  Platform.OS === 'macos' || (isElectron && typeof navigator !== 'undefined' && /mac/i.test(navigator.userAgent))
 
 type ReleaseAsset = {
   name: string
@@ -14,7 +16,6 @@ type ReleaseAsset = {
 }
 
 type GitHubRelease = {
-  body?: string | null
   html_url?: string
   name?: string | null
   published_at?: string | null
@@ -31,34 +32,15 @@ export type AppUpdaterState = {
   isSupported: boolean
   lastCheckedAt: string | null
   latestVersion: string | null
-  releaseNotes: string | null
   releasePageUrl: string | null
   status: AppUpdaterStatus
 }
 
-type PersistedUpdaterState = Pick<
-  AppUpdaterState,
-  'lastCheckedAt' | 'latestVersion' | 'releaseNotes' | 'releasePageUrl'
->
+type PersistedUpdaterState = Pick<AppUpdaterState, 'lastCheckedAt' | 'latestVersion' | 'releasePageUrl'>
 
 type Listener = (state: AppUpdaterState) => void
 
 const listeners = new Set<Listener>()
-
-function sanitizePersistedText(value: string | null | undefined): string | null {
-  if (typeof value !== 'string') {
-    return null
-  }
-
-  const sanitized = value
-    .replace(/\u0000/g, '')
-    .replace(/[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
-    .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/g, '\uFFFD')
-    .replace(/(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '\uFFFD')
-    .trim()
-
-  return sanitized.length > 0 ? sanitized : null
-}
 
 let initializePromise: Promise<void> | null = null
 let checkPromise: Promise<AppUpdaterState> | null = null
@@ -68,10 +50,9 @@ let state: AppUpdaterState = {
   currentVersion: normalizeVersion(MenuBarModule.appVersion || '0.0.0'),
   downloadUrl: null,
   error: null,
-  isSupported: Platform.OS === 'macos',
+  isSupported: isMacOS,
   lastCheckedAt: null,
   latestVersion: null,
-  releaseNotes: null,
   releasePageUrl: null,
   status: 'idle',
 }
@@ -87,26 +68,14 @@ function setState(next: Partial<AppUpdaterState>) {
 
 function toPersistedState(value: AppUpdaterState): PersistedUpdaterState {
   return {
-    lastCheckedAt: sanitizePersistedText(value.lastCheckedAt),
-    latestVersion: sanitizePersistedText(value.latestVersion),
-    releaseNotes: sanitizePersistedText(value.releaseNotes),
-    releasePageUrl: sanitizePersistedText(value.releasePageUrl),
+    lastCheckedAt: value.lastCheckedAt,
+    latestVersion: value.latestVersion,
+    releasePageUrl: value.releasePageUrl,
   }
 }
 
 function serializePersistedState(value: AppUpdaterState): string {
-  const persisted = toPersistedState(value)
-
-  try {
-    const serialized = JSON.stringify(persisted)
-    JSON.parse(serialized)
-    return serialized
-  } catch {
-    return JSON.stringify({
-      ...persisted,
-      releaseNotes: null,
-    } satisfies PersistedUpdaterState)
-  }
+  return JSON.stringify(toPersistedState(value))
 }
 
 async function persistState() {
@@ -124,14 +93,12 @@ async function hydrateState() {
     setState({
       lastCheckedAt: typeof persisted.lastCheckedAt === 'string' ? persisted.lastCheckedAt : null,
       latestVersion: typeof persisted.latestVersion === 'string' ? persisted.latestVersion : null,
-      releaseNotes: typeof persisted.releaseNotes === 'string' ? persisted.releaseNotes : null,
       releasePageUrl: typeof persisted.releasePageUrl === 'string' ? persisted.releasePageUrl : null,
     })
   } catch {
     setState({
       lastCheckedAt: null,
       latestVersion: null,
-      releaseNotes: null,
       releasePageUrl: null,
     })
   }
@@ -170,6 +137,25 @@ function compareVersions(left: string, right: string): number {
 }
 
 function getReleaseAsset(assets: ReleaseAsset[] = []): ReleaseAsset | null {
+  if (isElectron) {
+    return (
+      assets.find(
+        (asset) =>
+          /tray[-_. ]?link/i.test(asset.name) &&
+          /darwin/i.test(asset.name) &&
+          /\.zip$/i.test(asset.name) &&
+          !/tray[-_. ]?link[-_. ]?macos[-_. ]?universal/i.test(asset.name),
+      ) ??
+      assets.find(
+        (asset) =>
+          /darwin/i.test(asset.name) &&
+          /\.zip$/i.test(asset.name) &&
+          !/tray[-_. ]?link[-_. ]?macos[-_. ]?universal/i.test(asset.name),
+      ) ??
+      null
+    )
+  }
+
   return (
     assets.find(
       (asset) => /tray[-_. ]?link[-_. ]?macos[-_. ]?universal/i.test(asset.name) && /\.zip$/i.test(asset.name),
@@ -232,7 +218,7 @@ export async function initializeUpdater(): Promise<void> {
   initializePromise = (async () => {
     setState({
       currentVersion: normalizeVersion(MenuBarModule.appVersion || state.currentVersion),
-      isSupported: Platform.OS === 'macos',
+      isSupported: isMacOS,
     })
 
     await hydrateState()
@@ -283,7 +269,6 @@ export async function checkForUpdates(options: { silent?: boolean } = {}): Promi
         error: null,
         lastCheckedAt: new Date().toISOString(),
         latestVersion,
-        releaseNotes: release.body?.trim() || null,
         releasePageUrl: release.html_url ?? null,
         status: isAvailable ? 'available' : 'upToDate',
       })
@@ -305,7 +290,7 @@ export async function checkForUpdates(options: { silent?: boolean } = {}): Promi
 
 export async function installLatestUpdate(): Promise<AppUpdaterState> {
   if (!state.isSupported) {
-    setState({ error: 'In-app updates are only available on the native macOS build', status: 'error' })
+    setState({ error: 'In-app updates are only available on macOS', status: 'error' })
     return state
   }
 

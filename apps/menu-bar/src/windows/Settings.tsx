@@ -380,6 +380,15 @@ export const Settings = () => {
             <Text style={styles.itemLabel}>{t('latestVersion')}</Text>
             <Text style={styles.itemDescription}>{updaterState.latestVersion ?? '—'}</Text>
           </View>
+          <TouchableOpacity
+            accessibilityLabel={t('viewReleaseNotes')}
+            disabled={!updaterState.releasePageUrl}
+            onPress={() => Linking.openURL(updaterState.releasePageUrl ?? RELEASES_URL)}
+            style={[styles.button, !updaterState.releasePageUrl && styles.buttonDisabled]}
+          >
+            <Ionicons name="open-outline" size={14} color="var(--text-color)" />
+            <Text style={styles.buttonText}>{t('viewReleaseNotes')}</Text>
+          </TouchableOpacity>
         </Row>
 
         <Divider />

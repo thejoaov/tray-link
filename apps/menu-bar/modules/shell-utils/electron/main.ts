@@ -160,6 +160,56 @@ async function getMacOSBundleIconDataUrl(appPath: string): Promise<string | null
   return null
 }
 
+async function downloadFile(downloadUrl: string, destinationPath: string): Promise<void> {
+  await execAsync(`curl -L "${downloadUrl.replace(/"/g, '\\"')}" -o "${destinationPath.replace(/"/g, '\\"')}"`)
+}
+
+async function unzipArchive(zipPath: string, destinationPath: string): Promise<void> {
+  fs.mkdirSync(destinationPath, { recursive: true })
+  await execAsync(`ditto -x -k "${zipPath.replace(/"/g, '\\"')}" "${destinationPath.replace(/"/g, '\\"')}"`)
+}
+
+function findAppBundle(rootPath: string): string | null {
+  const entries = fs.readdirSync(rootPath, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const entryPath = path.join(rootPath, entry.name)
+
+    if (entry.isDirectory() && entry.name.endsWith('.app')) {
+      return entryPath
+    }
+
+    if (entry.isDirectory()) {
+      const nested = findAppBundle(entryPath)
+      if (nested) {
+        return nested
+      }
+    }
+  }
+
+  return null
+}
+
+function getCurrentAppBundlePath(): string {
+  return path.resolve(path.dirname(app.getPath('exe')), '../..')
+}
+
+function createInstallerScript(sourceAppPath: string, targetAppPath: string, currentProcessId: number): string {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'tray-link-electron-update-script-'))
+  const scriptPath = path.join(tempRoot, 'install-update.sh')
+  const script = `#!/bin/sh
+while kill -0 ${currentProcessId} 2>/dev/null; do
+  sleep 1
+done
+rm -rf "${targetAppPath.replace(/"/g, '\\"')}"
+ditto "${sourceAppPath.replace(/"/g, '\\"')}" "${targetAppPath.replace(/"/g, '\\"')}"
+open "${targetAppPath.replace(/"/g, '\\"')}"
+`
+
+  fs.writeFileSync(scriptPath, script, { mode: 0o755, encoding: 'utf8' })
+  return scriptPath
+}
+
 export const ShellUtilsMain = {
   openInEditor: async (path: string, editorCommand: string) => {
     try {
@@ -370,10 +420,35 @@ export const ShellUtilsMain = {
       return { success: false, error: message }
     }
   },
-  installAppUpdate: async (): Promise<{ success: boolean; error?: string }> => {
-    return {
-      success: false,
-      error: 'In-app updates are only supported on the native macOS build',
+  installAppUpdate: async (downloadUrl: string): Promise<{ success: boolean; error?: string }> => {
+    if (process.platform !== 'darwin') {
+      return {
+        success: false,
+        error: 'In-app updates are only available on macOS',
+      }
+    }
+
+    try {
+      const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'tray-link-electron-update-'))
+      const zipPath = path.join(tempRoot, 'update.zip')
+      const extractedPath = path.join(tempRoot, 'extracted')
+
+      await downloadFile(downloadUrl, zipPath)
+      await unzipArchive(zipPath, extractedPath)
+
+      const appBundlePath = findAppBundle(extractedPath)
+      if (!appBundlePath) {
+        return { success: false, error: 'Could not find the application bundle in the downloaded archive' }
+      }
+
+      const targetAppPath = getCurrentAppBundlePath()
+      const installerScriptPath = createInstallerScript(appBundlePath, targetAppPath, process.pid)
+      await execAsync(`nohup "${installerScriptPath.replace(/"/g, '\\"')}" >/dev/null 2>&1 &`)
+
+      return { success: true }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      return { success: false, error: message }
     }
   },
 }

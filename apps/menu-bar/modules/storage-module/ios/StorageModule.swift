@@ -135,7 +135,6 @@ public class StorageModule: Module {
       return
     }
     var jsonString = String(data: data, encoding: .utf8) ?? "{}"
-    jsonString = jsonString.replacingOccurrences(of: "  ", with: "\t")
     jsonString += "\n"
     try? jsonString.write(toFile: path, atomically: true, encoding: .utf8)
   }
@@ -168,7 +167,6 @@ public class StorageModule: Module {
     }
 
     var jsonString = String(data: encoded, encoding: .utf8) ?? "[]"
-    jsonString = jsonString.replacingOccurrences(of: "  ", with: "\t")
     jsonString += "\n"
 
     do {
