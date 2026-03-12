@@ -81,7 +81,7 @@ Prebuilt binaries are available in [Releases](https://github.com/thejoaov/tray-l
 ### Install with Homebrew (macOS)
 
 ```bash
-brew tap thejoaov/tray-link
+brew tap thejoaov/tap
 brew install --cask tray-link
 ```
 
@@ -93,7 +93,7 @@ brew upgrade --cask tray-link
 
 ### Homebrew maintainers
 
-- Cask file: [`thejoaov/homebrew-tray-link`](https://github.com/thejoaov/homebrew-tray-link)
+- Cask file: [`thejoaov/homebrew-tap`](https://github.com/thejoaov/homebrew-tap)
 - Release sync workflow: `.github/workflows/homebrew-cask-sync.yml`
 
 ## Signing disclaimer

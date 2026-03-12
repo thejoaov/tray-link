@@ -1,4 +1,4 @@
 {
   "title": "Documentación",
-  "pages": ["index", "installation", "app", "cli"]
+  "pages": ["index", "installation", "homebrew-migration", "app", "cli"]
 }

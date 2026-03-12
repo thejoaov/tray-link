@@ -5,7 +5,7 @@
 - Install with Homebrew (macOS):
 
   ```bash
-  brew tap thejoaov/tray-link
+  brew tap thejoaov/tap
   brew install --cask tray-link
   ```
 

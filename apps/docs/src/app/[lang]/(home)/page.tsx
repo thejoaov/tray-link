@@ -73,7 +73,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'To update later, run brew upgrade --cask tray-link.',
           ],
           command:
-            'brew tap thejoaov/tray-link\nbrew install --cask tray-link\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app',
+            'brew tap thejoaov/tap\nbrew install --cask tray-link\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app',
         },
         {
           id: 'linux-fedora',
@@ -233,7 +233,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Para atualizar depois, rode brew upgrade --cask tray-link.',
           ],
           command:
-            'brew tap thejoaov/tray-link\nbrew install --cask tray-link\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app',
+            'brew tap thejoaov/tap\nbrew install --cask tray-link\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app',
         },
         {
           id: 'linux-fedora',
@@ -397,7 +397,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             'Para actualizar después, ejecuta brew upgrade --cask tray-link.',
           ],
           command:
-            'brew tap thejoaov/tray-link\nbrew install --cask tray-link\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app',
+            'brew tap thejoaov/tap\nbrew install --cask tray-link\nxattr -d com.apple.quarantine /Applications/Tray\\ Link.app',
         },
         {
           id: 'linux-fedora',
@@ -539,8 +539,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
     },
   }
 
-  const { lang = 'pt' } = await params
-  const locale = (['en', 'pt', 'es'].includes(lang) ? lang : 'pt') as Locale
+  const { lang = 'en' } = await params
+  const locale = (['en', 'pt', 'es'].includes(lang) ? lang : 'en') as Locale
   const copy = content[locale]
 
   return (

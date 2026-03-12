@@ -1,0 +1,48 @@
+---
+title: Migración de Homebrew
+description: Migra Tray Link desde el tap anterior de Homebrew al nuevo repositorio thejoaov/tap.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Resumen
+
+El tap de Homebrew de Tray Link se movió de `thejoaov/tray-link` a `thejoaov/tap`.
+
+- Token completo anterior del cask: `thejoaov/tray-link/tray-link`
+- Nuevo token completo del cask: `thejoaov/tap/tray-link`
+
+Si ya instalaste Tray Link desde el tap anterior, sigue los pasos de abajo una sola vez en tu máquina.
+
+## Pasos de migración
+
+```bash
+brew uninstall --cask tray-link
+brew untap thejoaov/tray-link
+brew tap thejoaov/tap
+brew install --cask tray-link
+```
+
+## Actualizaciones después de la migración
+
+Después de migrar el tap, las futuras actualizaciones seguirán funcionando con:
+
+```bash
+brew update
+brew upgrade --cask tray-link
+```
+
+## Solución de problemas
+
+Si Homebrew todavía muestra el tap anterior o una versión desactualizada, actualiza los metadatos locales y reinstala:
+
+```bash
+brew update
+brew untap thejoaov/tray-link
+brew tap thejoaov/tap
+brew reinstall --cask tray-link
+```
+
+<Callout type="info" title="Por qué cambió esto">
+  El nuevo nombre genérico del tap hace que el identificador canónico del cask pase a ser `thejoaov/tap/tray-link`, evitando el patrón duplicado `tray-link/tray-link` de la configuración anterior.
+</Callout>
