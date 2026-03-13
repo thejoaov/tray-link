@@ -122,6 +122,7 @@ const defaultPreferences: Settings = {
   launchOnLogin: false,
   showAppIcons: false,
   removeFromDiskByDefault: false,
+  requireProjectDeletionConfirmation: false,
   hasInstalledCli: false,
   customEditors: [],
   customTerminals: [],
