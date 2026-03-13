@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
 import React from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { GestureResponderHandlers, LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { AppIcon } from '../components'
 import { Text } from '../components/Text'
@@ -31,6 +31,8 @@ type Props = {
   onOpenWithTerminal: (command: string) => void
   onSelectProjectEditorDefault: (command: string) => void
   onSelectProjectTerminalDefault: (command: string) => void
+  globalEditorCommand?: string | null
+  globalTerminalCommand?: string | null
   toolSelectionMode?: boolean
   onToggleProjectToolSelectionMode: () => void
   labels: {
@@ -42,10 +44,9 @@ type Props = {
     close: string
   }
   editMode?: boolean
-  onMoveUp?: () => void
-  onMoveDown?: () => void
-  canMoveUp?: boolean
-  canMoveDown?: boolean
+  onLayout?: (event: LayoutChangeEvent) => void
+  dragHandleProps?: GestureResponderHandlers
+  isDragging?: boolean
 }
 
 export const ProjectItem = ({
@@ -66,14 +67,15 @@ export const ProjectItem = ({
   onOpenWithTerminal,
   onSelectProjectEditorDefault,
   onSelectProjectTerminalDefault,
+  globalEditorCommand,
+  globalTerminalCommand,
   toolSelectionMode = false,
   onToggleProjectToolSelectionMode,
   labels,
   editMode = false,
-  onMoveUp,
-  onMoveDown,
-  canMoveUp,
-  canMoveDown,
+  onLayout,
+  dragHandleProps,
+  isDragging = false,
 }: Props) => {
   const renderQuickActionIcon = (
     option: ToolOption | null | undefined,
@@ -88,12 +90,12 @@ export const ProjectItem = ({
     )
   }
 
-  const renderOptionLabel = (label: string, selected: boolean) => {
-    return selected ? `${label} *` : label
+  const renderOptionLabel = (label: string, globalDefault: boolean) => {
+    return globalDefault ? `${label} *` : label
   }
 
   return (
-    <View style={styles.container}>
+    <View onLayout={onLayout} style={[styles.container, isDragging && styles.draggingContainer]}>
       <View style={styles.info}>
         <View style={styles.nameRow}>
           <Text style={styles.name}>
@@ -125,31 +127,21 @@ export const ProjectItem = ({
           <Ionicons name="folder-open-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
         {editMode ? (
-          <>
-            <TouchableOpacity
-              accessibilityLabel="Move project up"
-              disabled={!canMoveUp}
-              style={[styles.button, !canMoveUp && styles.disabled]}
-              onPress={onMoveUp}
-            >
-              <Ionicons name="arrow-up" size={14} color="var(--text-color)" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              accessibilityLabel="Move project down"
-              disabled={!canMoveDown}
-              style={[styles.button, !canMoveDown && styles.disabled]}
-              onPress={onMoveDown}
-            >
-              <Ionicons name="arrow-down" size={14} color="var(--text-color)" />
-            </TouchableOpacity>
-          </>
+          <View
+            style={[styles.button, styles.dragHandleButton, isDragging && styles.dragHandleButtonActive]}
+            {...dragHandleProps}
+          >
+            <Ionicons name="reorder-three-outline" size={16} color="var(--text-color)" />
+          </View>
         ) : null}
         <TouchableOpacity accessibilityLabel="Remove project" style={styles.button} onPress={onRemove}>
           <Ionicons name="trash-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
-        <TouchableOpacity accessibilityLabel={labels.moreActions} style={styles.button} onPress={onToggleContextMenu}>
-          <Ionicons name="ellipsis-horizontal" size={14} color="var(--text-color)" />
-        </TouchableOpacity>
+        {!editMode ? (
+          <TouchableOpacity accessibilityLabel={labels.moreActions} style={styles.button} onPress={onToggleContextMenu}>
+            <Ionicons name="ellipsis-horizontal" size={14} color="var(--text-color)" />
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {contextMenuOpen ? (
@@ -177,7 +169,10 @@ export const ProjectItem = ({
             {editorOptions.map((option) => (
               <TouchableOpacity
                 key={option.command}
-                style={styles.contextActionButton}
+                style={[
+                  styles.contextActionButton,
+                  option.command === project.defaultEditor && styles.contextActionButtonProjectDefault,
+                ]}
                 onPress={() =>
                   toolSelectionMode ? onSelectProjectEditorDefault(option.command) : onOpenWithEditor(option.command)
                 }
@@ -190,7 +185,7 @@ export const ProjectItem = ({
                   }
                 />
                 <Text style={styles.contextActionText}>
-                  {renderOptionLabel(option.label, option.command === project.defaultEditor)}
+                  {renderOptionLabel(option.label, option.command === globalEditorCommand)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -201,7 +196,10 @@ export const ProjectItem = ({
             {terminalOptions.map((option) => (
               <TouchableOpacity
                 key={option.command}
-                style={styles.contextActionButton}
+                style={[
+                  styles.contextActionButton,
+                  option.command === project.defaultTerminal && styles.contextActionButtonProjectDefault,
+                ]}
                 onPress={() =>
                   toolSelectionMode
                     ? onSelectProjectTerminalDefault(option.command)
@@ -216,7 +214,7 @@ export const ProjectItem = ({
                   }
                 />
                 <Text style={styles.contextActionText}>
-                  {renderOptionLabel(option.label, option.command === project.defaultTerminal)}
+                  {renderOptionLabel(option.label, option.command === globalTerminalCommand)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -230,6 +228,21 @@ export const ProjectItem = ({
 const styles = StyleSheet.create({
   container: {
     padding: 12,
+  },
+  draggingContainer: {
+    zIndex: 20,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(125, 211, 252, 0.8)',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 8,
   },
   info: {
     marginBottom: 8,
@@ -273,6 +286,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  dragHandleButton: {
+    minWidth: 30,
+  },
+  dragHandleButtonActive: {
+    backgroundColor: 'rgba(125, 211, 252, 0.22)',
   },
   quickActionIconImage: {
     width: 14,
@@ -341,6 +360,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  contextActionButtonProjectDefault: {
+    borderColor: 'rgba(125, 211, 252, 0.9)',
+    backgroundColor: 'rgba(125, 211, 252, 0.12)',
   },
   contextActionIconImage: {
     width: 16,

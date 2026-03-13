@@ -1,11 +1,15 @@
 /** biome-ignore-all lint/suspicious/noEmptyBlockStatements: Fail silently if loading preferences on popover focus fails for any reason, to avoid breaking other popover functionality */
 import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
   FlatList,
+  LayoutChangeEvent,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  PanResponder,
   Platform,
   StyleSheet,
   Text,
@@ -37,11 +41,34 @@ import SectionHeader from './SectionHeader'
 const PROJECT_SEARCH_HEIGHT = 34
 const PROJECT_SEARCH_GAP = 12
 const FILTERED_PROJECT_LIST_HEIGHT = Math.max(PROJECT_LIST_HEIGHT - PROJECT_SEARCH_HEIGHT - PROJECT_SEARCH_GAP, 120)
+const DRAG_AUTO_SCROLL_EDGE = 48
+const DRAG_AUTO_SCROLL_STEP = 18
+const DRAG_ACTIVATION_DISTANCE = 6
 
 type RemoveProjectPayload = {
   id: string
   path: string
   deleteFromDisk: boolean
+}
+
+type ItemLayout = {
+  y: number
+  height: number
+}
+
+const clamp = (value: number, min: number, max: number) => {
+  return Math.min(Math.max(value, min), max)
+}
+
+const moveProject = (items: Project[], fromIndex: number, toIndex: number) => {
+  if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= items.length || toIndex >= items.length) {
+    return items
+  }
+
+  const reordered = [...items]
+  const [moved] = reordered.splice(fromIndex, 1)
+  reordered.splice(toIndex, 0, moved)
+  return reordered
 }
 
 export const ProjectList = () => {
@@ -53,6 +80,26 @@ export const ProjectList = () => {
   const [toolSelectionProjectId, setToolSelectionProjectId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [preferences, setPreferences] = useState(defaultUserPreferences)
+  const [itemLayouts, setItemLayouts] = useState<Record<string, ItemLayout>>({})
+  const [activeDragProjectId, setActiveDragProjectId] = useState<string | null>(null)
+  const [dragDestinationIndex, setDragDestinationIndex] = useState<number | null>(null)
+  const [scrollOffset, setScrollOffset] = useState(0)
+  const listRef = useRef<FlatList<Project>>(null)
+  const listContainerRef = useRef<View>(null)
+  const projectsRef = useRef<Project[]>([])
+  const itemWrapperRefsRef = useRef(new Map<string, View | null>())
+  const itemLayoutsRef = useRef<Record<string, ItemLayout>>({})
+  const scrollOffsetRef = useRef(0)
+  const listTopInWindowRef = useRef(0)
+  const listHeightRef = useRef(FILTERED_PROJECT_LIST_HEIGHT)
+  const dragTouchOffsetWithinItemRef = useRef(0)
+  const activeDragProjectIdRef = useRef<string | null>(null)
+  const dragDestinationIndexRef = useRef<number | null>(null)
+  const editModeRef = useRef(false)
+  const beginProjectDragRef = useRef<(projectId: string, absoluteY: number) => void>(() => {})
+  const updateProjectDragRef = useRef<(absoluteY: number) => void>(() => {})
+  const finishProjectDragRef = useRef<() => void>(() => {})
+  const dragPanRespondersRef = useRef(new Map<string, ReturnType<typeof PanResponder.create>>())
   const editorOptions = useMemo(
     () =>
       getEditorOptions(preferences.customEditors).map((option) =>
@@ -75,6 +122,14 @@ export const ProjectList = () => {
     () => new Map(terminalOptions.map((option) => [option.command, option])),
     [terminalOptions],
   )
+  const globalEditorCommand = useMemo(
+    () => preferences.defaultEditor ?? editorOptions[0]?.command ?? 'code',
+    [editorOptions, preferences.defaultEditor],
+  )
+  const globalTerminalCommand = useMemo(
+    () => preferences.defaultTerminal ?? terminalOptions[0]?.command ?? 'open -a Terminal',
+    [preferences.defaultTerminal, terminalOptions],
+  )
   const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery])
   const filteredProjects = useMemo(() => {
     if (!normalizedSearchQuery) {
@@ -86,9 +141,29 @@ export const ProjectList = () => {
       return searchableText.includes(normalizedSearchQuery)
     })
   }, [normalizedSearchQuery, projects])
+  const displayedProjects = useMemo(() => {
+    return editMode ? projects : filteredProjects
+  }, [editMode, filteredProjects, projects])
+  const listEmptyHasSearchState = !editMode && Boolean(normalizedSearchQuery)
+
+  const loadProjects = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const data = await projectStore.getProjects()
+      const orderedProjects = [...data].sort((a, b) => a.position - b.position)
+      projectsRef.current = orderedProjects
+      setProjects(orderedProjects)
+    } catch (error) {
+      console.error(error)
+      await logError('project-list:loadProjects', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    loadProjects()
+    void loadProjects()
     loadPreferences()
       .then(setPreferences)
       .catch((error) => {
@@ -119,34 +194,36 @@ export const ProjectList = () => {
       preferencesSubscription.remove()
       removeSubscription.remove()
     }
-  }, [])
+  }, [loadProjects])
+
+  useEffect(() => {
+    projectsRef.current = projects
+  }, [projects])
+
+  useEffect(() => {
+    itemLayoutsRef.current = itemLayouts
+  }, [itemLayouts])
+
+  useEffect(() => {
+    editModeRef.current = editMode
+  }, [editMode])
+
+  useEffect(() => {
+    dragDestinationIndexRef.current = dragDestinationIndex
+  }, [dragDestinationIndex])
 
   // Reload projects and preferences every time the popover becomes visible
   // This ensures CLI changes appear without a manual restart
   usePopoverFocusEffect(
     useCallback(() => {
-      loadProjects()
+      void loadProjects()
       loadPreferences()
         .then(setPreferences)
         .catch((error) => {
           void logError('project-list:focus-loadPreferences', error)
         })
-    }, []),
+    }, [loadProjects]),
   )
-
-  const loadProjects = async () => {
-    setLoading(true)
-
-    try {
-      const data = await projectStore.getProjects()
-      setProjects(data.sort((a, b) => a.position - b.position))
-    } catch (error) {
-      console.error(error)
-      await logError('project-list:loadProjects', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleAddProject = async () => {
     try {
@@ -176,11 +253,11 @@ export const ProjectList = () => {
   }
 
   const resolveEditorCommand = (project: Project) => {
-    return project.defaultEditor ?? preferences.defaultEditor ?? editorOptions[0]?.command ?? 'code'
+    return project.defaultEditor ?? globalEditorCommand
   }
 
   const resolveTerminalCommand = (project: Project) => {
-    return project.defaultTerminal ?? preferences.defaultTerminal ?? terminalOptions[0]?.command ?? 'open -a Terminal'
+    return project.defaultTerminal ?? globalTerminalCommand
   }
 
   const resolveEditorOption = (project: Project): ToolOption | null => {
@@ -277,21 +354,302 @@ export const ProjectList = () => {
     return true
   }
 
-  const handleMoveProject = async (index: number, direction: 'up' | 'down') => {
-    const target = direction === 'up' ? index - 1 : index + 1
-    if (target < 0 || target >= projects.length) return
+  const measureListContainer = useCallback(() => {
+    listContainerRef.current?.measureInWindow((_x, y, _width, height) => {
+      listTopInWindowRef.current = y
+      listHeightRef.current = height
+    })
+  }, [])
 
-    const reordered = [...projects]
-    ;[reordered[index], reordered[target]] = [reordered[target], reordered[index]]
-    await projectStore.saveProjectOrder(reordered)
-    setProjects(reordered.map((project, position) => ({ ...project, position })))
-  }
+  const handleListLayout = useCallback(
+    (_event: LayoutChangeEvent) => {
+      measureListContainer()
+    },
+    [measureListContainer],
+  )
 
-  const handleMoveFilteredProject = async (projectId: string, direction: 'up' | 'down') => {
-    const index = projects.findIndex((project) => project.id === projectId)
-    if (index < 0) return
-    await handleMoveProject(index, direction)
-  }
+  const setProjectWrapperRef = useCallback((projectId: string, node: View | null) => {
+    if (node) {
+      itemWrapperRefsRef.current.set(projectId, node)
+      return
+    }
+
+    itemWrapperRefsRef.current.delete(projectId)
+  }, [])
+
+  const handleProjectLayout = useCallback((projectId: string) => {
+    const itemNode = itemWrapperRefsRef.current.get(projectId)
+    if (!itemNode || !listContainerRef.current) {
+      return
+    }
+
+    listContainerRef.current.measureInWindow((_listX, listY, _listWidth, listHeight) => {
+      listTopInWindowRef.current = listY
+      listHeightRef.current = listHeight
+
+      itemNode.measureInWindow((_itemX, itemY, _itemWidth, itemHeight) => {
+        const y = itemY - listY + scrollOffsetRef.current
+
+        setItemLayouts((current) => {
+          const previous = current[projectId]
+          if (previous?.y === y && previous?.height === itemHeight) {
+            return current
+          }
+
+          return {
+            ...current,
+            [projectId]: {
+              y,
+              height: itemHeight,
+            },
+          }
+        })
+      })
+    })
+  }, [])
+
+  const persistProjectOrder = useCallback(
+    async (orderedProjects: Project[]) => {
+      const normalized = orderedProjects.map((project, position) => ({
+        ...project,
+        position,
+        updatedAt: new Date().toISOString(),
+      }))
+
+      projectsRef.current = normalized
+      setProjects(normalized)
+
+      try {
+        await projectStore.saveProjectOrder(normalized)
+      } catch (error) {
+        await logError('project-list:persistProjectOrder', error, {
+          projectCount: normalized.length,
+        })
+        await loadProjects()
+      }
+    },
+    [loadProjects],
+  )
+
+  const maybeAutoScrollDuringDrag = useCallback((absoluteY: number) => {
+    const relativeY = absoluteY - listTopInWindowRef.current
+    const layouts = Object.values(itemLayoutsRef.current)
+    const contentHeight = layouts.length ? Math.max(...layouts.map((layout) => layout.y + layout.height)) : 0
+    const maxOffset = Math.max(contentHeight - listHeightRef.current, 0)
+
+    if (relativeY < DRAG_AUTO_SCROLL_EDGE) {
+      const nextOffset = clamp(scrollOffsetRef.current - DRAG_AUTO_SCROLL_STEP, 0, maxOffset)
+      if (nextOffset !== scrollOffsetRef.current) {
+        scrollOffsetRef.current = nextOffset
+        listRef.current?.scrollToOffset({ offset: nextOffset, animated: false })
+      }
+      return
+    }
+
+    if (relativeY > listHeightRef.current - DRAG_AUTO_SCROLL_EDGE) {
+      const nextOffset = clamp(scrollOffsetRef.current + DRAG_AUTO_SCROLL_STEP, 0, maxOffset)
+      if (nextOffset !== scrollOffsetRef.current) {
+        scrollOffsetRef.current = nextOffset
+        listRef.current?.scrollToOffset({ offset: nextOffset, animated: false })
+      }
+    }
+  }, [])
+
+  const beginProjectDrag = useCallback(
+    (projectId: string, absoluteY: number) => {
+      if (!editModeRef.current) {
+        return
+      }
+
+      measureListContainer()
+      const layout = itemLayoutsRef.current[projectId]
+      if (!layout) {
+        return
+      }
+
+      const pointerContentY = absoluteY - listTopInWindowRef.current + scrollOffsetRef.current
+      const currentIndex = projectsRef.current.findIndex((project) => project.id === projectId)
+      dragTouchOffsetWithinItemRef.current = clamp(pointerContentY - layout.y, 0, layout.height)
+      activeDragProjectIdRef.current = projectId
+      setActiveDragProjectId(projectId)
+      dragDestinationIndexRef.current = currentIndex >= 0 ? currentIndex : null
+      setDragDestinationIndex(currentIndex >= 0 ? currentIndex : null)
+      setContextMenuProjectId(null)
+      setToolSelectionProjectId(null)
+    },
+    [measureListContainer],
+  )
+
+  const updateProjectDrag = useCallback(
+    (absoluteY: number) => {
+      const activeProjectId = activeDragProjectIdRef.current
+      if (!activeProjectId) {
+        return
+      }
+
+      maybeAutoScrollDuringDrag(absoluteY)
+      const pointerContentY = absoluteY - listTopInWindowRef.current + scrollOffsetRef.current
+      const activeLayout = itemLayoutsRef.current[activeProjectId]
+
+      if (!activeLayout) {
+        return
+      }
+
+      const draggedCenterY = pointerContentY - dragTouchOffsetWithinItemRef.current + activeLayout.height / 2
+      const currentProjects = projectsRef.current
+      const currentIndex = currentProjects.findIndex((project) => project.id === activeProjectId)
+      if (currentIndex < 0) {
+        return
+      }
+
+      const candidateProjects = currentProjects.filter((project) => project.id !== activeProjectId)
+      let insertionIndex = candidateProjects.length
+
+      for (let index = 0; index < candidateProjects.length; index += 1) {
+        const layout = itemLayoutsRef.current[candidateProjects[index].id]
+        if (!layout) {
+          continue
+        }
+
+        if (draggedCenterY < layout.y + layout.height / 2) {
+          insertionIndex = index
+          break
+        }
+      }
+
+      const nextDestinationIndex = clamp(insertionIndex, 0, Math.max(currentProjects.length - 1, 0))
+
+      if (dragDestinationIndexRef.current !== nextDestinationIndex) {
+        dragDestinationIndexRef.current = nextDestinationIndex
+        setDragDestinationIndex(nextDestinationIndex)
+      }
+    },
+    [maybeAutoScrollDuringDrag],
+  )
+
+  const finishProjectDrag = useCallback(() => {
+    const activeProjectId = activeDragProjectIdRef.current
+    if (!activeProjectId) {
+      return
+    }
+
+    const currentProjects = projectsRef.current
+    const currentIndex = currentProjects.findIndex((project) => project.id === activeProjectId)
+    const destinationIndex = dragDestinationIndexRef.current
+
+    activeDragProjectIdRef.current = null
+    dragTouchOffsetWithinItemRef.current = 0
+    setActiveDragProjectId(null)
+    dragDestinationIndexRef.current = null
+    setDragDestinationIndex(null)
+
+    if (currentIndex < 0 || destinationIndex === null || destinationIndex === currentIndex) {
+      return
+    }
+
+    const reordered = moveProject(currentProjects, currentIndex, destinationIndex)
+    void persistProjectOrder(reordered)
+  }, [persistProjectOrder])
+
+  useEffect(() => {
+    beginProjectDragRef.current = beginProjectDrag
+  }, [beginProjectDrag])
+
+  useEffect(() => {
+    updateProjectDragRef.current = updateProjectDrag
+  }, [updateProjectDrag])
+
+  useEffect(() => {
+    finishProjectDragRef.current = finishProjectDrag
+  }, [finishProjectDrag])
+
+  const handleListScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const nextOffset = event.nativeEvent.contentOffset.y
+    scrollOffsetRef.current = nextOffset
+    setScrollOffset(nextOffset)
+  }, [])
+
+  const toggleEditMode = useCallback(() => {
+    setEditMode((current) => {
+      const next = !current
+
+      if (next) {
+        setContextMenuProjectId(null)
+        setToolSelectionProjectId(null)
+      } else {
+        activeDragProjectIdRef.current = null
+        dragDestinationIndexRef.current = null
+        dragTouchOffsetWithinItemRef.current = 0
+        setActiveDragProjectId(null)
+        setDragDestinationIndex(null)
+      }
+
+      return next
+    })
+  }, [])
+
+  const getDragPanResponder = useCallback((projectId: string) => {
+    const cached = dragPanRespondersRef.current.get(projectId)
+    if (cached) {
+      return cached
+    }
+
+    const responder = PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_event, gestureState) => {
+        return editModeRef.current && Math.abs(gestureState.dy) >= DRAG_ACTIVATION_DISTANCE
+      },
+      onPanResponderGrant: (_event, gestureState) => {
+        beginProjectDragRef.current(projectId, gestureState.moveY || gestureState.y0)
+      },
+      onPanResponderMove: (_event, gestureState) => {
+        updateProjectDragRef.current(gestureState.moveY)
+      },
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderRelease: () => {
+        finishProjectDragRef.current()
+      },
+      onPanResponderTerminate: () => {
+        finishProjectDragRef.current()
+      },
+    })
+
+    dragPanRespondersRef.current.set(projectId, responder)
+    return responder
+  }, [])
+
+  useEffect(() => {
+    const activeProjectIds = new Set(projects.map((project) => project.id))
+
+    for (const projectId of dragPanRespondersRef.current.keys()) {
+      if (!activeProjectIds.has(projectId)) {
+        dragPanRespondersRef.current.delete(projectId)
+      }
+    }
+  }, [projects])
+
+  const insertionIndicatorTop = useMemo(() => {
+    if (!editMode || activeDragProjectId === null || dragDestinationIndex === null) {
+      return null
+    }
+
+    const activeIndex = displayedProjects.findIndex((project) => project.id === activeDragProjectId)
+    if (activeIndex < 0 || dragDestinationIndex === activeIndex) {
+      return null
+    }
+
+    const destinationProject = displayedProjects[dragDestinationIndex]
+    const destinationLayout = destinationProject ? itemLayouts[destinationProject.id] : null
+    if (!destinationLayout) {
+      return null
+    }
+
+    if (dragDestinationIndex < activeIndex) {
+      return destinationLayout.y - scrollOffset
+    }
+
+    return destinationLayout.y + destinationLayout.height - scrollOffset
+  }, [activeDragProjectId, displayedProjects, dragDestinationIndex, editMode, itemLayouts, scrollOffset])
 
   const handleRequestRemove = (project: Project) => {
     if (!preferences.requireProjectDeletionConfirmation && !preferences.removeFromDiskByDefault) {
@@ -384,7 +742,7 @@ export const ProjectList = () => {
         label={t('projects')}
         accessoryRight={
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={() => setEditMode((value) => !value)} style={styles.addButton}>
+            <TouchableOpacity onPress={toggleEditMode} style={styles.addButton}>
               <Text style={styles.metaButtonText}>{editMode ? t('done') : t('reorder')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleAddProject} style={styles.addButton}>
@@ -393,76 +751,109 @@ export const ProjectList = () => {
           </View>
         }
       />
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, editMode && styles.searchContainerDisabled]}>
         <Ionicons name="search-outline" size={14} color="var(--text-color)" />
         <TextInput
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={editMode ? undefined : setSearchQuery}
           placeholder={t('searchProjects')}
           placeholderTextColor="#8E8E93"
-          style={styles.searchInput}
+          style={[styles.searchInput, editMode && styles.searchInputDisabled]}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={!editMode}
         />
         {searchQuery ? (
           <TouchableOpacity
             accessibilityLabel={t('clearSearch')}
             onPress={() => setSearchQuery('')}
-            style={styles.clearSearchButton}
+            style={[styles.clearSearchButton, editMode && styles.clearSearchButtonDisabled]}
           >
             <Ionicons name="close-circle" size={16} color="var(--text-color)" />
           </TouchableOpacity>
         ) : null}
       </View>
-      <FlatList
-        data={filteredProjects}
-        keyExtractor={(item) => item.id}
-        style={{ height: FILTERED_PROJECT_LIST_HEIGHT }}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>{normalizedSearchQuery ? t('noProjectsFound') : t('noProjectsYet')}</Text>
-            <Text style={styles.emptySubtext}>
-              {normalizedSearchQuery ? t('adjustSearchOrAddProject') : t('clickToAddProject')}
-            </Text>
-          </View>
-        }
-        renderItem={({ item, index }) => (
-          <ProjectItem
-            index={index}
-            project={item}
-            onOpenEditor={() => handleOpenEditor(item)}
-            onOpenTerminal={() => handleOpenTerminal(item)}
-            onOpenFinder={() => handleOpenFinder(item)}
-            onRemove={() => handleRequestRemove(item)}
-            onToggleContextMenu={() => handleToggleContextMenu(item.id)}
-            onCloseContextMenu={() => handleCloseContextMenu(item.id)}
-            contextMenuOpen={contextMenuProjectId === item.id}
-            editorOptions={editorOptions}
-            terminalOptions={terminalOptions}
-            editorQuickActionOption={resolveEditorOption(item)}
-            terminalQuickActionOption={resolveTerminalOption(item)}
-            onOpenWithEditor={(command) => handleOpenWithEditor(item, command)}
-            onOpenWithTerminal={(command) => handleOpenWithTerminal(item, command)}
-            onSelectProjectEditorDefault={(command) => handleSetProjectEditorDefault(item, command)}
-            onSelectProjectTerminalDefault={(command) => handleSetProjectTerminalDefault(item, command)}
-            toolSelectionMode={toolSelectionProjectId === item.id}
-            onToggleProjectToolSelectionMode={() => handleToggleProjectToolSelectionMode(item.id)}
-            labels={{
-              moreActions: t('moreActions'),
-              openWithEditor: t('openWithEditor'),
-              openWithTerminal: t('openWithTerminal'),
-              selectProjectDefaults: t('selectProjectDefaults'),
-              done: t('done'),
-              close: t('close'),
-            }}
-            editMode={editMode}
-            onMoveUp={() => handleMoveFilteredProject(item.id, 'up')}
-            onMoveDown={() => handleMoveFilteredProject(item.id, 'down')}
-            canMoveUp={projects.findIndex((project) => project.id === item.id) > 0}
-            canMoveDown={projects.findIndex((project) => project.id === item.id) < projects.length - 1}
+      <View ref={listContainerRef} onLayout={handleListLayout} style={styles.listContainer}>
+        <FlatList
+          ref={listRef}
+          data={displayedProjects}
+          keyExtractor={(item) => item.id}
+          style={{ height: FILTERED_PROJECT_LIST_HEIGHT }}
+          extraData={{
+            activeDragProjectId,
+            contextMenuProjectId,
+            dragDestinationIndex,
+            editMode,
+            globalEditorCommand,
+            globalTerminalCommand,
+            itemLayouts,
+            scrollOffset,
+            toolSelectionProjectId,
+          }}
+          scrollEnabled={!activeDragProjectId}
+          onScroll={handleListScroll}
+          scrollEventThrottle={16}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                {listEmptyHasSearchState ? t('noProjectsFound') : t('noProjectsYet')}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {listEmptyHasSearchState ? t('adjustSearchOrAddProject') : t('clickToAddProject')}
+              </Text>
+            </View>
+          }
+          renderItem={({ item, index }) => (
+            <View ref={(node) => setProjectWrapperRef(item.id, node)} onLayout={() => handleProjectLayout(item.id)}>
+              <ProjectItem
+                index={index}
+                project={item}
+                onOpenEditor={() => handleOpenEditor(item)}
+                onOpenTerminal={() => handleOpenTerminal(item)}
+                onOpenFinder={() => handleOpenFinder(item)}
+                onRemove={() => handleRequestRemove(item)}
+                onToggleContextMenu={() => handleToggleContextMenu(item.id)}
+                onCloseContextMenu={() => handleCloseContextMenu(item.id)}
+                contextMenuOpen={!editMode && contextMenuProjectId === item.id}
+                editorOptions={editorOptions}
+                terminalOptions={terminalOptions}
+                editorQuickActionOption={resolveEditorOption(item)}
+                terminalQuickActionOption={resolveTerminalOption(item)}
+                onOpenWithEditor={(command) => handleOpenWithEditor(item, command)}
+                onOpenWithTerminal={(command) => handleOpenWithTerminal(item, command)}
+                onSelectProjectEditorDefault={(command) => handleSetProjectEditorDefault(item, command)}
+                onSelectProjectTerminalDefault={(command) => handleSetProjectTerminalDefault(item, command)}
+                globalEditorCommand={globalEditorCommand}
+                globalTerminalCommand={globalTerminalCommand}
+                toolSelectionMode={!editMode && toolSelectionProjectId === item.id}
+                onToggleProjectToolSelectionMode={() => handleToggleProjectToolSelectionMode(item.id)}
+                labels={{
+                  moreActions: t('moreActions'),
+                  openWithEditor: t('openWithEditor'),
+                  openWithTerminal: t('openWithTerminal'),
+                  selectProjectDefaults: t('selectProjectDefaults'),
+                  done: t('done'),
+                  close: t('close'),
+                }}
+                editMode={editMode}
+                dragHandleProps={getDragPanResponder(item.id).panHandlers}
+                isDragging={activeDragProjectId === item.id}
+              />
+            </View>
+          )}
+        />
+        {insertionIndicatorTop !== null ? (
+          <View
+            pointerEvents="none"
+            style={[
+              styles.insertionIndicatorOverlay,
+              {
+                top: insertionIndicatorTop,
+              },
+            ]}
           />
-        )}
-      />
+        ) : null}
+      </View>
 
       <Footer />
     </View>
@@ -499,6 +890,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
   },
+  listContainer: {
+    position: 'relative',
+  },
+  insertionIndicatorOverlay: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    height: 3,
+    borderRadius: 999,
+    backgroundColor: 'rgba(125, 211, 252, 0.95)',
+  },
   searchInput: {
     flex: 1,
     height: '100%',
@@ -510,9 +912,18 @@ const styles = StyleSheet.create({
     borderColor: 'none',
     borderWidth: 0,
   },
+  searchContainerDisabled: {
+    opacity: 0.7,
+  },
+  searchInputDisabled: {
+    opacity: 0.8,
+  },
   clearSearchButton: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  clearSearchButtonDisabled: {
+    opacity: 0.6,
   },
   metaButtonText: {
     fontSize: 10,
