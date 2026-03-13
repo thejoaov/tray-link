@@ -140,6 +140,7 @@ const createMainWindow = () => {
     frame: false,
     fullscreenable: false,
     resizable: false,
+    alwaysOnTop: true,
     webPreferences: {
       devTools: true,
       webSecurity: false,
@@ -147,6 +148,11 @@ const createMainWindow = () => {
     },
     skipTaskbar: true,
   })
+
+  if (process.platform === 'darwin') {
+    mainWindow.setAlwaysOnTop(true, 'pop-up-menu')
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  }
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
@@ -166,6 +172,10 @@ const createMainWindow = () => {
 app.on('ready', () => {
   sanitizeCorruptedElectronStore()
   restoreProjectsIfNeeded()
+
+  if (process.platform === 'darwin') {
+    app.dock?.hide()
+  }
 
   registerMainModules(MainModules)
 

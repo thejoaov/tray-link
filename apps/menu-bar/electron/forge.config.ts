@@ -32,6 +32,9 @@ const config: ForgeConfig = {
     executableName: 'tray-link',
     name: 'Tray Link',
     extraResource: './assets',
+    extendInfo: {
+      LSUIElement: '1',
+    },
   },
   rebuildConfig: {},
   hooks: {

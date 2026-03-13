@@ -21,6 +21,7 @@ type Props = {
   onOpenFinder: () => void
   onRemove: () => void
   onToggleContextMenu: () => void
+  onCloseContextMenu: () => void
   contextMenuOpen?: boolean
   editorOptions: ToolOption[]
   terminalOptions: ToolOption[]
@@ -38,6 +39,7 @@ type Props = {
     openWithTerminal: string
     selectProjectDefaults: string
     done: string
+    close: string
   }
   editMode?: boolean
   onMoveUp?: () => void
@@ -54,6 +56,7 @@ export const ProjectItem = ({
   onOpenFinder,
   onRemove,
   onToggleContextMenu,
+  onCloseContextMenu,
   contextMenuOpen = false,
   editorOptions,
   terminalOptions,
@@ -153,11 +156,20 @@ export const ProjectItem = ({
         <View style={styles.contextMenu}>
           <View style={styles.contextMenuHeader}>
             <Text style={styles.contextMenuHeaderText}>{labels.moreActions}</Text>
-            <TouchableOpacity style={styles.contextModeButton} onPress={onToggleProjectToolSelectionMode}>
-              <Text style={styles.contextModeButtonText}>
-                {toolSelectionMode ? labels.done : labels.selectProjectDefaults}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.contextMenuHeaderActions}>
+              <TouchableOpacity style={styles.contextModeButton} onPress={onToggleProjectToolSelectionMode}>
+                <Text style={styles.contextModeButtonText}>
+                  {toolSelectionMode ? labels.done : labels.selectProjectDefaults}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityLabel={labels.close}
+                style={styles.contextCloseButton}
+                onPress={onCloseContextMenu}
+              >
+                <Ionicons name="close" size={14} color="var(--text-color)" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <Text style={styles.contextTitle}>{labels.openWithEditor}</Text>
@@ -286,10 +298,23 @@ const styles = StyleSheet.create({
     opacity: 0.75,
     color: 'var(--text-color)',
   },
+  contextMenuHeaderActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   contextModeButton: {
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  contextCloseButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.1)',
   },
   contextModeButtonText: {

@@ -1,20 +1,17 @@
 import type { IpcMainInvokeEvent } from 'electron'
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow } from 'electron'
 
 async function setPopoverSize(width: number, height: number, event: IpcMainInvokeEvent) {
   for (const window of BrowserWindow.getAllWindows()) {
     if (event.sender === window.webContents) {
       const [oldX, oldY] = window.getPosition()
-      const [oldWidth, oldHeight] = window.getSize()
-
-      const display = screen.getDisplayNearestPoint({ x: oldX, y: oldY })
 
       window.setBounds(
         {
           width,
           height,
-          x: oldX + oldWidth - width,
-          y: display.size.height / 2 > oldY ? oldY : oldY + oldHeight - height,
+          x: oldX,
+          y: oldY,
         },
         true,
       )

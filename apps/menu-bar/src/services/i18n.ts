@@ -19,6 +19,7 @@ type TranslationKey =
   | 'openOnStartup'
   | 'showAppIcons'
   | 'deleteFilesFromDiskByDefault'
+  | 'requireProjectDeletionConfirmation'
   | 'addCustomEditor'
   | 'addCustomTerminal'
   | 'projects'
@@ -34,6 +35,7 @@ type TranslationKey =
   | 'deleteFilesFromDisk'
   | 'cancel'
   | 'remove'
+  | 'close'
   | 'deleteFailed'
   | 'couldNotDeleteFromDisk'
   | 'loading'
@@ -96,6 +98,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openOnStartup: 'Open on startup',
     showAppIcons: 'Show real app icons',
     deleteFilesFromDiskByDefault: 'Delete files from disk by default',
+    requireProjectDeletionConfirmation: 'Require confirmation to delete projects',
     addCustomEditor: 'Add custom editor',
     addCustomTerminal: 'Add custom terminal',
     projects: 'Projects',
@@ -111,6 +114,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     deleteFilesFromDisk: 'Delete files from disk',
     cancel: 'Cancel',
     remove: 'Remove',
+    close: 'Close',
     deleteFailed: 'Delete failed',
     couldNotDeleteFromDisk: 'Could not delete {{path}} from disk.',
     loading: 'Loading...',
@@ -129,7 +133,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     moreActions: 'More actions',
     openWithEditor: 'Open with editor',
     openWithTerminal: 'Open with terminal',
-    selectProjectDefaults: 'Select defaults',
+    selectProjectDefaults: 'Defaults',
     reload: 'Reload',
     reloadToolList: 'Reload editors and terminals',
     advanced: 'Advanced',
@@ -172,6 +176,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openOnStartup: 'Abrir na inicialização',
     showAppIcons: 'Mostrar ícones reais dos apps',
     deleteFilesFromDiskByDefault: 'Excluir arquivos do disco por padrão',
+    requireProjectDeletionConfirmation: 'Exigir confirmação para exclusão de projetos',
     addCustomEditor: 'Adicionar editor personalizado',
     addCustomTerminal: 'Adicionar terminal personalizado',
     projects: 'Projetos',
@@ -187,6 +192,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     deleteFilesFromDisk: 'Excluir arquivos do disco',
     cancel: 'Cancelar',
     remove: 'Remover',
+    close: 'Fechar',
     deleteFailed: 'Falha ao excluir',
     couldNotDeleteFromDisk: 'Não foi possível excluir {{path}} do disco.',
     loading: 'Carregando...',
@@ -205,7 +211,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     moreActions: 'Mais ações',
     openWithEditor: 'Abrir com editor',
     openWithTerminal: 'Abrir com terminal',
-    selectProjectDefaults: 'Selecionar padrões',
+    selectProjectDefaults: 'Padrões',
     reload: 'Recarregar',
     reloadToolList: 'Recarregar lista de editores e terminais',
     advanced: 'Avançado',
@@ -248,6 +254,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     openOnStartup: 'Abrir al iniciar',
     showAppIcons: 'Mostrar iconos reales de las apps',
     deleteFilesFromDiskByDefault: 'Eliminar archivos del disco por defecto',
+    requireProjectDeletionConfirmation: 'Requerir confirmación para eliminar proyectos',
     addCustomEditor: 'Agregar editor personalizado',
     addCustomTerminal: 'Agregar terminal personalizado',
     projects: 'Proyectos',
@@ -263,6 +270,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     deleteFilesFromDisk: 'Eliminar archivos del disco',
     cancel: 'Cancelar',
     remove: 'Eliminar',
+    close: 'Cerrar',
     deleteFailed: 'Error al eliminar',
     couldNotDeleteFromDisk: 'No se pudo eliminar {{path}} del disco.',
     loading: 'Cargando...',
@@ -281,7 +289,7 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     moreActions: 'Más acciones',
     openWithEditor: 'Abrir con editor',
     openWithTerminal: 'Abrir con terminal',
-    selectProjectDefaults: 'Seleccionar predeterminados',
+    selectProjectDefaults: 'Predeterminados',
     reload: 'Recargar',
     reloadToolList: 'Recargar lista de editores y terminales',
     advanced: 'Avanzado',

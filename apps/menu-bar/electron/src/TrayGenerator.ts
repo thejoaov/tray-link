@@ -69,7 +69,12 @@ export default class TrayGenerator {
       return
     }
     this.mainWindow.setPosition(position.x, position.y, false)
+    if (process.platform === 'darwin') {
+      this.mainWindow.setAlwaysOnTop(true, 'pop-up-menu')
+      this.mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    }
     this.mainWindow.show()
+    this.mainWindow.moveTop()
   }
   hideWindow = () => {
     this.mainWindow.hide()

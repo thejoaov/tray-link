@@ -38,6 +38,12 @@ const PROJECT_SEARCH_HEIGHT = 34
 const PROJECT_SEARCH_GAP = 12
 const FILTERED_PROJECT_LIST_HEIGHT = Math.max(PROJECT_LIST_HEIGHT - PROJECT_SEARCH_HEIGHT - PROJECT_SEARCH_GAP, 120)
 
+type RemoveProjectPayload = {
+  id: string
+  path: string
+  deleteFromDisk: boolean
+}
+
 export const ProjectList = () => {
   const { t } = useTranslation()
   const [projects, setProjects] = useState<Project[]>([])
@@ -99,16 +105,7 @@ export const ProjectList = () => {
 
     const removeSubscription = subscribeProjectRemoveConfirm(async (payload) => {
       try {
-        if (payload.deleteFromDisk) {
-          const removed = await removeFromDisk(payload.path)
-          if (!removed) {
-            Alert.alert(t('deleteFailed'), t('couldNotDeleteFromDisk', { path: payload.path }))
-            return
-          }
-        }
-
-        await projectStore.removeProject(payload.id)
-        await loadProjects()
+        await executeProjectRemoval(payload)
       } catch (error) {
         await logError('project-list:removeSubscription', error, {
           projectId: payload.id,
@@ -240,7 +237,6 @@ export const ProjectList = () => {
         updatedAt: new Date().toISOString(),
       })
       await loadProjects()
-      setToolSelectionProjectId(null)
     } catch (error) {
       await logError('project-list:handleSetProjectEditorDefault', error, {
         projectId: project.id,
@@ -257,13 +253,28 @@ export const ProjectList = () => {
         updatedAt: new Date().toISOString(),
       })
       await loadProjects()
-      setToolSelectionProjectId(null)
     } catch (error) {
       await logError('project-list:handleSetProjectTerminalDefault', error, {
         projectId: project.id,
         command,
       })
     }
+  }
+
+  const executeProjectRemoval = async ({ id, path, deleteFromDisk }: RemoveProjectPayload) => {
+    if (deleteFromDisk) {
+      const removed = await removeFromDisk(path)
+      if (!removed) {
+        Alert.alert(t('deleteFailed'), t('couldNotDeleteFromDisk', { path }))
+        return false
+      }
+    }
+
+    await projectStore.removeProject(id)
+    await loadProjects()
+    setContextMenuProjectId((current) => (current === id ? null : current))
+    setToolSelectionProjectId((current) => (current === id ? null : current))
+    return true
   }
 
   const handleMoveProject = async (index: number, direction: 'up' | 'down') => {
@@ -283,6 +294,20 @@ export const ProjectList = () => {
   }
 
   const handleRequestRemove = (project: Project) => {
+    if (!preferences.requireProjectDeletionConfirmation && !preferences.removeFromDiskByDefault) {
+      executeProjectRemoval({
+        id: project.id,
+        path: project.path,
+        deleteFromDisk: false,
+      }).catch((error) => {
+        void logError('project-list:handleImmediateRemove', error, {
+          projectId: project.id,
+          path: project.path,
+        })
+      })
+      return
+    }
+
     setPendingProjectRemove({
       id: project.id,
       name: project.name,
@@ -303,6 +328,11 @@ export const ProjectList = () => {
 
   const handleToggleProjectToolSelectionMode = (projectId: string) => {
     setToolSelectionProjectId((current) => (current === projectId ? null : projectId))
+  }
+
+  const handleCloseContextMenu = (projectId: string) => {
+    setContextMenuProjectId((current) => (current === projectId ? null : current))
+    setToolSelectionProjectId((current) => (current === projectId ? null : current))
   }
 
   if (loading) {
@@ -405,6 +435,7 @@ export const ProjectList = () => {
             onOpenFinder={() => handleOpenFinder(item)}
             onRemove={() => handleRequestRemove(item)}
             onToggleContextMenu={() => handleToggleContextMenu(item.id)}
+            onCloseContextMenu={() => handleCloseContextMenu(item.id)}
             contextMenuOpen={contextMenuProjectId === item.id}
             editorOptions={editorOptions}
             terminalOptions={terminalOptions}
@@ -422,6 +453,7 @@ export const ProjectList = () => {
               openWithTerminal: t('openWithTerminal'),
               selectProjectDefaults: t('selectProjectDefaults'),
               done: t('done'),
+              close: t('close'),
             }}
             editMode={editMode}
             onMoveUp={() => handleMoveFilteredProject(item.id, 'up')}

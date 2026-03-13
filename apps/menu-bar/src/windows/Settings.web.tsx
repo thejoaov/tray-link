@@ -3,7 +3,13 @@ import { Picker } from '@react-native-picker/picker'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import { installCli, isCliInstalled, openInEditor, openPathWithSystem } from '../../modules/shell-utils/src'
+import {
+  installCli,
+  isCliInstalled,
+  openInEditor,
+  openPathWithSystem,
+  uninstallCli,
+} from '../../modules/shell-utils/src'
 import { getConfigPath } from '../../modules/storage-module/src'
 import Analytics, { AnalyticsEvent } from '../analytics'
 import { Divider, Row, ScrollView, Switch, Text, View } from '../components'
@@ -75,6 +81,7 @@ export const Settings = () => {
   const [legacyProjectsPreviewCount, setLegacyProjectsPreviewCount] = useState(0)
   const [cliInstalled, setCliInstalled] = useState(false)
   const [installingCli, setInstallingCli] = useState(false)
+  const [uninstallingCli, setUninstallingCli] = useState(false)
   const [updaterState, setUpdaterState] = useState<AppUpdaterState>(getUpdaterState())
 
   const editorOptions = useMemo(
@@ -89,8 +96,16 @@ export const Settings = () => {
     [preferences.customTerminals, toolsVersion],
   )
 
+  const normalizePreferences = (next: UserPreferences): UserPreferences => {
+    if (next.removeFromDiskByDefault) {
+      return { ...next, requireProjectDeletionConfirmation: true }
+    }
+
+    return next
+  }
+
   const updatePreference = async <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
-    const next = { ...preferences, [key]: value }
+    const next = normalizePreferences({ ...preferences, [key]: value })
     setPreferences(next)
     await persistPreferences(next)
   }
@@ -99,8 +114,17 @@ export const Settings = () => {
     // Load preferences asynchronously on mount
     loadPreferences()
       .then((loadedPreferences) => {
-        setPreferences(loadedPreferences)
+        const normalizedPreferences = normalizePreferences(loadedPreferences)
+        setPreferences(normalizedPreferences)
         setPreferencesLoaded(true)
+        if (
+          normalizedPreferences.requireProjectDeletionConfirmation !==
+          loadedPreferences.requireProjectDeletionConfirmation
+        ) {
+          persistPreferences(normalizedPreferences).catch((error) => {
+            Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+          })
+        }
       })
       .catch((e) => {
         Analytics.track(AnalyticsEvent.ERROR, { error: String(e) })
@@ -109,8 +133,17 @@ export const Settings = () => {
     const subscription = subscribePreferencesChange(() => {
       loadPreferences()
         .then((loadedPreferences) => {
-          setPreferences(loadedPreferences)
+          const normalizedPreferences = normalizePreferences(loadedPreferences)
+          setPreferences(normalizedPreferences)
           setPreferencesLoaded(true)
+          if (
+            normalizedPreferences.requireProjectDeletionConfirmation !==
+            loadedPreferences.requireProjectDeletionConfirmation
+          ) {
+            persistPreferences(normalizedPreferences).catch((error) => {
+              Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+            })
+          }
         })
         .catch((e) => {
           Analytics.track(AnalyticsEvent.ERROR, { error: String(e) })
@@ -177,6 +210,7 @@ export const Settings = () => {
   const isInstallingUpdate = updaterState.status === 'installing' || updaterState.status === 'installed'
   const canInstallUpdate =
     updaterState.isSupported && updaterState.status === 'available' && Boolean(updaterState.downloadUrl)
+  const deletionConfirmationLocked = preferences.removeFromDiskByDefault
 
   const handleOpenConfigFile = async () => {
     try {
@@ -191,6 +225,40 @@ export const Settings = () => {
     } catch (error) {
       Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
       Alert.alert(t('settings'), t('openConfigFileFailed'))
+    }
+  }
+
+  const handleInstallCli = async () => {
+    setInstallingCli(true)
+    try {
+      const result = await installCli()
+      if (result.success) {
+        setCliInstalled(true)
+        if (!preferences.hasInstalledCli) {
+          const next = { ...preferences, hasInstalledCli: true }
+          setPreferences(next)
+          await persistPreferences(next)
+        }
+      }
+    } finally {
+      setInstallingCli(false)
+    }
+  }
+
+  const handleUninstallCli = async () => {
+    setUninstallingCli(true)
+    try {
+      const result = await uninstallCli()
+      if (result.success) {
+        setCliInstalled(false)
+        if (preferences.hasInstalledCli) {
+          const next = { ...preferences, hasInstalledCli: false }
+          setPreferences(next)
+          await persistPreferences(next)
+        }
+      }
+    } finally {
+      setUninstallingCli(false)
     }
   }
 
@@ -319,6 +387,17 @@ export const Settings = () => {
               onValueChange={(value) => updatePreference('removeFromDiskByDefault', value)}
             />
           </Row>
+
+          <Divider />
+
+          <Row align="center" justify="between" style={styles.boxItem}>
+            <Text style={styles.itemLabel}>{t('requireProjectDeletionConfirmation')}</Text>
+            <Switch
+              value={preferences.requireProjectDeletionConfirmation}
+              disabled={deletionConfirmationLocked}
+              onValueChange={(value) => updatePreference('requireProjectDeletionConfirmation', value)}
+            />
+          </Row>
         </View>
 
         <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('cli')}</Text>
@@ -331,27 +410,29 @@ export const Settings = () => {
             </View>
             <TouchableOpacity
               accessibilityLabel={t(preferences.hasInstalledCli ? 'reinstallCli' : 'installCli')}
-              disabled={installingCli}
-              onPress={async () => {
-                setInstallingCli(true)
-                try {
-                  const result = await installCli()
-                  if (result.success) {
-                    setCliInstalled(true)
-                    if (!preferences.hasInstalledCli) {
-                      const next = { ...preferences, hasInstalledCli: true }
-                      setPreferences(next)
-                      await persistPreferences(next)
-                    }
-                  }
-                } finally {
-                  setInstallingCli(false)
-                }
-              }}
-              style={[styles.button, installingCli && styles.buttonDisabled]}
+              disabled={installingCli || uninstallingCli}
+              onPress={handleInstallCli}
+              style={[styles.button, (installingCli || uninstallingCli) && styles.buttonDisabled]}
             >
               <Ionicons name="terminal-outline" size={14} color="var(--text-color)" />
               <Text style={styles.buttonText}>{t(preferences.hasInstalledCli ? 'reinstallCli' : 'installCli')}</Text>
+            </TouchableOpacity>
+          </Row>
+
+          <Divider />
+
+          <Row align="center" justify="between" style={styles.boxItem}>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemLabel}>{t('uninstallCli')} CLI</Text>
+            </View>
+            <TouchableOpacity
+              accessibilityLabel={t('uninstallCli')}
+              disabled={!cliInstalled || installingCli || uninstallingCli}
+              onPress={handleUninstallCli}
+              style={[styles.button, (!cliInstalled || installingCli || uninstallingCli) && styles.buttonDisabled]}
+            >
+              <Ionicons name="trash-outline" size={14} color="var(--text-color)" />
+              <Text style={styles.buttonText}>{t('uninstallCli')}</Text>
             </TouchableOpacity>
           </Row>
         </View>
