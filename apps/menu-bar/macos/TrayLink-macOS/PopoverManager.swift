@@ -7,6 +7,9 @@ class PopoverManager: NSObject {
   @objc public var delegate: RCTAppDelegate
   private var statusItem: NSStatusItem!
   @objc var popover: NSPopover!
+  private var preservedPopoverTopLeft: NSPoint?
+  private var popoverMoveObserver: NSObjectProtocol?
+  private var isRestoringPopoverPosition = false
 
   @objc public static func initializeShared(delegate: RCTAppDelegate) -> PopoverManager {
     if shared == nil {
@@ -125,6 +128,23 @@ class PopoverManager: NSObject {
       preferredEdge: .minY)
     popover.contentViewController?.view.window?.makeKey()
 
+    if let window = popover.contentViewController?.view.window {
+      preservedPopoverTopLeft = NSPoint(x: window.frame.minX, y: window.frame.maxY)
+
+      if let popoverMoveObserver {
+        NotificationCenter.default.removeObserver(popoverMoveObserver)
+      }
+
+      popoverMoveObserver = NotificationCenter.default.addObserver(
+        forName: NSWindow.didMoveNotification,
+        object: window,
+        queue: .main
+      ) { [weak self] _ in
+        guard let self else { return }
+        self.restorePopoverPositionIfNeeded()
+      }
+    }
+
     let screenSize: [String: Any] = [
       "height": NSScreen.main?.frame.height ?? 0,
       "width": NSScreen.main?.frame.width ?? 0
@@ -135,11 +155,41 @@ class PopoverManager: NSObject {
   }
 
   @objc func closePopover() {
+    if let popoverMoveObserver {
+      NotificationCenter.default.removeObserver(popoverMoveObserver)
+      self.popoverMoveObserver = nil
+    }
+
+    preservedPopoverTopLeft = nil
     popover.close()
+  }
+
+  private func restorePopoverPositionIfNeeded() {
+    guard !isRestoringPopoverPosition,
+          popover.isShown,
+          let preservedPopoverTopLeft,
+          let window = popover.contentViewController?.view.window else {
+      return
+    }
+
+    let currentTopLeft = NSPoint(x: window.frame.minX, y: window.frame.maxY)
+    guard currentTopLeft != preservedPopoverTopLeft else {
+      return
+    }
+
+    isRestoringPopoverPosition = true
+    window.setFrameTopLeftPoint(preservedPopoverTopLeft)
+    DispatchQueue.main.async { [weak self] in
+      self?.isRestoringPopoverPosition = false
+    }
   }
 
   @objc func setPopoverContentSize(_ size: NSSize) {
     popover.contentSize = size
     popover.contentViewController?.view.frame.size = size
+
+    DispatchQueue.main.async { [weak self] in
+      self?.restorePopoverPositionIfNeeded()
+    }
   }
 }
