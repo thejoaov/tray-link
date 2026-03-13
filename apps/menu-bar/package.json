@@ -1,6 +1,6 @@
 {
   "name": "@tray-link/menu-bar",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "private": true,
   "scripts": {
     "start": "expo start",
