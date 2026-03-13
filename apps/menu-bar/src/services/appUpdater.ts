@@ -1,11 +1,13 @@
 import { EmitterSubscription, Platform } from 'react-native'
 import { installAppUpdate } from '../../modules/shell-utils/src'
 import { getItem, setItem } from '../../modules/storage-module/src'
+import packageJson from '../../package.json'
 import MenuBarModule from '../modules/MenuBarModule'
 
 const RELEASES_API_URL = 'https://api.github.com/repos/thejoaov/tray-link/releases/latest'
 const UPDATE_STATE_STORAGE_KEY = 'app-updater-state'
 const AUTO_CHECK_DELAY_MS = 4000
+const PACKAGE_JSON_APP_VERSION = packageJson.version
 const isElectron = Platform.OS === 'web'
 const isMacOS =
   Platform.OS === 'macos' || (isElectron && typeof navigator !== 'undefined' && /mac/i.test(navigator.userAgent))
@@ -46,8 +48,19 @@ let initializePromise: Promise<void> | null = null
 let checkPromise: Promise<AppUpdaterState> | null = null
 let autoCheckTimer: ReturnType<typeof setTimeout> | null = null
 
+function getCurrentAppVersion(): string {
+  const packageVersion = normalizeVersion(PACKAGE_JSON_APP_VERSION)
+  const nativeVersion = normalizeVersion(MenuBarModule.appVersion || '')
+
+  if (!nativeVersion) {
+    return packageVersion
+  }
+
+  return compareVersions(packageVersion, nativeVersion) >= 0 ? packageVersion : nativeVersion
+}
+
 let state: AppUpdaterState = {
-  currentVersion: normalizeVersion(MenuBarModule.appVersion || '0.0.0'),
+  currentVersion: getCurrentAppVersion(),
   downloadUrl: null,
   error: null,
   isSupported: isMacOS,
@@ -189,7 +202,7 @@ async function fetchLatestRelease(): Promise<GitHubRelease> {
 
 async function finalizeCheck(nextState: Partial<AppUpdaterState>) {
   setState({
-    currentVersion: normalizeVersion(MenuBarModule.appVersion || state.currentVersion),
+    currentVersion: getCurrentAppVersion(),
     ...nextState,
   })
   await persistState()
@@ -217,7 +230,7 @@ export async function initializeUpdater(): Promise<void> {
 
   initializePromise = (async () => {
     setState({
-      currentVersion: normalizeVersion(MenuBarModule.appVersion || state.currentVersion),
+      currentVersion: getCurrentAppVersion(),
       isSupported: isMacOS,
     })
 

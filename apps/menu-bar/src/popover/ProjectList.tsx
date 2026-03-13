@@ -3,7 +3,16 @@ import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  ActivityIndicator,
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { pickFolder } from '../../modules/file-picker'
 import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
@@ -129,6 +138,8 @@ export const ProjectList = () => {
   )
 
   const loadProjects = async () => {
+    setLoading(true)
+
     try {
       const data = await projectStore.getProjects()
       setProjects(data.sort((a, b) => a.position - b.position))
@@ -296,8 +307,39 @@ export const ProjectList = () => {
 
   if (loading) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text>{t('loading')}</Text>
+      <View
+        style={{
+          maxHeight: MAX_UI_HEIGHT,
+        }}
+      >
+        <SectionHeader
+          label={t('projects')}
+          accessoryRight={
+            <View style={styles.headerActions}>
+              <TouchableOpacity disabled style={[styles.addButton, styles.addButtonDisabled]}>
+                <Text style={styles.metaButtonText}>{t('reorder')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity disabled style={[styles.addButton, styles.addButtonDisabled]}>
+                <Ionicons name="add" size={16} color="var(--text-color)" />
+              </TouchableOpacity>
+            </View>
+          }
+        />
+        <View style={styles.searchContainer}>
+          <Ionicons name="search-outline" size={14} color="var(--text-color)" />
+          <TextInput
+            value=""
+            editable={false}
+            placeholder={t('searchProjects')}
+            placeholderTextColor="#8E8E93"
+            style={styles.searchInput}
+          />
+        </View>
+        <View style={[styles.emptyContainer, styles.loadingContainer]}>
+          <ActivityIndicator size="small" color="var(--text-color)" />
+          <Text style={styles.emptyText}>{t('loading')}</Text>
+        </View>
+        <Footer />
       </View>
     )
   }
@@ -404,6 +446,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'rgba(255,255,255,0.1)',
   },
+  addButtonDisabled: {
+    opacity: 0.5,
+  },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -428,6 +473,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: 'var(--text-color)',
     paddingVertical: 0,
+    paddingTop: Platform.OS === 'web' ? 0 : 8,
     alignContent: 'center',
     borderColor: 'none',
     borderWidth: 0,
@@ -445,6 +491,10 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    gap: 10,
+    minHeight: FILTERED_PROJECT_LIST_HEIGHT,
   },
   emptyText: {
     fontSize: 14,
