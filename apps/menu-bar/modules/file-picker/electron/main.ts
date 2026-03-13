@@ -28,6 +28,17 @@ const FilePickerModule: Partial<NativeFilePickerModule> & { name: string } = {
 
     return filePaths[0]
   },
+  pickFolders: async () => {
+    const { filePaths, canceled } = await dialog.showOpenDialog({
+      properties: ['openDirectory', 'multiSelections'],
+    })
+
+    if (canceled) {
+      throw new Error('NSModalResponseCancel')
+    }
+
+    return filePaths
+  },
 }
 
 export default FilePickerModule

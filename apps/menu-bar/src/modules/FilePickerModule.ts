@@ -3,6 +3,7 @@ import { NativeModule, NativeModules } from 'react-native'
 type FilePickerModuleType = NativeModule & {
   pickFileWithFilenameExtension: (extensions: string[], prompt?: string) => Promise<string>
   pickFolder: () => Promise<string>
+  pickFolders: () => Promise<string[]>
 }
 
 const FilePickerModule: FilePickerModuleType = NativeModules.FilePicker
@@ -13,4 +14,5 @@ export default {
     return await FilePickerModule.pickFileWithFilenameExtension(['apk', 'app', 'gzip', 'ipa', 'tar'], 'Select')
   },
   pickFolder: async () => FilePickerModule.pickFolder(),
+  pickFolders: async () => FilePickerModule.pickFolders(),
 }

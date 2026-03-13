@@ -52,5 +52,18 @@ public class FilePickerModule: Module {
       }
       return panel.url?.path
     }.runOnQueue(.main)
+
+    AsyncFunction("pickFolders"){ () -> [String] in
+      let panel = NSOpenPanel()
+      panel.allowsMultipleSelection = true
+      panel.canChooseFiles = false
+      panel.canChooseDirectories = true
+      panel.canCreateDirectories = true
+
+      guard panel.runModal() == NSApplication.ModalResponse.OK else {
+        throw Exception(name: "FILE_PICKER_ERROR", description: "NSModalResponseCancel")
+      }
+      return panel.urls.map(\.path)
+    }.runOnQueue(.main)
   }
 }

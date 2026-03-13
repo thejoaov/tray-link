@@ -17,7 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { pickFolder } from '../../modules/file-picker'
+import { pickFolders } from '../../modules/file-picker'
 import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
 import Alert from '../modules/Alert'
@@ -56,6 +56,8 @@ type ItemLayout = {
   height: number
 }
 
+type ProjectSortMode = 'manual' | 'alphaAsc' | 'alphaDesc' | 'neighborhood'
+
 const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max)
 }
@@ -71,6 +73,71 @@ const moveProject = (items: Project[], fromIndex: number, toIndex: number) => {
   return reordered
 }
 
+const compareText = (left: string, right: string) => {
+  return left.localeCompare(right, undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  })
+}
+
+const getPathSegments = (path: string) => {
+  return path
+    .split('/')
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+}
+
+const compareProjectsByNeighborhood = (left: Project, right: Project) => {
+  const leftSegments = getPathSegments(left.path)
+  const rightSegments = getPathSegments(right.path)
+  const maxSegmentCount = Math.max(leftSegments.length, rightSegments.length)
+
+  for (let index = 0; index < maxSegmentCount; index += 1) {
+    const leftSegment = leftSegments[index] ?? ''
+    const rightSegment = rightSegments[index] ?? ''
+    const comparison = compareText(leftSegment, rightSegment)
+
+    if (comparison !== 0) {
+      return comparison
+    }
+  }
+
+  const nameComparison = compareText(left.name, right.name)
+  if (nameComparison !== 0) {
+    return nameComparison
+  }
+
+  return compareText(left.path, right.path)
+}
+
+const sortProjectsByMode = (items: Project[], mode: Exclude<ProjectSortMode, 'manual'>) => {
+  const sorted = [...items]
+
+  sorted.sort((left, right) => {
+    if (mode === 'alphaAsc') {
+      const nameComparison = compareText(left.name, right.name)
+      if (nameComparison !== 0) {
+        return nameComparison
+      }
+
+      return compareText(left.path, right.path)
+    }
+
+    if (mode === 'alphaDesc') {
+      const nameComparison = compareText(right.name, left.name)
+      if (nameComparison !== 0) {
+        return nameComparison
+      }
+
+      return compareText(right.path, left.path)
+    }
+
+    return compareProjectsByNeighborhood(left, right)
+  })
+
+  return sorted
+}
+
 export const ProjectList = () => {
   const { t } = useTranslation()
   const [projects, setProjects] = useState<Project[]>([])
@@ -84,6 +151,7 @@ export const ProjectList = () => {
   const [activeDragProjectId, setActiveDragProjectId] = useState<string | null>(null)
   const [dragDestinationIndex, setDragDestinationIndex] = useState<number | null>(null)
   const [scrollOffset, setScrollOffset] = useState(0)
+  const [projectSortMode, setProjectSortMode] = useState<ProjectSortMode>('manual')
   const listRef = useRef<FlatList<Project>>(null)
   const listContainerRef = useRef<View>(null)
   const projectsRef = useRef<Project[]>([])
@@ -227,21 +295,33 @@ export const ProjectList = () => {
 
   const handleAddProject = async () => {
     try {
-      const folderPath = await pickFolder()
-      if (folderPath) {
-        const now = new Date().toISOString()
-        const newProject: Project = {
-          id: Date.now().toString(),
-          name: folderPath.split('/').pop() || 'New Project',
-          path: folderPath,
-          position: projects.length,
-          createdAt: now,
-          updatedAt: now,
-          isFavorite: false,
-          defaultEditor: null,
-          defaultTerminal: null,
-        }
-        await projectStore.addProject(newProject)
+      const folderPaths = await pickFolders()
+      const uniqueFolderPaths = Array.from(
+        new Set(
+          folderPaths.filter((folderPath) => folderPath && !projects.some((project) => project.path === folderPath)),
+        ),
+      )
+
+      if (uniqueFolderPaths.length > 0) {
+        const timestamp = Date.now()
+        const basePosition = projects.length
+        const newProjects: Project[] = uniqueFolderPaths.map((folderPath, index) => {
+          const now = new Date().toISOString()
+
+          return {
+            id: `${timestamp}-${index}`,
+            name: folderPath.split('/').pop() || 'New Project',
+            path: folderPath,
+            position: basePosition + index,
+            createdAt: now,
+            updatedAt: now,
+            isFavorite: false,
+            defaultEditor: null,
+            defaultTerminal: null,
+          }
+        })
+
+        await projectStore.saveProjects([...projects, ...newProjects])
         await loadProjects()
       }
     } catch (error) {
@@ -431,6 +511,20 @@ export const ProjectList = () => {
     [loadProjects],
   )
 
+  const cycleProjectSortMode = useCallback(() => {
+    const nextMode: Exclude<ProjectSortMode, 'manual'> =
+      projectSortMode === 'manual'
+        ? 'alphaAsc'
+        : projectSortMode === 'alphaAsc'
+          ? 'alphaDesc'
+          : projectSortMode === 'alphaDesc'
+            ? 'neighborhood'
+            : 'alphaAsc'
+
+    setProjectSortMode(nextMode)
+    void persistProjectOrder(sortProjectsByMode(projectsRef.current, nextMode))
+  }, [persistProjectOrder, projectSortMode])
+
   const maybeAutoScrollDuringDrag = useCallback((absoluteY: number) => {
     const relativeY = absoluteY - listTopInWindowRef.current
     const layouts = Object.values(itemLayoutsRef.current)
@@ -547,6 +641,7 @@ export const ProjectList = () => {
       return
     }
 
+    setProjectSortMode('manual')
     const reordered = moveProject(currentProjects, currentIndex, destinationIndex)
     void persistProjectOrder(reordered)
   }, [persistProjectOrder])
@@ -582,6 +677,7 @@ export const ProjectList = () => {
         dragTouchOffsetWithinItemRef.current = 0
         setActiveDragProjectId(null)
         setDragDestinationIndex(null)
+        setProjectSortMode('manual')
       }
 
       return next
@@ -650,6 +746,38 @@ export const ProjectList = () => {
 
     return destinationLayout.y + destinationLayout.height - scrollOffset
   }, [activeDragProjectId, displayedProjects, dragDestinationIndex, editMode, itemLayouts, scrollOffset])
+
+  const projectSortModeButtonIcon = useMemo(() => {
+    if (projectSortMode === 'alphaAsc') {
+      return 'text-outline'
+    }
+
+    if (projectSortMode === 'alphaDesc') {
+      return 'text'
+    }
+
+    if (projectSortMode === 'neighborhood') {
+      return 'folder-open-outline'
+    }
+
+    return 'swap-vertical-outline'
+  }, [projectSortMode])
+
+  const projectSortModeButtonLabel = useMemo(() => {
+    if (projectSortMode === 'alphaAsc') {
+      return t('sortProjectsAlphabeticalAsc')
+    }
+
+    if (projectSortMode === 'alphaDesc') {
+      return t('sortProjectsAlphabeticalDesc')
+    }
+
+    if (projectSortMode === 'neighborhood') {
+      return t('sortProjectsNeighborhood')
+    }
+
+    return t('cycleProjectSortMode')
+  }, [projectSortMode, t])
 
   const handleRequestRemove = (project: Project) => {
     if (!preferences.requireProjectDeletionConfirmation && !preferences.removeFromDiskByDefault) {
@@ -745,6 +873,16 @@ export const ProjectList = () => {
             <TouchableOpacity onPress={toggleEditMode} style={styles.addButton}>
               <Text style={styles.metaButtonText}>{editMode ? t('done') : t('reorder')}</Text>
             </TouchableOpacity>
+            {editMode ? (
+              <TouchableOpacity
+                accessibilityLabel={projectSortModeButtonLabel}
+                disabled={Boolean(activeDragProjectId)}
+                onPress={cycleProjectSortMode}
+                style={[styles.addButton, activeDragProjectId && styles.addButtonDisabled]}
+              >
+                <Ionicons name={projectSortModeButtonIcon} size={16} color="var(--text-color)" />
+              </TouchableOpacity>
+            ) : null}
             <TouchableOpacity onPress={handleAddProject} style={styles.addButton}>
               <Ionicons name="add" size={16} color="var(--text-color)" />
             </TouchableOpacity>

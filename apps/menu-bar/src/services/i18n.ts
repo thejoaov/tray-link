@@ -25,6 +25,10 @@ type TranslationKey =
   | 'projects'
   | 'reorder'
   | 'done'
+  | 'cycleProjectSortMode'
+  | 'sortProjectsAlphabeticalAsc'
+  | 'sortProjectsAlphabeticalDesc'
+  | 'sortProjectsNeighborhood'
   | 'searchProjects'
   | 'clearSearch'
   | 'noProjectsYet'
@@ -104,6 +108,10 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     projects: 'Projects',
     reorder: 'Reorder',
     done: 'Done',
+    cycleProjectSortMode: 'Cycle project sorting',
+    sortProjectsAlphabeticalAsc: 'Sort projects alphabetically ascending',
+    sortProjectsAlphabeticalDesc: 'Sort projects alphabetically descending',
+    sortProjectsNeighborhood: 'Sort projects by folder neighborhood',
     searchProjects: 'Search projects',
     clearSearch: 'Clear search',
     noProjectsYet: 'No projects added yet.',
@@ -182,6 +190,10 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     projects: 'Projetos',
     reorder: 'Reordenar',
     done: 'Concluir',
+    cycleProjectSortMode: 'Alternar ordenação dos projetos',
+    sortProjectsAlphabeticalAsc: 'Ordenar projetos em ordem alfabética crescente',
+    sortProjectsAlphabeticalDesc: 'Ordenar projetos em ordem alfabética decrescente',
+    sortProjectsNeighborhood: 'Ordenar projetos por vizinhança de pastas',
     searchProjects: 'Buscar projetos',
     clearSearch: 'Limpar busca',
     noProjectsYet: 'Nenhum projeto adicionado ainda.',
@@ -260,6 +272,10 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     projects: 'Proyectos',
     reorder: 'Reordenar',
     done: 'Listo',
+    cycleProjectSortMode: 'Alternar orden de proyectos',
+    sortProjectsAlphabeticalAsc: 'Ordenar proyectos alfabéticamente ascendente',
+    sortProjectsAlphabeticalDesc: 'Ordenar proyectos alfabéticamente descendente',
+    sortProjectsNeighborhood: 'Ordenar proyectos por vecindad de carpetas',
     searchProjects: 'Buscar proyectos',
     clearSearch: 'Limpiar búsqueda',
     noProjectsYet: 'Aún no hay proyectos agregados.',
