@@ -50,11 +50,14 @@ type TranslationKey =
   | 'name'
   | 'binary'
   | 'openCommandTemplate'
+  | 'appIconSource'
+  | 'chooseAppIcon'
   | 'saveCustomEditor'
   | 'saveCustomTerminal'
   | 'saved'
   | 'customEditorSaved'
   | 'customTerminalSaved'
+  | 'invalidAppIcon'
   | 'moreActions'
   | 'openWithEditor'
   | 'openWithTerminal'
@@ -133,11 +136,14 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     name: 'Name',
     binary: 'Binary',
     openCommandTemplate: 'Open command template',
+    appIconSource: 'App icon source',
+    chooseAppIcon: 'Choose app icon',
     saveCustomEditor: 'Save custom editor',
     saveCustomTerminal: 'Save custom terminal',
     saved: 'Saved',
     customEditorSaved: 'Custom editor saved successfully.',
     customTerminalSaved: 'Custom terminal saved successfully.',
+    invalidAppIcon: 'Could not resolve an icon from the selected app.',
     moreActions: 'More actions',
     openWithEditor: 'Open with editor',
     openWithTerminal: 'Open with terminal',
@@ -215,11 +221,14 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     name: 'Nome',
     binary: 'Binário',
     openCommandTemplate: 'Template de comando de abertura',
+    appIconSource: 'Origem do ícone do app',
+    chooseAppIcon: 'Escolher ícone do app',
     saveCustomEditor: 'Salvar editor personalizado',
     saveCustomTerminal: 'Salvar terminal personalizado',
     saved: 'Salvo',
     customEditorSaved: 'Editor personalizado salvo com sucesso.',
     customTerminalSaved: 'Terminal personalizado salvo com sucesso.',
+    invalidAppIcon: 'Não foi possível resolver um ícone do app selecionado.',
     moreActions: 'Mais ações',
     openWithEditor: 'Abrir com editor',
     openWithTerminal: 'Abrir com terminal',
@@ -297,11 +306,14 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     name: 'Nombre',
     binary: 'Binario',
     openCommandTemplate: 'Plantilla de comando de apertura',
+    appIconSource: 'Origen del icono de la app',
+    chooseAppIcon: 'Elegir icono de la app',
     saveCustomEditor: 'Guardar editor personalizado',
     saveCustomTerminal: 'Guardar terminal personalizado',
     saved: 'Guardado',
     customEditorSaved: 'Editor personalizado guardado con éxito.',
     customTerminalSaved: 'Terminal personalizado guardado con éxito.',
+    invalidAppIcon: 'No se pudo resolver un icono de la app seleccionada.',
     moreActions: 'Más acciones',
     openWithEditor: 'Abrir con editor',
     openWithTerminal: 'Abrir con terminal',

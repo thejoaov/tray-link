@@ -3,9 +3,11 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import { z } from 'zod'
+import { getAppAsync } from '../../modules/file-picker'
 import { Button, Text, TextInput, View } from '../components'
 import Alert from '../modules/Alert'
-import { loadPreferences, persistPreferences } from '../services/preferences'
+import { loadPreferences, persistPreferences, resolveCustomToolIconPath } from '../services/preferences'
+import { WindowsNavigator } from './index'
 
 const customToolSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -18,11 +20,28 @@ export const CustomEditorWindow = () => {
   const [name, setName] = useState('')
   const [binary, setBinary] = useState('')
   const [command, setCommand] = useState('')
+  const [iconAppPath, setIconAppPath] = useState('')
+
+  const handlePickIconApp = async () => {
+    try {
+      const path = await getAppAsync()
+      setIconAppPath(path)
+    } catch {
+      // User canceled file picker.
+    }
+  }
 
   const onSave = async () => {
     const result = customToolSchema.safeParse({ name, binary, command })
     if (!result.success) {
       Alert.alert(t('invalidEditor'), result.error.issues[0]?.message || t('invalidValues'))
+      return
+    }
+
+    const normalizedIconAppPath = iconAppPath.trim()
+    const iconPath = await resolveCustomToolIconPath(normalizedIconAppPath || null)
+    if (normalizedIconAppPath && !iconPath) {
+      Alert.alert(t('invalidEditor'), t('invalidAppIcon'))
       return
     }
 
@@ -32,6 +51,7 @@ export const CustomEditorWindow = () => {
       name: result.data.name,
       binary: result.data.binary,
       command: result.data.command,
+      iconPath,
     }
 
     await persistPreferences({
@@ -39,10 +59,11 @@ export const CustomEditorWindow = () => {
       customEditors: [...preferences.customEditors, tool],
     })
 
-    Alert.alert(t('saved'), t('customEditorSaved'))
     setName('')
     setBinary('')
     setCommand('')
+    setIconAppPath('')
+    WindowsNavigator.close('CustomEditorWindow')
   }
 
   return (
@@ -80,6 +101,19 @@ export const CustomEditorWindow = () => {
         onChangeText={setCommand}
         placeholder="cursor"
       />
+
+      <Text style={styles.label}>{t('appIconSource')}</Text>
+      <TextInput
+        border="default"
+        rounded="small"
+        px="2"
+        py="2"
+        value={iconAppPath}
+        onChangeText={setIconAppPath}
+        placeholder="/Applications/Cursor.app"
+      />
+
+      <Button title={t('chooseAppIcon')} onPress={handlePickIconApp} />
 
       <Button title={t('saveCustomEditor')} onPress={onSave} />
     </View>

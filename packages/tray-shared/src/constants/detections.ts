@@ -1,4 +1,5 @@
 enum EDITORS {
+  ANTIGRAVITY = 'Antigravity',
   VSCODE = 'Visual Studio Code',
   VISUAL_STUDIO = 'Visual Studio',
   SUBLIME_TEXT = 'Sublime Text',
@@ -23,6 +24,7 @@ enum EDITORS {
 }
 
 enum TERMINALS {
+  GHOSTTY = 'Ghostty',
   HYPER = 'Hyper',
   ITERM = 'iTerm',
   TERMINAL = 'Terminal',

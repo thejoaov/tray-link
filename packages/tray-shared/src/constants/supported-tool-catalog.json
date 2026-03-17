@@ -1,0 +1,571 @@
+{
+  "editors": {
+    "darwin": [
+      {
+        "name": "Visual Studio Code",
+        "command": "code",
+        "binary": "code",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Visual Studio Code.app", "/Applications/Visual Studio Code - OSS.app"],
+        "iconBasenames": ["Code", "AppIcon", "Visual Studio Code"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Visual Studio Code Insiders",
+        "command": "code-insiders",
+        "binary": "code-insiders",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Visual Studio Code - Insiders.app"],
+        "iconBasenames": ["Code", "AppIcon", "Visual Studio Code"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Visual Studio",
+        "command": "open -a \"Visual Studio\"",
+        "binary": null,
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Visual Studio.app"],
+        "iconBasenames": ["Visual Studio", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Cursor",
+        "command": "cursor",
+        "binary": "cursor",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Cursor.app"],
+        "iconBasenames": ["Cursor", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Windsurf",
+        "command": "windsurf",
+        "binary": "windsurf",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Windsurf.app"],
+        "iconBasenames": ["Windsurf", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Antigravity",
+        "command": "open -a Antigravity",
+        "binary": "agy",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Antigravity.app"],
+        "iconBasenames": ["Antigravity", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Sublime Text",
+        "command": "subl",
+        "binary": "subl",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Sublime Text.app"],
+        "iconBasenames": ["Sublime Text", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Atom",
+        "command": "atom",
+        "binary": "atom",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Atom.app"],
+        "iconBasenames": ["Atom", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "IntelliJ IDEA CE",
+        "command": "open -a \"IntelliJ IDEA CE\"",
+        "binary": null,
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/IntelliJ IDEA CE.app"],
+        "iconBasenames": ["idea", "idea64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "PyCharm CE",
+        "command": "open -a PyCharm CE",
+        "binary": null,
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/PyCharm CE.app"],
+        "iconBasenames": ["pycharm", "pycharm64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "PyCharm",
+        "command": "pycharm",
+        "binary": "pycharm",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/PyCharm.app"],
+        "iconBasenames": ["pycharm", "pycharm64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Android Studio",
+        "command": "open -a \"Android Studio\"",
+        "binary": null,
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Android Studio.app", "/Applications/Android Studio Preview.app"],
+        "iconBasenames": ["studio", "studio64", "AndroidStudio", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Xcode",
+        "command": "xed -b",
+        "binary": "xed",
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Xcode.app"],
+        "iconBasenames": ["Xcode", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Geany",
+        "command": "open -a Geany",
+        "binary": "geany",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Geany.app"],
+        "iconBasenames": ["Geany", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Gedit",
+        "command": "gedit",
+        "binary": "gedit",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Gedit.app"],
+        "iconBasenames": ["Gedit", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ],
+    "linux": [
+      {
+        "name": "Visual Studio Code",
+        "command": "code",
+        "binary": "code",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/share/code/bin/code"],
+        "iconBasenames": ["Code", "AppIcon", "Visual Studio Code"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Visual Studio Code Insiders",
+        "command": "code-insiders",
+        "binary": "code-insiders",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/share/code-insiders/bin/code-insiders"],
+        "iconBasenames": ["Code", "AppIcon", "Visual Studio Code"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Cursor",
+        "command": "cursor",
+        "binary": "cursor",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/cursor"],
+        "iconBasenames": ["Cursor", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Windsurf",
+        "command": "windsurf",
+        "binary": "windsurf",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/windsurf"],
+        "iconBasenames": ["Windsurf", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Antigravity",
+        "command": "antigravity",
+        "binary": "antigravity",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/antigravity", "/opt/antigravity/antigravity"],
+        "iconBasenames": ["Antigravity", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Sublime Text",
+        "command": "subl",
+        "binary": "subl",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/subl"],
+        "iconBasenames": ["Sublime Text", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Atom",
+        "command": "atom",
+        "binary": "atom",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/atom"],
+        "iconBasenames": ["Atom", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "IntelliJ IDEA CE",
+        "command": "idea.sh",
+        "binary": "idea.sh",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/share/intellij-idea-ce/bin/idea.sh"],
+        "iconBasenames": ["idea", "idea64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "PyCharm CE",
+        "command": "pycharm.sh",
+        "binary": "pycharm.sh",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/share/pycharm/bin/pycharm.sh"],
+        "iconBasenames": ["pycharm", "pycharm64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "PyCharm",
+        "command": "pycharm",
+        "binary": "pycharm",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/share/pycharm/bin/pycharm.sh"],
+        "iconBasenames": ["pycharm", "pycharm64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Android Studio",
+        "command": "studio.sh",
+        "binary": "studio.sh",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/share/android-studio/bin/studio.sh"],
+        "iconBasenames": ["studio", "studio64", "AndroidStudio", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Geany",
+        "command": "geany",
+        "binary": "geany",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/geany"],
+        "iconBasenames": ["Geany", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Gedit",
+        "command": "gedit",
+        "binary": "gedit",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/gedit"],
+        "iconBasenames": ["Gedit", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ],
+    "win32": [
+      {
+        "name": "Visual Studio Code",
+        "command": "code.cmd",
+        "binary": "code",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": [
+          "C:\\Program Files\\Microsoft VS Code\\Code.exe",
+          "C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+        ],
+        "iconBasenames": ["Code", "AppIcon", "Visual Studio Code"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Visual Studio Code Insiders",
+        "command": "code-insiders.cmd",
+        "binary": "code-insiders",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": [
+          "C:\\Program Files\\Microsoft VS Code Insiders\\Code - Insiders.exe",
+          "C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Microsoft VS Code Insiders\\Code - Insiders.exe"
+        ],
+        "iconBasenames": ["Code", "AppIcon", "Visual Studio Code"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Visual Studio",
+        "command": "devenv.exe",
+        "binary": "devenv.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\devenv.exe",
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\IDE\\devenv.exe",
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\Common7\\IDE\\devenv.exe",
+          "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\devenv.exe",
+          "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\Common7\\IDE\\devenv.exe",
+          "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\Common7\\IDE\\devenv.exe"
+        ],
+        "iconBasenames": ["Visual Studio", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Cursor",
+        "command": "cursor.exe",
+        "binary": "cursor",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Cursor\\Cursor.exe"],
+        "iconBasenames": ["Cursor", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Windsurf",
+        "command": "windsurf.exe",
+        "binary": "windsurf",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Windsurf\\Windsurf.exe"],
+        "iconBasenames": ["Windsurf", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Antigravity",
+        "command": "Antigravity.exe",
+        "binary": "Antigravity.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Antigravity\\Antigravity.exe"],
+        "iconBasenames": ["Antigravity", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Sublime Text",
+        "command": "subl.exe",
+        "binary": "subl.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Program Files\\Sublime Text 3\\subl.exe"],
+        "iconBasenames": ["Sublime Text", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Atom",
+        "command": "atom.exe",
+        "binary": "atom.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\atom\\atom.exe"],
+        "iconBasenames": ["Atom", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "IntelliJ IDEA CE",
+        "command": "idea64.exe",
+        "binary": "idea64.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2023.1.4\\bin\\idea64.exe"],
+        "iconBasenames": ["idea", "idea64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "PyCharm CE",
+        "command": "pycharm64.exe",
+        "binary": "pycharm64.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Program Files\\JetBrains\\PyCharm Community Edition 2023.1.4\\bin\\pycharm64.exe"],
+        "iconBasenames": ["pycharm", "pycharm64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "PyCharm",
+        "command": "pycharm64.exe",
+        "binary": "pycharm64.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Program Files\\JetBrains\\PyCharm\\bin\\pycharm64.exe"],
+        "iconBasenames": ["pycharm", "pycharm64", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Android Studio",
+        "command": "studio64.exe",
+        "binary": "studio64.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe"],
+        "iconBasenames": ["studio", "studio64", "AndroidStudio", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ]
+  },
+  "terminals": {
+    "darwin": [
+      {
+        "name": "Terminal",
+        "command": "open -a Terminal",
+        "binary": null,
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Utilities/Terminal.app", "/System/Applications/Utilities/Terminal.app"],
+        "iconBasenames": ["Terminal", "AppIcon"],
+        "alwaysAvailable": true
+      },
+      {
+        "name": "iTerm",
+        "command": "open -a iTerm",
+        "binary": "iterm",
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/iTerm.app"],
+        "iconBasenames": ["iTerm2", "iTerm"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Warp",
+        "command": "open -a Warp",
+        "binary": "warp",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Warp.app"],
+        "iconBasenames": ["Warp", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Hyper",
+        "command": "hyper",
+        "binary": "hyper",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Hyper.app"],
+        "iconBasenames": ["Hyper", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Ghostty",
+        "command": "open -a Ghostty",
+        "binary": "ghostty",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Ghostty.app"],
+        "iconBasenames": ["Ghostty", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ],
+    "linux": [
+      {
+        "name": "GNOME Terminal",
+        "command": "gnome-terminal",
+        "binary": "gnome-terminal",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["org.gnome.Terminal", "utilities-terminal", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Warp",
+        "command": "warp-terminal",
+        "binary": "warp-terminal",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/warp-terminal"],
+        "iconBasenames": ["Warp", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Hyper",
+        "command": "hyper",
+        "binary": "hyper",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/Hyper/hyper"],
+        "iconBasenames": ["Hyper", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Ghostty",
+        "command": "ghostty",
+        "binary": "ghostty",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/ghostty"],
+        "iconBasenames": ["Ghostty", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ],
+    "win32": [
+      {
+        "name": "CMD",
+        "command": "cmd.exe",
+        "binary": "cmd.exe",
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Windows\\System32\\cmd.exe"],
+        "iconBasenames": ["cmd", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "PowerShell",
+        "command": "powershell.exe",
+        "binary": "powershell.exe",
+        "enableBinaryCheck": false,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"],
+        "iconBasenames": ["powershell", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Windows Terminal",
+        "command": "wt.exe",
+        "binary": "wt.exe",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Microsoft\\WindowsApps\\wt.exe"],
+        "iconBasenames": ["WindowsTerminal", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Warp",
+        "command": "warp.exe",
+        "binary": "warp",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Warp\\warp.exe"],
+        "iconBasenames": ["Warp", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Hyper",
+        "command": "hyper",
+        "binary": "hyper",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\hyper\\hyper.exe"],
+        "iconBasenames": ["Hyper", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ]
+  }
+}

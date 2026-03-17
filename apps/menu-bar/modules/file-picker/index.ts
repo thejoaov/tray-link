@@ -9,5 +9,8 @@ export function pickFolders(): Promise<string[]> {
 }
 
 export function getAppAsync(): Promise<string> {
-  return FilePickerModule.pickFileWithFilenameExtension(['apk', 'app', 'gzip', 'ipa', 'tar'], 'Select')
+  return FilePickerModule.pickFileWithFilenameExtension(
+    ['app', 'exe', 'appimage', 'desktop', 'png', 'ico', 'icns', 'apk', 'ipa', 'tar', 'gzip'],
+    'Select',
+  )
 }

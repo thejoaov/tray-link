@@ -20,7 +20,7 @@ export const WindowsList = [
     options: {
       title: i18n.t('addCustomEditor'),
       width: 420,
-      height: 360,
+      height: 470,
       resizable: false,
     },
   },
@@ -30,7 +30,7 @@ export const WindowsList = [
     options: {
       title: i18n.t('addCustomTerminal'),
       width: 420,
-      height: 360,
+      height: 470,
       resizable: false,
     },
   },

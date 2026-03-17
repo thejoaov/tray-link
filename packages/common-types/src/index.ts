@@ -33,6 +33,7 @@ export interface CustomTool {
   name: string
   binary: string
   command: string
+  iconPath?: string | null
 }
 
 export interface Settings {
