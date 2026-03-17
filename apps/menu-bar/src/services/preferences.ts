@@ -5,7 +5,7 @@ import {
   SupportedToolCatalog,
   SupportedToolDefinition,
   ToolCatalogPlatform,
-} from '@tray-link/tray-shared'
+} from '@tray-link/tray-shared/constants/supportedTools.ts'
 import { EmitterSubscription, Platform } from 'react-native'
 import { z } from 'zod'
 import { fileExists, getFileIconDataUrl, which } from '../../modules/shell-utils/src'
