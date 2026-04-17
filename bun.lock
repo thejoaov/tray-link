@@ -15,7 +15,7 @@
     },
     "apps/cli": {
       "name": "@tray-link/cli",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "dependencies": {
         "@clack/prompts": "^1.1.0",
         "@tray-link/common-types": "workspace:*",
@@ -60,7 +60,7 @@
     },
     "apps/menu-bar": {
       "name": "@tray-link/menu-bar",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "dependencies": {
         "@expo/metro-runtime": "~6.1.2",
         "@expo/styleguide-native": "^1.0.1",
@@ -108,7 +108,7 @@
     },
     "apps/menu-bar/electron": {
       "name": "@tray-link/electron",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "dependencies": {
         "@tray-link/common-types": "workspace:*",
         "@tray-link/rn-electron-modules": "workspace:*",
@@ -136,22 +136,22 @@
     },
     "apps/menu-bar/modules/file-picker": {
       "name": "file-picker",
-      "version": "2.2.4",
+      "version": "2.2.7",
     },
     "apps/menu-bar/modules/menu-bar": {
       "name": "menu-bar",
-      "version": "2.2.4",
+      "version": "2.2.7",
     },
     "apps/menu-bar/modules/shell-utils": {
       "name": "shell-utils",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "dependencies": {
         "expo-modules-core": "*",
       },
     },
     "apps/menu-bar/modules/storage-module": {
       "name": "storage-module",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "dependencies": {
         "electron-store": "^11.0.2",
         "expo-modules-core": "*",
@@ -159,14 +159,14 @@
     },
     "packages/common-types": {
       "name": "@tray-link/common-types",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "devDependencies": {
         "typescript": "^5.9.3",
       },
     },
     "packages/rn-electron-modules": {
       "name": "@tray-link/rn-electron-modules",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "devDependencies": {
         "electron": "33.2.0",
         "electron-store": "^11.0.2",
@@ -175,7 +175,7 @@
     },
     "packages/tray-shared": {
       "name": "@tray-link/tray-shared",
-      "version": "2.2.4",
+      "version": "2.2.7",
       "dependencies": {
         "@tray-link/common-types": "workspace:*",
         "execa": "^9.6.1",
