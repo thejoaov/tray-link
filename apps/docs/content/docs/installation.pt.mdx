@@ -25,6 +25,8 @@ Baixe a versão mais recente para o seu sistema operacional e siga as instruçõ
     brew install --cask tray-link
     ```
 
+    O Homebrew instala automaticamente tanto o `Tray Link.app` quanto a CLI `tlink`.
+
     <Callout type="info" title="Está migrando do tap anterior do Homebrew?">
       Se você instalou o Tray Link a partir de `thejoaov/tray-link`, siga o [guia de migração do Homebrew](./homebrew-migration) antes de atualizar.
     </Callout>
@@ -87,13 +89,15 @@ Baixe a versão mais recente para o seu sistema operacional e siga as instruçõ
 
 ## Instalando a CLI
 
-A CLI `tlink` pode ser instalada diretamente pelo app Tray Link:
+Se você instalou o Tray Link com Homebrew, o `tlink` já fica disponível no terminal.
+
+Para instalações manuais do `.app`, a CLI `tlink` pode ser instalada diretamente pelo app Tray Link:
 
 1. Abra o Tray Link pela bandeja do sistema/barra de menus
 2. Clique em **Configurações** (ícone de engrenagem)
 3. Na seção **CLI**, clique em **Instalar CLI**
 
-Isso cria um link simbólico para o binário `tlink` para que fique disponível no seu terminal.
+Isso cria um link simbólico para o binário `tlink` empacotado com o app para que fique disponível no seu terminal.
 
 Você também pode desinstalar a CLI pela mesma seção de configurações.
 

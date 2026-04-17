@@ -1,5 +1,21 @@
 import { requireNativeModule } from 'expo-modules-core'
 
+type CliInstallResult = {
+  success: boolean
+  error?: string
+  alreadyInstalled?: boolean
+  managedByHomebrew?: boolean
+  path?: string
+}
+
+type CliUninstallResult = {
+  success: boolean
+  error?: string
+  managedByHomebrew?: boolean
+  path?: string
+  removed?: boolean
+}
+
 const ShellUtilsModule = requireNativeModule('ShellUtils')
 
 export function openInEditor(path: string, editorCommand: string): Promise<boolean> {
@@ -42,11 +58,11 @@ export function isCliInstalled(): Promise<boolean> {
   return ShellUtilsModule.isCliInstalled()
 }
 
-export function installCli(): Promise<{ success: boolean; error?: string }> {
+export function installCli(): Promise<CliInstallResult> {
   return ShellUtilsModule.installCli()
 }
 
-export function uninstallCli(): Promise<{ success: boolean; error?: string }> {
+export function uninstallCli(): Promise<CliUninstallResult> {
   return ShellUtilsModule.uninstallCli()
 }
 

@@ -236,13 +236,16 @@ export const Settings = () => {
     setInstallingCli(true)
     try {
       const result = await installCli()
-      if (result.success) {
-        setCliInstalled(true)
-        if (!preferences.hasInstalledCli) {
-          const next = { ...preferences, hasInstalledCli: true }
-          setPreferences(next)
-          await persistPreferences(next)
-        }
+      if (!result.success) {
+        Alert.alert(t('cli'), t('cliInstallError', { error: result.error ?? 'Unknown error' }))
+        return
+      }
+
+      setCliInstalled(true)
+      if (!preferences.hasInstalledCli) {
+        const next = { ...preferences, hasInstalledCli: true }
+        setPreferences(next)
+        await persistPreferences(next)
       }
     } finally {
       setInstallingCli(false)
@@ -253,13 +256,22 @@ export const Settings = () => {
     setUninstallingCli(true)
     try {
       const result = await uninstallCli()
-      if (result.success) {
-        setCliInstalled(false)
-        if (preferences.hasInstalledCli) {
-          const next = { ...preferences, hasInstalledCli: false }
-          setPreferences(next)
-          await persistPreferences(next)
-        }
+      if (!result.success) {
+        Alert.alert(t('cli'), t('cliUninstallError', { error: result.error ?? 'Unknown error' }))
+        return
+      }
+
+      if (result.managedByHomebrew || result.removed === false) {
+        setCliInstalled(true)
+        Alert.alert(t('cli'), t('cliManagedByHomebrew'))
+        return
+      }
+
+      setCliInstalled(false)
+      if (preferences.hasInstalledCli) {
+        const next = { ...preferences, hasInstalledCli: false }
+        setPreferences(next)
+        await persistPreferences(next)
       }
     } finally {
       setUninstallingCli(false)

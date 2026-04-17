@@ -111,17 +111,45 @@ jobs:
       - name: Build native macOS app (React Native macOS)
         if: matrix.build_target == 'native-macos'
         run: >
-          xcodebuild
-          -workspace ./macos/TrayLink.xcworkspace
-          -scheme TrayLink-macOS
-          -configuration Release
-          -derivedDataPath ./macos/build
-          ARCHS=arm64
-          ONLY_ACTIVE_ARCH=YES
-          CODE_SIGNING_ALLOWED=NO
-          CODE_SIGNING_REQUIRED=NO
-          CODE_SIGN_IDENTITY=
+          xcodebuild -workspace ./macos/TrayLink.xcworkspace -scheme
+          TrayLink-macOS -configuration Release -derivedDataPath ./macos/build
+          ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=
         working-directory: apps/menu-bar
+
+      - name: Validate native macOS bundle contents
+        if: matrix.build_target == 'native-macos'
+        run: |
+          set -euo pipefail
+
+          APP_BUNDLE="./macos/build/Build/Products/Release/Tray Link.app"
+          INFO_PLIST="$APP_BUNDLE/Contents/Info.plist"
+
+          if [ ! -d "$APP_BUNDLE" ]; then
+            echo "Missing app bundle at $APP_BUNDLE"
+            exit 1
+          fi
+
+          for arch in arm64 x64; do
+            binary_path="$APP_BUNDLE/Contents/Resources/tlink-$arch"
+
+            if [ ! -f "$binary_path" ]; then
+              echo "Missing bundled CLI binary: $binary_path"
+              exit 1
+            fi
+
+            if [ ! -x "$binary_path" ]; then
+              echo "Bundled CLI binary is not executable: $binary_path"
+              exit 1
+            fi
+          done
+
+          icon_name=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconFile' "$INFO_PLIST" 2>/dev/null || true)
+
+          if [ "$icon_name" != "AppIcon" ]; then
+            echo "Unexpected CFBundleIconFile value: ${icon_name:-<empty>}"
+            exit 1
+          fi
 
       - name: Package native macOS app for Homebrew
         if: matrix.build_target == 'native-macos'

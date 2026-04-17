@@ -42,5 +42,6 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.biome": "always"
     }
-  }
+  },
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
 }

@@ -78,6 +78,8 @@ type TranslationKey =
   | 'cliInstalled'
   | 'cliNotInstalled'
   | 'cliInstallError'
+  | 'cliUninstallError'
+  | 'cliManagedByHomebrew'
   | 'updates'
   | 'checkForUpdates'
   | 'installUpdate'
@@ -164,6 +166,8 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     cliInstalled: 'tlink command is available in your terminal',
     cliNotInstalled: 'Install tlink to use from any terminal',
     cliInstallError: 'Failed to install CLI: {{error}}',
+    cliUninstallError: 'Failed to uninstall CLI: {{error}}',
+    cliManagedByHomebrew: 'This CLI installation is managed by Homebrew. Use Homebrew to update or remove it.',
     updates: 'Updates',
     checkForUpdates: 'Check for updates',
     installUpdate: 'Install update',
@@ -249,6 +253,9 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     cliInstalled: 'O comando tlink está disponível no seu terminal',
     cliNotInstalled: 'Instale o tlink para usar em qualquer terminal',
     cliInstallError: 'Falha ao instalar CLI: {{error}}',
+    cliUninstallError: 'Falha ao desinstalar CLI: {{error}}',
+    cliManagedByHomebrew:
+      'Esta instalação da CLI é gerenciada pelo Homebrew. Use o Homebrew para atualizar ou remover.',
     updates: 'Atualizações',
     checkForUpdates: 'Verificar atualizações',
     installUpdate: 'Instalar atualização',
@@ -334,6 +341,9 @@ export const dictionaries: Record<Locale, Record<TranslationKey, string>> = {
     cliInstalled: 'El comando tlink está disponible en tu terminal',
     cliNotInstalled: 'Instala tlink para usar desde cualquier terminal',
     cliInstallError: 'Error al instalar CLI: {{error}}',
+    cliUninstallError: 'Error al desinstalar CLI: {{error}}',
+    cliManagedByHomebrew:
+      'Esta instalación de la CLI es administrada por Homebrew. Usa Homebrew para actualizarla o eliminarla.',
     updates: 'Actualizaciones',
     checkForUpdates: 'Buscar actualizaciones',
     installUpdate: 'Instalar actualización',

@@ -70,6 +70,72 @@ private func getCliWrapperURL() -> URL {
   return getCliWrapperDirectoryURL().appendingPathComponent("tlink")
 }
 
+private func resolveInstalledCliPath() -> String? {
+  let task = Process()
+  let pipe = Pipe()
+
+  task.executableURL = URL(fileURLWithPath: "/bin/zsh")
+  task.arguments = ["-lc", "command -v tlink"]
+  task.standardOutput = pipe
+
+  do {
+    try task.run()
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    task.waitUntilExit()
+
+    guard task.terminationStatus == 0 else {
+      return nil
+    }
+
+    let path = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard let path, !path.isEmpty else {
+      return nil
+    }
+
+    return path
+  } catch {
+    return nil
+  }
+}
+
+private func resolveSymlinkDestination(_ path: String) -> String? {
+  do {
+    return try FileManager.default.destinationOfSymbolicLink(atPath: path)
+  } catch {
+    return nil
+  }
+}
+
+private func isHomebrewManagedCli(at installedPath: String) -> Bool {
+  let resolvedPath = URL(fileURLWithPath: installedPath).resolvingSymlinksInPath().path
+
+  if installedPath.hasPrefix("/opt/homebrew/bin/") {
+    return true
+  }
+
+  if installedPath == "/usr/local/bin/tlink" {
+    guard let symlinkDestination = resolveSymlinkDestination(installedPath) else {
+      return false
+    }
+
+    let normalizedDestination: String
+    if symlinkDestination.hasPrefix("/") {
+      normalizedDestination = symlinkDestination
+    } else {
+      normalizedDestination = URL(
+        fileURLWithPath: symlinkDestination,
+        relativeTo: URL(fileURLWithPath: "/usr/local/bin/")
+      ).standardizedFileURL.path
+    }
+
+    if normalizedDestination.contains("/.tray-link/") {
+      return false
+    }
+  }
+
+  return resolvedPath.contains("/Applications/Tray Link.app/Contents/Resources/tlink-")
+}
+
 private func getBundledCliBinaryURL() -> URL {
   return Bundle.main.bundleURL
     .appendingPathComponent("Contents", isDirectory: true)
@@ -101,7 +167,7 @@ private func createCliWrapper() throws -> URL {
     "    exec \"$candidate\" \"$@\"",
     "  fi",
     "done",
-    "echo \"Tray Link CLI binary not found. Open Tray Link and install the CLI again.\" >&2",
+    "echo \"Tray Link CLI binary not found. Reinstall Tray Link or reinstall it with Homebrew to restore the bundled CLI.\" >&2",
     "exit 1",
     "",
   ].joined(separator: "\n")
@@ -293,15 +359,26 @@ public class ShellUtilsModule: Module {
     }
 
     AsyncFunction("isCliInstalled") { () -> Bool in
-      let symlinkPath = "/usr/local/bin/tlink"
-      return FileManager.default.fileExists(atPath: symlinkPath)
+      return resolveInstalledCliPath() != nil
     }
 
     AsyncFunction("installCli") { () -> [String: Any] in
       do {
+        if let installedPath = resolveInstalledCliPath() {
+          return [
+            "success": true,
+            "alreadyInstalled": true,
+            "path": installedPath,
+            "managedByHomebrew": isHomebrewManagedCli(at: installedPath)
+          ]
+        }
+
         let cliBinary = getBundledCliBinaryURL()
         guard FileManager.default.fileExists(atPath: cliBinary.path) else {
-          return ["success": false, "error": "CLI binary not found in bundle"]
+          return [
+            "success": false,
+            "error": "CLI binary not found in the Tray Link app bundle. Reinstall the app or install it again with Homebrew."
+          ]
         }
 
         let wrapperPath = try createCliWrapper().path
@@ -322,6 +399,16 @@ public class ShellUtilsModule: Module {
     }
 
     AsyncFunction("uninstallCli") { () -> [String: Any] in
+      if let installedPath = resolveInstalledCliPath(), isHomebrewManagedCli(at: installedPath) {
+        return [
+          "success": true,
+          "managedByHomebrew": true,
+          "path": installedPath,
+          "removed": false,
+          "error": "Tray Link CLI is managed by Homebrew. Use Homebrew to uninstall it."
+        ]
+      }
+
       let symlinkPath = "/usr/local/bin/tlink"
       let wrapperPath = getCliWrapperURL().path
       let wrapperDirectoryPath = getCliWrapperDirectoryURL().path
@@ -345,7 +432,7 @@ public class ShellUtilsModule: Module {
         try? FileManager.default.removeItem(atPath: wrapperDirectoryPath)
       }
 
-      return ["success": true]
+      return ["success": true, "removed": true]
     }
 
     AsyncFunction("installAppUpdate") { (downloadUrl: String) -> [String: Any] in

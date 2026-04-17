@@ -9,6 +9,8 @@
   brew install --cask tray-link
   ```
 
+  This installs both `Tray Link.app` and the `tlink` CLI.
+
 - Or download the latest release from [tray-link/releases](https://github.com/thejoaov/tray-link/releases)
 - Unzip the file and drag Tray Link to the Applications folder.
 

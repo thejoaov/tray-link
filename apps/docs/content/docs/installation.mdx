@@ -25,6 +25,8 @@ Download the latest version for your operating system and follow the platform-sp
     brew install --cask tray-link
     ```
 
+    Homebrew installs both `Tray Link.app` and the `tlink` CLI automatically.
+
     <Callout type="info" title="Migrating from the previous Homebrew tap?">
       If you installed Tray Link from `thejoaov/tray-link`, follow the [Homebrew migration guide](./homebrew-migration) before upgrading.
     </Callout>
@@ -93,13 +95,15 @@ Download the latest version for your operating system and follow the platform-sp
 
 ## Installing the CLI
 
-The `tlink` CLI can be installed directly from the Tray Link app:
+If you installed Tray Link with Homebrew, `tlink` is already available in your terminal.
+
+For manual `.app` installs, the `tlink` CLI can be installed directly from the Tray Link app:
 
 1. Open Tray Link from your system tray/menu bar
 2. Click **Settings** (gear icon)
 3. In the **CLI** section, click **Install CLI**
 
-This creates a symlink to the `tlink` binary so it's available in your terminal.
+This creates a symlink to the bundled `tlink` binary so it's available in your terminal.
 
 You can also uninstall the CLI from the same settings section.
 

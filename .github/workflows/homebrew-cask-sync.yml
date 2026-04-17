@@ -6,8 +6,8 @@ env:
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Build and Release"]
-    types: [completed]
+    workflows: [ "Build and Release" ]
+    types: [ completed ]
 
 permissions:
   contents: write
@@ -15,7 +15,8 @@ permissions:
 jobs:
   update-homebrew-cask:
     runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion
+      == 'success'
     permissions:
       contents: write
     env:
@@ -147,11 +148,18 @@ jobs:
             local asset_url="$2"
             local sha256="$3"
             local arch_requirement="${4:-}"
+            local install_cli_binary="${5:-false}"
             local cask_file="${tap_casks_dir}/${cask_name}.rb"
 
             {
+              printf '%s\n' "cask \"${cask_name}\" do"
+
+              if [ "$install_cli_binary" = "true" ]; then
+                printf '%s\n' '  arch arm: "arm64", intel: "x64"'
+                printf '\n'
+              fi
+
               printf '%s\n' \
-                "cask \"${cask_name}\" do" \
                 "  version \"${version}\"" \
                 "  sha256 \"${sha256}\"" \
                 "" \
@@ -164,13 +172,18 @@ jobs:
                 printf '\n%s\n' "  depends_on arch: :${arch_requirement}"
               fi
 
+              printf '\n%s\n' "  app \"Tray Link.app\""
+
+              if [ "$install_cli_binary" = "true" ]; then
+                printf '%s\n' '  binary "#{appdir}/Tray Link.app/Contents/Resources/tlink-#{arch}", target: "tlink"'
+              fi
+
               printf '\n%s\n' \
-                "  app \"Tray Link.app\"" \
-                "" \
                 "  zap trash: [" \
                 "    \"~/Library/Application Support/Tray Link\"," \
                 "    \"~/Library/Preferences/com.thejoaov.tray-link.plist\"," \
                 "    \"~/Library/Caches/com.thejoaov.tray-link\"," \
+                "    \"~/.tray-link\"," \
                 "  ]" \
                 "end"
             } > "$cask_file"
@@ -182,7 +195,7 @@ jobs:
           native_asset_url=$(resolve_asset_url "$native_asset_name")
           native_sha256=$(resolve_asset_sha256 "$native_asset_url" native-release.zip)
           echo "Selected native macOS asset: ${native_asset_name}"
-          write_cask_file "${NATIVE_CASK_NAME}" "$native_asset_url" "$native_sha256"
+          write_cask_file "${NATIVE_CASK_NAME}" "$native_asset_url" "$native_sha256" "" "true"
 
           electron_asset_name=$(resolve_asset_name "electron")
           electron_asset_url=$(resolve_asset_url "$electron_asset_name")

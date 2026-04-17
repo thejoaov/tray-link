@@ -85,6 +85,8 @@ brew tap thejoaov/tap
 brew install --cask tray-link
 ```
 
+The Homebrew cask installs both `Tray Link.app` and the `tlink` CLI.
+
 To update later:
 
 ```bash
