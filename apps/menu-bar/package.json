@@ -11,7 +11,7 @@
     "premacos": "bunx pod-install --project-directory=macos",
     "macos": "bash ./macos/scripts/build.sh",
     "export:web": "expo export --platform web --output-dir electron/dist && node ./electron/scripts/fix-export-paths.js",
-    "update-cli": "cp ../cli/dist/tlink-arm64 ../cli/tlink-arm64 && cp ../cli/dist/tlink-x64 ../cli/tlink-x64"
+    "update-cli": "cp ../cli/dist/tlink-arm64 ./cli/tlink-arm64 && cp ../cli/dist/tlink-x64 ./cli/tlink-x64 && chmod +x ./cli/tlink-arm64 ./cli/tlink-x64"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
