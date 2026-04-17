@@ -150,6 +150,7 @@ jobs:
             echo "Unexpected CFBundleIconFile value: ${icon_name:-<empty>}"
             exit 1
           fi
+        working-directory: apps/menu-bar
 
       - name: Package native macOS app for Homebrew
         if: matrix.build_target == 'native-macos'
