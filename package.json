@@ -1,6 +1,6 @@
 {
   "name": "@tray-link/tray-link",
-  "version": "2.2.10",
+  "version": "2.2.11",
   "private": true,
   "packageManager": "bun@1.0.0",
   "workspaces": [
