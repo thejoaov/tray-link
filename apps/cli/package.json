@@ -10,7 +10,8 @@
   "scripts": {
     "cli": "node ./dist/index.js",
     "build": "tsc",
-    "archive": "bun run build && pkg dist/index.js --config pkg.config.json -o dist/tlink",
+    "bundle": "bun build ./src/index.ts --bundle --target=node --format=cjs --outfile ./dist/pkg-entry.js",
+    "archive": "bun run bundle && pkg dist/pkg-entry.js --config pkg.config.json -o dist/tlink",
     "watch": "tsc --watch --preserveWatchOutput",
     "typecheck": "tsc"
   },

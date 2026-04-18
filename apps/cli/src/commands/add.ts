@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto'
 import { Command } from 'commander'
 import fs from 'fs'
 import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
 import { projectStore } from '../storage'
 
 export default new Command('add')
@@ -19,7 +19,7 @@ export default new Command('add')
     const name = options.name || path.basename(fullPath)
 
     await projectStore.addProject({
-      id: uuidv4(),
+      id: randomUUID(),
       name,
       path: fullPath,
       createdAt: new Date().toISOString(),

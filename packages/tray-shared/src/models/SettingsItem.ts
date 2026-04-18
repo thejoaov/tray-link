@@ -1,5 +1,17 @@
-import { v4 as uuidv4 } from 'uuid'
 import { generateSlug } from '../utils/slug'
+
+function createUUID(): string {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID()
+  }
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replaceAll(/[xy]/g, (char) => {
+    const random = Math.floor(Math.random() * 16)
+    const value = char === 'x' ? random : (random & 0x3) | 0x8
+
+    return value.toString(16)
+  })
+}
 
 type ISettingsItem = {
   name: string
@@ -18,7 +30,7 @@ export default class SettingsItem implements ISettingsItem {
   slug: string
 
   constructor(data: ISettingsItem) {
-    this.id = uuidv4()
+    this.id = createUUID()
     this.name = data.name
     this.path = data.path
     this.command = data.command

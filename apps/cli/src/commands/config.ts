@@ -1,4 +1,4 @@
-import { cancel, intro, isCancel, outro, select } from '@clack/prompts'
+import { createInterface } from 'node:readline/promises'
 import { Project } from '@tray-link/common-types'
 import { editorList, generateSlug, getEditorList, getTerminalList, terminalList } from '@tray-link/tray-shared'
 import { Command } from 'commander'
@@ -10,6 +10,52 @@ type ToolEntry = {
   name: string
   slug: string
   command: string
+}
+
+type InteractiveOption = {
+  value: string
+  label: string
+  hint?: string
+}
+
+const CANCELLED = Symbol('cancelled')
+
+async function selectOption(message: string, options: InteractiveOption[]): Promise<string | typeof CANCELLED> {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) {
+    throw new Error('Interactive selection requires a TTY. Pass a slug explicitly instead.')
+  }
+
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+
+  try {
+    console.log(`\n${message}`)
+
+    for (const [index, option] of options.entries()) {
+      const hint = option.hint ? ` — ${option.hint}` : ''
+      console.log(`${index + 1}. ${option.label}${hint}`)
+    }
+
+    while (true) {
+      const answer = (await rl.question(`Choose 1-${options.length} (press Enter to cancel): `)).trim()
+
+      if (answer === '') {
+        return CANCELLED
+      }
+
+      const selectedIndex = Number.parseInt(answer, 10)
+
+      if (Number.isInteger(selectedIndex) && selectedIndex >= 1 && selectedIndex <= options.length) {
+        return options[selectedIndex - 1].value
+      }
+
+      console.log(`Please enter a number between 1 and ${options.length}, or press Enter to cancel.`)
+    }
+  } finally {
+    rl.close()
+  }
 }
 
 /** Returns all known entries (static list + custom tools) with name, slug, and command. */
@@ -175,21 +221,21 @@ const setCommand = new Command('set')
       }
 
       if (options.interactive || !slugArg) {
-        intro(project ? `Set project default ${toolType}` : `Set default ${toolType}`)
+        console.log(project ? `Set project default ${toolType}` : `Set default ${toolType}`)
 
         const entries = getAllEntries(toolType)
 
         if (entries.length === 0) {
-          cancel(`No ${toolType}s are available. Configure one before running this command.`)
+          console.error(`No ${toolType}s are available. Configure one before running this command.`)
           process.exit(1)
         }
 
         const currentCommand = getEffectiveCommand(toolType, project)
         const projectCommand = project ? getProjectCommand(project, toolType) : null
 
-        const chosen = await select({
-          message: project ? `Choose a default ${toolType} for "${project.name}":` : `Choose a default ${toolType}:`,
-          options: entries.map((entry) => ({
+        const chosen = await selectOption(
+          project ? `Choose a default ${toolType} for "${project.name}":` : `Choose a default ${toolType}:`,
+          entries.map((entry) => ({
             value: entry.command,
             label: entry.name,
             hint:
@@ -199,22 +245,24 @@ const setCommand = new Command('set')
                   : 'current default'
                 : undefined,
           })),
-        })
+        )
 
-        if (isCancel(chosen)) {
-          cancel('Cancelled.')
+        if (chosen === CANCELLED) {
+          console.log('Cancelled.')
           process.exit(0)
         }
 
         if (project) {
-          await updateProjectCommand(project, toolType, chosen as string)
+          await updateProjectCommand(project, toolType, chosen)
         } else if (toolType === 'editor') {
-          preferencesStore.setDefaultEditor(chosen as string)
+          preferencesStore.setDefaultEditor(chosen)
         } else {
-          preferencesStore.setDefaultTerminal(chosen as string)
+          preferencesStore.setDefaultTerminal(chosen)
         }
 
-        outro(project ? `Project default ${toolType} set to "${chosen}"` : `Default ${toolType} set to "${chosen}"`)
+        console.log(
+          project ? `Project default ${toolType} set to "${chosen}"` : `Default ${toolType} set to "${chosen}"`,
+        )
         return
       }
 

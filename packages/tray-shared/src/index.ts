@@ -1,7 +1,6 @@
 export * from './constants/defaults'
 export * from './constants/detections'
 export * from './constants/supportedTools'
-export * from './i18n/index'
 export { default as SettingsItem } from './models/SettingsItem'
 export * from './services/config/index'
 export * from './services/config/utils'
