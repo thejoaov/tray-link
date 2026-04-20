@@ -2,10 +2,14 @@
 set -e
 
 WORKSPACE_PATH='./macos/TrayLink.xcworkspace'
-CONFIGURATION='Debug'
+CONFIGURATION="${CONFIGURATION:-Release}"
 SCHEME='TrayLink-macOS'
 
-echo "🔨 Building TrayLink..."
+if [[ "$CONFIGURATION" != *Debug* ]]; then
+    export RCT_NO_LAUNCH_PACKAGER="${RCT_NO_LAUNCH_PACKAGER:-1}"
+fi
+
+echo "🔨 Building TrayLink ($CONFIGURATION)..."
 # Build
 xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$SCHEME" -configuration "$CONFIGURATION"
 
