@@ -1,5 +1,5 @@
 enum EDITORS {
-  ANTIGRAVITY = 'Antigravity',
+  ANTIGRAVITY = 'Antigravity IDE',
   VSCODE = 'Visual Studio Code',
   VISUAL_STUDIO = 'Visual Studio',
   SUBLIME_TEXT = 'Sublime Text',

@@ -52,13 +52,13 @@
         "alwaysAvailable": false
       },
       {
-        "name": "Antigravity",
-        "command": "open -a Antigravity",
-        "binary": "agy",
+        "name": "Antigravity IDE",
+        "command": "open -a 'Antigravity IDE'",
+        "binary": "agy-ide",
         "enableBinaryCheck": true,
         "enableCommonPathCheck": true,
-        "commonFilepaths": ["/Applications/Antigravity.app"],
-        "iconBasenames": ["Antigravity", "AppIcon"],
+        "commonFilepaths": ["/Applications/Antigravity IDE.app"],
+        "iconBasenames": ["Antigravity IDE", "AppIcon"],
         "alwaysAvailable": false
       },
       {
@@ -194,13 +194,13 @@
         "alwaysAvailable": false
       },
       {
-        "name": "Antigravity",
-        "command": "antigravity",
-        "binary": "antigravity",
+        "name": "Antigravity IDE",
+        "command": "agy-ide",
+        "binary": "agy-ide",
         "enableBinaryCheck": true,
         "enableCommonPathCheck": true,
-        "commonFilepaths": ["/usr/bin/antigravity", "/opt/antigravity/antigravity"],
-        "iconBasenames": ["Antigravity", "AppIcon"],
+        "commonFilepaths": ["/usr/bin/agy-ide", "/opt/antigravity-ide/agy-ide"],
+        "iconBasenames": ["Antigravity IDE", "AppIcon"],
         "alwaysAvailable": false
       },
       {
@@ -349,13 +349,13 @@
         "alwaysAvailable": false
       },
       {
-        "name": "Antigravity",
-        "command": "Antigravity.exe",
-        "binary": "Antigravity.exe",
+        "name": "Antigravity IDE",
+        "command": "Antigravity IDE.exe",
+        "binary": "Antigravity IDE.exe",
         "enableBinaryCheck": true,
         "enableCommonPathCheck": true,
-        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Antigravity\\Antigravity.exe"],
-        "iconBasenames": ["Antigravity", "AppIcon"],
+        "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Antigravity IDE\\Antigravity IDE.exe"],
+        "iconBasenames": ["Antigravity IDE", "AppIcon"],
         "alwaysAvailable": false
       },
       {
