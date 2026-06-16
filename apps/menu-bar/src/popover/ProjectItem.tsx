@@ -47,6 +47,7 @@ type Props = {
   onLayout?: (event: LayoutChangeEvent) => void
   dragHandleProps?: GestureResponderHandlers
   isDragging?: boolean
+  onToggleFavorite?: () => void
 }
 
 export const ProjectItem = ({
@@ -76,6 +77,7 @@ export const ProjectItem = ({
   onLayout,
   dragHandleProps,
   isDragging = false,
+  onToggleFavorite,
 }: Props) => {
   const renderQuickActionIcon = (
     option: ToolOption | null | undefined,
@@ -126,6 +128,19 @@ export const ProjectItem = ({
         <TouchableOpacity accessibilityLabel="Open in finder" style={styles.button} onPress={onOpenFinder}>
           <Ionicons name="folder-open-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
+        {onToggleFavorite ? (
+          <TouchableOpacity
+            accessibilityLabel={project.isFavorite ? 'Remove from favorites' : 'Mark as favorite'}
+            style={styles.button}
+            onPress={onToggleFavorite}
+          >
+            <Ionicons
+              name={project.isFavorite ? 'star' : 'star-outline'}
+              size={14}
+              color={project.isFavorite ? '#FFD700' : 'var(--text-color)'}
+            />
+          </TouchableOpacity>
+        ) : null}
         {editMode ? (
           <View
             style={[styles.button, styles.dragHandleButton, isDragging && styles.dragHandleButtonActive]}

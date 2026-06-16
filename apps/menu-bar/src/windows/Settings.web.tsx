@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Picker } from '@react-native-picker/picker'
-import React, { useEffect, useMemo, useState } from 'react'
+import { Project } from '@tray-link/common-types'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, TouchableOpacity } from 'react-native'
+import { PanResponder, StyleSheet, TouchableOpacity } from 'react-native'
 import {
   installCli,
   isCliInstalled,
@@ -23,6 +24,7 @@ import {
   installLatestUpdate,
   subscribeUpdater,
 } from '../services/appUpdater'
+import { logError } from '../services/errorLogger'
 import { getLegacyMigrationPreview, hasLegacyMigrationCompleted, runLegacyMigration } from '../services/legacyMigration'
 import {
   getEditorOptions,
@@ -33,6 +35,7 @@ import {
   reloadToolOptions,
   subscribePreferencesChange,
 } from '../services/preferences'
+import { projectStore } from '../services/projectStore'
 import { WindowsNavigator } from './index'
 
 const LOCALE_OPTIONS = [
@@ -71,6 +74,221 @@ const getUpdaterStatusMessage = (updaterState: AppUpdaterState, t: ReturnType<ty
 
 export const Settings = () => {
   const { t } = useTranslation()
+  const [favoriteProjects, setFavoriteProjects] = useState<Project[]>([])
+  const [activeDragProjectId, setActiveDragProjectId] = useState<string | null>(null)
+  const [_dragDestinationIndex, setDragDestinationIndex] = useState<number | null>(null)
+  const [_scrollOffset, setScrollOffset] = useState(0)
+
+  // biome-ignore lint/suspicious/noExplicitAny: explicit any needed for ScrollView ref
+  const listRef = useRef<any>(null)
+  // biome-ignore lint/suspicious/noExplicitAny: explicit any needed for container ref
+  const listContainerRef = useRef<any>(null)
+  // biome-ignore lint/suspicious/noExplicitAny: explicit any needed for item wrapper ref map
+  const itemWrapperRefsRef = useRef(new Map<string, any>())
+  const listTopInWindowRef = useRef(0)
+  const listHeightRef = useRef(0)
+  const dragTouchOffsetWithinItemRef = useRef(0)
+
+  const activeDragProjectIdRef = useRef<string | null>(null)
+  const dragDestinationIndexRef = useRef<number | null>(null)
+  const favoriteProjectsRef = useRef<Project[]>([])
+  const itemLayoutsRef = useRef<Record<string, { y: number; height: number }>>({})
+  const scrollOffsetRef = useRef(0)
+  const [itemLayouts, setItemLayouts] = useState<Record<string, { y: number; height: number }>>({})
+
+  const dragPanRespondersRef = useRef(new Map<string, ReturnType<typeof PanResponder.create>>())
+
+  useEffect(() => {
+    projectStore.getProjects().then((allProjects) => {
+      const favs = allProjects
+        .filter((p) => p.isFavorite)
+        .sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0))
+      setFavoriteProjects(favs)
+    })
+  }, [])
+
+  useEffect(() => {
+    favoriteProjectsRef.current = favoriteProjects
+  }, [favoriteProjects])
+
+  useEffect(() => {
+    itemLayoutsRef.current = itemLayouts
+  }, [itemLayouts])
+
+  // biome-ignore lint/suspicious/noExplicitAny: explicit any needed for ScrollView scroll event
+  const handleScroll = useCallback((event: any) => {
+    const y = event.nativeEvent.contentOffset.y
+    scrollOffsetRef.current = y
+    setScrollOffset(y)
+  }, [])
+
+  const handleProjectLayout = useCallback((projectId: string) => {
+    const itemNode = itemWrapperRefsRef.current.get(projectId)
+    if (!itemNode || !listContainerRef.current) return
+
+    listContainerRef.current.measureInWindow(
+      (_listX: number, listY: number, _listWidth: number, listHeight: number) => {
+        listTopInWindowRef.current = listY
+        listHeightRef.current = listHeight
+
+        itemNode.measureInWindow((_itemX: number, itemY: number, _itemWidth: number, itemHeight: number) => {
+          const y = itemY - listY + scrollOffsetRef.current
+
+          setItemLayouts((current) => {
+            const previous = current[projectId]
+            if (previous?.y === y && previous?.height === itemHeight) {
+              return current
+            }
+
+            return {
+              ...current,
+              [projectId]: {
+                y,
+                height: itemHeight,
+              },
+            }
+          })
+        })
+      },
+    )
+  }, [])
+
+  // biome-ignore lint/suspicious/noExplicitAny: explicit any needed for View ref node
+  const setProjectWrapperRef = useCallback((projectId: string, node: any) => {
+    if (node) {
+      itemWrapperRefsRef.current.set(projectId, node)
+    } else {
+      itemWrapperRefsRef.current.delete(projectId)
+    }
+  }, [])
+
+  const getDragPanResponder = useCallback((projectId: string) => {
+    const cached = dragPanRespondersRef.current.get(projectId)
+    if (cached) {
+      return cached
+    }
+
+    const responder = PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_event, gestureState) => {
+        return Math.abs(gestureState.dy) >= 6
+      },
+      onPanResponderGrant: (_event, gestureState) => {
+        if (listContainerRef.current) {
+          listContainerRef.current.measureInWindow(
+            (_listX: number, listY: number, _listWidth: number, listHeight: number) => {
+              listTopInWindowRef.current = listY
+              listHeightRef.current = listHeight
+            },
+          )
+        }
+
+        const layout = itemLayoutsRef.current[projectId]
+        if (!layout) return
+
+        const pointerContentY =
+          (gestureState.moveY || gestureState.y0) - listTopInWindowRef.current + scrollOffsetRef.current
+        dragTouchOffsetWithinItemRef.current = Math.min(Math.max(pointerContentY - layout.y, 0), layout.height)
+        activeDragProjectIdRef.current = projectId
+        setActiveDragProjectId(projectId)
+
+        const currentIndex = favoriteProjectsRef.current.findIndex((p) => p.id === projectId)
+        dragDestinationIndexRef.current = currentIndex >= 0 ? currentIndex : null
+        setDragDestinationIndex(currentIndex >= 0 ? currentIndex : null)
+      },
+      onPanResponderMove: (_event, gestureState) => {
+        const activeId = activeDragProjectIdRef.current
+        if (!activeId) return
+
+        const pointerContentY = gestureState.moveY - listTopInWindowRef.current + scrollOffsetRef.current
+        const activeLayout = itemLayoutsRef.current[projectId]
+        if (!activeLayout) return
+
+        const draggedCenterY = pointerContentY - dragTouchOffsetWithinItemRef.current + activeLayout.height / 2
+
+        const candidateProjects = favoriteProjectsRef.current.filter((p) => p.id !== projectId)
+        let insertionIndex = candidateProjects.length
+
+        for (let index = 0; index < candidateProjects.length; index += 1) {
+          const layout = itemLayoutsRef.current[candidateProjects[index].id]
+          if (!layout) continue
+
+          if (draggedCenterY < layout.y + layout.height / 2) {
+            insertionIndex = index
+            break
+          }
+        }
+
+        const nextDestinationIndex = Math.min(
+          Math.max(insertionIndex, 0),
+          Math.max(favoriteProjectsRef.current.length - 1, 0),
+        )
+        if (dragDestinationIndexRef.current !== nextDestinationIndex) {
+          dragDestinationIndexRef.current = nextDestinationIndex
+          setDragDestinationIndex(nextDestinationIndex)
+        }
+      },
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderRelease: () => {
+        const activeId = activeDragProjectIdRef.current
+        if (!activeId) return
+
+        const currentIndex = favoriteProjectsRef.current.findIndex((p) => p.id === activeId)
+        const destinationIndex = dragDestinationIndexRef.current
+
+        activeDragProjectIdRef.current = null
+        dragDestinationIndexRef.current = null
+        dragTouchOffsetWithinItemRef.current = 0
+        setActiveDragProjectId(null)
+        setDragDestinationIndex(null)
+
+        if (currentIndex < 0 || destinationIndex === null || destinationIndex === currentIndex) {
+          return
+        }
+
+        const reordered = [...favoriteProjectsRef.current]
+        const [moved] = reordered.splice(currentIndex, 1)
+        reordered.splice(destinationIndex, 0, moved)
+        setFavoriteProjects(reordered)
+      },
+      onPanResponderTerminate: () => {
+        activeDragProjectIdRef.current = null
+        dragDestinationIndexRef.current = null
+        dragTouchOffsetWithinItemRef.current = 0
+        setActiveDragProjectId(null)
+        setDragDestinationIndex(null)
+      },
+    })
+
+    dragPanRespondersRef.current.set(projectId, responder)
+    return responder
+  }, [])
+
+  const handleSaveFavoritesOrder = async () => {
+    try {
+      const allProjects = await projectStore.getProjects()
+
+      const updated = allProjects.map((p) => {
+        const favIndex = favoriteProjects.findIndex((fp) => fp.id === p.id)
+        if (favIndex >= 0) {
+          return {
+            ...p,
+            isFavorite: true,
+            favoritePosition: favIndex,
+            updatedAt: new Date().toISOString(),
+          }
+        }
+        return p
+      })
+
+      await projectStore.saveProjects(updated)
+
+      Alert.alert(t('settings'), t('confirm') + '!')
+    } catch (error) {
+      console.error('Error saving favorites order:', error)
+      await logError('settings:handleSaveFavoritesOrder', error)
+    }
+  }
   const [preferences, setPreferences] = useState<UserPreferences>(defaultUserPreferences)
   const [preferencesLoaded, setPreferencesLoaded] = useState(false)
   const [reloadingTools, setReloadingTools] = useState(false)
@@ -276,7 +494,14 @@ export const Settings = () => {
 
   return (
     <View style={styles.root}>
-      <ScrollView contentContainerStyle={styles.scrollContent} indicatorStyle="black">
+      <ScrollView
+        ref={listRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        scrollEnabled={!activeDragProjectId}
+        contentContainerStyle={styles.scrollContent}
+        indicatorStyle="black"
+      >
         <Text style={styles.sectionTitle}>{t('settings')}</Text>
 
         <View border="light" rounded="medium" style={styles.box}>
@@ -411,6 +636,64 @@ export const Settings = () => {
             />
           </Row>
         </View>
+
+        {favoriteProjects.length > 0 ? (
+          <>
+            <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('favorites')}</Text>
+            <Text style={styles.sectionSubtitle}>{t('favoritesDescription')}</Text>
+
+            <View
+              ref={listContainerRef}
+              onLayout={() => {
+                if (listContainerRef.current) {
+                  listContainerRef.current.measureInWindow(
+                    (_listX: number, listY: number, _listWidth: number, listHeight: number) => {
+                      listTopInWindowRef.current = listY
+                      listHeightRef.current = listHeight
+                    },
+                  )
+                }
+              }}
+              border="light"
+              rounded="medium"
+              style={styles.box}
+            >
+              {favoriteProjects.map((project, index) => (
+                <React.Fragment key={project.id}>
+                  {index > 0 ? <Divider /> : null}
+                  <View
+                    ref={(node) => setProjectWrapperRef(project.id, node)}
+                    onLayout={() => handleProjectLayout(project.id)}
+                    style={[styles.favItemRow, activeDragProjectId === project.id && styles.draggingItemRow]}
+                  >
+                    <Row align="center" justify="between" style={styles.boxItem}>
+                      <View style={styles.itemTextContainer}>
+                        <Text style={styles.favItemName}>
+                          {index + 1}. {project.name}
+                        </Text>
+                        <Text style={styles.favItemPath} numberOfLines={1} ellipsizeMode="middle">
+                          {project.path}
+                        </Text>
+                      </View>
+                      <View style={styles.dragHandle} {...getDragPanResponder(project.id).panHandlers}>
+                        <Ionicons name="reorder-three-outline" size={20} color="var(--text-color)" />
+                      </View>
+                    </Row>
+                  </View>
+                </React.Fragment>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              accessibilityLabel={t('save')}
+              style={styles.saveButton}
+              onPress={handleSaveFavoritesOrder}
+            >
+              <Ionicons name="save-outline" size={14} color="#FFF" />
+              <Text style={styles.saveButtonText}>{t('save')}</Text>
+            </TouchableOpacity>
+          </>
+        ) : null}
 
         <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('cli')}</Text>
 
@@ -729,6 +1012,54 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(150, 150, 150, 0.1)',
   },
   releaseButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    color: 'var(--text-color)',
+    opacity: 0.6,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  favItemRow: {
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+  },
+  draggingItemRow: {
+    backgroundColor: 'rgba(125, 211, 252, 0.12)',
+    borderColor: 'rgba(125, 211, 252, 0.8)',
+    borderWidth: 1,
+    borderRadius: 8,
+    zIndex: 999,
+  },
+  favItemName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'var(--text-color)',
+  },
+  favItemPath: {
+    fontSize: 11,
+    opacity: 0.6,
+    color: 'var(--text-color)',
+    marginTop: 2,
+  },
+  dragHandle: {
+    padding: 8,
+  },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    alignSelf: 'flex-start',
+  },
+  saveButtonText: {
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '600',
   },

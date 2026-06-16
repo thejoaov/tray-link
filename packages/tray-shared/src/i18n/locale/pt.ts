@@ -56,6 +56,12 @@ const pt: typeof en = {
     'Esta ação recarregará a lista de terminais e editores que estão instalados em sua máquina. Deseja continuar?',
   cancel: 'Cancelar',
   reset: 'Redefinir',
+  favorites: 'Favoritos',
+  save: 'Salvar',
+  markAsFavorite: 'Marcar como favorito',
+  unmarkAsFavorite: 'Remover dos favoritos',
+  favoritesDescription: 'Arraste para reordenar seus projetos favoritos.',
+  projectsTitle: 'Projetos',
 }
 
 export default pt

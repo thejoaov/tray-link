@@ -6,6 +6,7 @@ export interface Project {
   updatedAt: string // ISO date string
   position: number
   isFavorite: boolean
+  favoritePosition?: number
   defaultEditor?: string | null
   defaultTerminal?: string | null
   migrated?: boolean

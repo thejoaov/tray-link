@@ -56,6 +56,12 @@ const es: typeof en = {
     'Esta acción recargará la lista de terminales y editores que están instalados en su máquina. ¿Desea continuar?',
   cancel: 'Cancelar',
   reset: 'Restaurar',
+  favorites: 'Favoritos',
+  save: 'Guardar',
+  markAsFavorite: 'Marcar como favorito',
+  unmarkAsFavorite: 'Quitar de favoritos',
+  favoritesDescription: 'Arrastre para reordenar sus proyectos favoritos.',
+  projectsTitle: 'Proyectos',
 }
 
 export default es

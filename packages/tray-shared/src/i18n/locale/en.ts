@@ -54,4 +54,10 @@ export default {
     'This action will reload the terminal and editors list that are installed on your machine. Do you want to continue?',
   cancel: 'Cancel',
   reset: 'Reset',
+  favorites: 'Favorites',
+  save: 'Save',
+  markAsFavorite: 'Mark as favorite',
+  unmarkAsFavorite: 'Remove from favorites',
+  favoritesDescription: 'Drag to reorder your favorite projects.',
+  projectsTitle: 'Projects',
 }

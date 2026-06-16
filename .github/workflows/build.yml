@@ -113,8 +113,15 @@ jobs:
         run: >
           xcodebuild -workspace ./macos/TrayLink.xcworkspace -scheme
           TrayLink-macOS -configuration Release -derivedDataPath ./macos/build
-          ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO
-          CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=
+          ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES
+          CODE_SIGNING_REQUIRED=YES CODE_SIGN_IDENTITY=-
+        working-directory: apps/menu-bar
+
+      - name: Codesign native macOS app (Ad-hoc)
+        if: matrix.build_target == 'native-macos'
+        run: |
+          APP_BUNDLE="./macos/build/Build/Products/Release/Tray Link.app"
+          codesign --force --deep --sign - "$APP_BUNDLE"
         working-directory: apps/menu-bar
 
       - name: Validate native macOS bundle contents

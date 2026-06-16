@@ -214,6 +214,81 @@ export const ProjectList = () => {
   }, [editMode, filteredProjects, projects])
   const listEmptyHasSearchState = !editMode && Boolean(normalizedSearchQuery)
 
+  const favoritesList = useMemo(() => {
+    return projects.filter((p) => p.isFavorite).sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0))
+  }, [projects])
+
+  const flatListData = useMemo(() => {
+    if (editMode) {
+      return projects.map((p) => ({
+        id: p.id,
+        type: 'project' as const,
+        project: p,
+        isFavoriteSection: false,
+        displayIndex: p.position,
+      }))
+    }
+
+    if (normalizedSearchQuery) {
+      return filteredProjects.map((p, idx) => ({
+        id: p.id,
+        type: 'project' as const,
+        project: p,
+        isFavoriteSection: false,
+        displayIndex: idx,
+      }))
+    }
+
+    if (favoritesList.length > 0) {
+      const items: Array<
+        | { id: string; type: 'header'; label: string }
+        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+      > = []
+
+      items.push({
+        id: 'header-favorites',
+        type: 'header',
+        label: t('favorites'),
+      })
+
+      favoritesList.forEach((p, idx) => {
+        items.push({
+          id: `fav-${p.id}`,
+          type: 'project',
+          project: p,
+          isFavoriteSection: true,
+          displayIndex: idx,
+        })
+      })
+
+      items.push({
+        id: 'header-all-projects',
+        type: 'header',
+        label: t('projectsTitle'),
+      })
+
+      projects.forEach((p, idx) => {
+        items.push({
+          id: p.id,
+          type: 'project',
+          project: p,
+          isFavoriteSection: false,
+          displayIndex: idx,
+        })
+      })
+
+      return items
+    }
+
+    return projects.map((p, idx) => ({
+      id: p.id,
+      type: 'project' as const,
+      project: p,
+      isFavoriteSection: false,
+      displayIndex: idx,
+    }))
+  }, [editMode, normalizedSearchQuery, filteredProjects, favoritesList, projects, t])
+
   const loadProjects = useCallback(async () => {
     setLoading(true)
 
@@ -331,6 +406,54 @@ export const ProjectList = () => {
       })
     }
   }
+
+  const handleToggleFavorite = useCallback(
+    async (project: Project) => {
+      try {
+        const allProjects = await projectStore.getProjects()
+        const updated = allProjects.map((p) => {
+          if (p.id === project.id) {
+            const nextIsFavorite = !p.isFavorite
+            let favoritePosition = p.favoritePosition
+            if (nextIsFavorite) {
+              const favs = allProjects.filter((ap) => ap.isFavorite)
+              const maxPos = favs.length > 0 ? Math.max(...favs.map((ap) => ap.favoritePosition ?? 0)) : -1
+              favoritePosition = maxPos + 1
+            } else {
+              favoritePosition = undefined
+            }
+            return {
+              ...p,
+              isFavorite: nextIsFavorite,
+              favoritePosition,
+              updatedAt: new Date().toISOString(),
+            }
+          }
+          return p
+        })
+
+        const favorited = updated
+          .filter((p) => p.isFavorite)
+          .sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0))
+
+        favorited.forEach((p, idx) => {
+          const found = updated.find((item) => item.id === p.id)
+          if (found) {
+            found.favoritePosition = idx
+          }
+        })
+
+        await projectStore.saveProjects(updated)
+        await loadProjects()
+      } catch (error) {
+        console.error('Error toggling favorite:', error)
+        await logError('project-list:handleToggleFavorite', error, {
+          projectId: project.id,
+        })
+      }
+    },
+    [loadProjects],
+  )
 
   const resolveEditorCommand = (project: Project) => {
     return project.defaultEditor ?? globalEditorCommand
@@ -913,8 +1036,10 @@ export const ProjectList = () => {
       </View>
       <View ref={listContainerRef} onLayout={handleListLayout} style={styles.listContainer}>
         <FlatList
-          ref={listRef}
-          data={displayedProjects}
+          // biome-ignore lint/suspicious/noExplicitAny: FlatList ref casting is required to support the union list item type
+          ref={listRef as any}
+          // biome-ignore lint/suspicious/noExplicitAny: FlatList data casting is required to support the union list item type
+          data={flatListData as any}
           keyExtractor={(item) => item.id}
           style={{ height: FILTERED_PROJECT_LIST_HEIGHT }}
           extraData={{
@@ -927,6 +1052,7 @@ export const ProjectList = () => {
             itemLayouts,
             scrollOffset,
             toolSelectionProjectId,
+            flatListData,
           }}
           scrollEnabled={!activeDragProjectId}
           onScroll={handleListScroll}
@@ -941,44 +1067,52 @@ export const ProjectList = () => {
               </Text>
             </View>
           }
-          renderItem={({ item, index }) => (
-            <View ref={(node) => setProjectWrapperRef(item.id, node)} onLayout={() => handleProjectLayout(item.id)}>
-              <ProjectItem
-                index={index}
-                project={item}
-                onOpenEditor={() => handleOpenEditor(item)}
-                onOpenTerminal={() => handleOpenTerminal(item)}
-                onOpenFinder={() => handleOpenFinder(item)}
-                onRemove={() => handleRequestRemove(item)}
-                onToggleContextMenu={() => handleToggleContextMenu(item.id)}
-                onCloseContextMenu={() => handleCloseContextMenu(item.id)}
-                contextMenuOpen={!editMode && contextMenuProjectId === item.id}
-                editorOptions={editorOptions}
-                terminalOptions={terminalOptions}
-                editorQuickActionOption={resolveEditorOption(item)}
-                terminalQuickActionOption={resolveTerminalOption(item)}
-                onOpenWithEditor={(command) => handleOpenWithEditor(item, command)}
-                onOpenWithTerminal={(command) => handleOpenWithTerminal(item, command)}
-                onSelectProjectEditorDefault={(command) => handleSetProjectEditorDefault(item, command)}
-                onSelectProjectTerminalDefault={(command) => handleSetProjectTerminalDefault(item, command)}
-                globalEditorCommand={globalEditorCommand}
-                globalTerminalCommand={globalTerminalCommand}
-                toolSelectionMode={!editMode && toolSelectionProjectId === item.id}
-                onToggleProjectToolSelectionMode={() => handleToggleProjectToolSelectionMode(item.id)}
-                labels={{
-                  moreActions: t('moreActions'),
-                  openWithEditor: t('openWithEditor'),
-                  openWithTerminal: t('openWithTerminal'),
-                  selectProjectDefaults: t('selectProjectDefaults'),
-                  done: t('done'),
-                  close: t('close'),
-                }}
-                editMode={editMode}
-                dragHandleProps={getDragPanResponder(item.id).panHandlers}
-                isDragging={activeDragProjectId === item.id}
-              />
-            </View>
-          )}
+          renderItem={({ item }) => {
+            if (item.type === 'header') {
+              return <SectionHeader label={item.label} />
+            }
+
+            const projectItem = item.project
+            return (
+              <View ref={(node) => setProjectWrapperRef(item.id, node)} onLayout={() => handleProjectLayout(item.id)}>
+                <ProjectItem
+                  index={item.displayIndex}
+                  project={projectItem}
+                  onOpenEditor={() => handleOpenEditor(projectItem)}
+                  onOpenTerminal={() => handleOpenTerminal(projectItem)}
+                  onOpenFinder={() => handleOpenFinder(projectItem)}
+                  onRemove={() => handleRequestRemove(projectItem)}
+                  onToggleContextMenu={() => handleToggleContextMenu(projectItem.id)}
+                  onCloseContextMenu={() => handleCloseContextMenu(projectItem.id)}
+                  contextMenuOpen={!editMode && contextMenuProjectId === projectItem.id}
+                  editorOptions={editorOptions}
+                  terminalOptions={terminalOptions}
+                  editorQuickActionOption={resolveEditorOption(projectItem)}
+                  terminalQuickActionOption={resolveTerminalOption(projectItem)}
+                  onOpenWithEditor={(command) => handleOpenWithEditor(projectItem, command)}
+                  onOpenWithTerminal={(command) => handleOpenWithTerminal(projectItem, command)}
+                  onSelectProjectEditorDefault={(command) => handleSetProjectEditorDefault(projectItem, command)}
+                  onSelectProjectTerminalDefault={(command) => handleSetProjectTerminalDefault(projectItem, command)}
+                  globalEditorCommand={globalEditorCommand}
+                  globalTerminalCommand={globalTerminalCommand}
+                  toolSelectionMode={!editMode && toolSelectionProjectId === projectItem.id}
+                  onToggleProjectToolSelectionMode={() => handleToggleProjectToolSelectionMode(projectItem.id)}
+                  onToggleFavorite={() => handleToggleFavorite(projectItem)}
+                  labels={{
+                    moreActions: t('moreActions'),
+                    openWithEditor: t('openWithEditor'),
+                    openWithTerminal: t('openWithTerminal'),
+                    selectProjectDefaults: t('selectProjectDefaults'),
+                    done: t('done'),
+                    close: t('close'),
+                  }}
+                  editMode={editMode}
+                  dragHandleProps={getDragPanResponder(item.id).panHandlers}
+                  isDragging={activeDragProjectId === item.id}
+                />
+              </View>
+            )
+          }}
         />
         {insertionIndicatorTop !== null ? (
           <View
