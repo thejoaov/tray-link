@@ -1,36 +1,29 @@
 {
   "fill": {
-    "linear-gradient": ["display-p3:0.05882,0.09020,0.16471,1.00000", "display-p3:0.11765,0.22745,0.37255,1.00000"]
+    "linear-gradient": ["srgb:0.73847,0.29561,1.00000,1.00000", "srgb:0.46095,0.58977,1.00000,1.00000"]
   },
   "groups": [
     {
-      "blur-material": null,
       "layers": [
         {
-          "glass": false,
-          "hidden": false,
-          "image-name": "tlink 2.png",
-          "name": "TrayLink",
-          "position": {
-            "scale": 1.08,
-            "translation-in-points": [0, 0]
-          }
+          "fill": {
+            "solid": "srgb:0.96953,0.98321,1.00000,1.00000"
+          },
+          "image-name": "tray-icon-template.png",
+          "name": "tray-icon-template"
         }
       ],
-      "lighting": "individual",
       "shadow": {
         "kind": "neutral",
-        "opacity": 0.18
+        "opacity": 0.5
       },
-      "specular": false,
       "translucency": {
-        "enabled": false,
-        "value": 0
+        "enabled": true,
+        "value": 0.5
       }
     }
   ],
   "supported-platforms": {
-    "circles": ["watchOS"],
     "squares": "shared"
   }
 }

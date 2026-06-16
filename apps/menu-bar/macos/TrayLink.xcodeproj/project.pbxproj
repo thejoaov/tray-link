@@ -13,8 +13,8 @@
 		514201552437B4B40078DB4F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 514201532437B4B40078DB4F /* Main.storyboard */; };
 		77818F2A6E488E8B68D317B2 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02E22FAC6ED05060D31BB51 /* ExpoModulesProvider.swift */; };
 		A961E5EFDD85D2BD61A876CD /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8C8623B49FAF0AE99A5F7711 /* PrivacyInfo.xcprivacy */; };
+		AC8A9ED42FE200BE008A67C0 /* AppIconDebug.icon in Resources */ = {isa = PBXBuildFile; fileRef = AC8A9ED32FE200BE008A67C0 /* AppIconDebug.icon */; };
 		C032EB582EBD108800D6F4A1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C032EB572EBD108800D6F4A1 /* AppIcon.icon */; };
-		C032EB5A2EBD116700D6F4A1 /* AppIconDebug.icon in Resources */ = {isa = PBXBuildFile; fileRef = C032EB592EBD116700D6F4A1 /* AppIconDebug.icon */; };
 		C032EDB72A1FE6F300FBC597 /* tlink-arm64 in Resources */ = {isa = PBXBuildFile; fileRef = C032EDB62A1FE6F300FBC597 /* tlink-arm64 */; };
 		C051E6B62A83577800C6D615 /* tlink-x64 in Resources */ = {isa = PBXBuildFile; fileRef = C051E6B52A83577800C6D615 /* tlink-x64 */; };
 		C051EC0E2AA227C600C6D615 /* SwifterWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C051EC0D2AA227C600C6D615 /* SwifterWrapper.swift */; };
@@ -65,9 +65,9 @@
 		8C8623B49FAF0AE99A5F7711 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = ../PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		9D32DFD059D5DB6DDEF38881 /* Pods-Shared-TrayLink-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Shared-TrayLink-iOS.debug.xcconfig"; path = "Target Support Files/Pods-Shared-TrayLink-iOS/Pods-Shared-TrayLink-iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		A82DFB63B157C65E5D698CA2 /* Pods-Shared-TrayLink-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Shared-TrayLink-iOS.release.xcconfig"; path = "Target Support Files/Pods-Shared-TrayLink-iOS/Pods-Shared-TrayLink-iOS.release.xcconfig"; sourceTree = "<group>"; };
+		AC8A9ED32FE200BE008A67C0 /* AppIconDebug.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIconDebug.icon; sourceTree = "<group>"; };
 		B02E22FAC6ED05060D31BB51 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-TrayLink-macOS/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		C032EB572EBD108800D6F4A1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
-		C032EB592EBD116700D6F4A1 /* AppIconDebug.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIconDebug.icon; sourceTree = "<group>"; };
 		C032EDB62A1FE6F300FBC597 /* tlink-arm64 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = "tlink-arm64"; path = "../../cli/tlink-arm64"; sourceTree = "<group>"; };
 		C051E6B32A83408800C6D615 /* TrayLink-macOSRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TrayLink-macOSRelease.entitlements"; sourceTree = "<group>"; };
 		C051E6B42A8340AF00C6D615 /* AutoLauncherRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AutoLauncherRelease.entitlements; sourceTree = "<group>"; };
@@ -163,8 +163,8 @@
 		5142014A2437B4B30078DB4F /* TrayLink-macOS */ = {
 			isa = PBXGroup;
 			children = (
-				C032EB592EBD116700D6F4A1 /* AppIconDebug.icon */,
 				C032EB572EBD108800D6F4A1 /* AppIcon.icon */,
+				AC8A9ED32FE200BE008A67C0 /* AppIconDebug.icon */,
 				C051E6B32A83408800C6D615 /* TrayLink-macOSRelease.entitlements */,
 				C081507C2A610E2F00E8890F /* Resources */,
 				C032EDB62A1FE6F300FBC597 /* tlink-arm64 */,
@@ -352,8 +352,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C032EB5A2EBD116700D6F4A1 /* AppIconDebug.icon in Resources */,
 				C032EB582EBD108800D6F4A1 /* AppIcon.icon in Resources */,
+				AC8A9ED42FE200BE008A67C0 /* AppIconDebug.icon in Resources */,
 				C051E6B62A83577800C6D615 /* tlink-x64 in Resources */,
 				C032EDB72A1FE6F300FBC597 /* tlink-arm64 in Resources */,
 				C081507F2A610E9C00E8890F /* fonts in Resources */,
@@ -440,9 +440,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TrayLink-macOS/Pods-TrayLink-macOS-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TrayLink-macOS/Pods-TrayLink-macOS-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -500,9 +504,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TrayLink-macOS/Pods-TrayLink-macOS-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TrayLink-macOS/Pods-TrayLink-macOS-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -576,10 +584,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_CFLAGS = "$(inherited)  ";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -618,10 +623,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_CFLAGS = "$(inherited)  ";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
