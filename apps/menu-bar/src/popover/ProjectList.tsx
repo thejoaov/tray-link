@@ -19,6 +19,7 @@ import {
 } from 'react-native'
 import { pickFolders } from '../../modules/file-picker'
 import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
+import { getItem, setItem } from '../../modules/storage-module/src'
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
 import Alert from '../modules/Alert'
 import { defaultUserPreferences } from '../modules/Storage'
@@ -78,6 +79,27 @@ const compareText = (left: string, right: string) => {
     numeric: true,
     sensitivity: 'base',
   })
+}
+
+const getParentFolderName = (path: string) => {
+  const segments = path
+    .split('/')
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+  if (segments.length >= 2) {
+    return segments[segments.length - 2]
+  }
+  return '/'
+}
+
+const getAlphabeticalGroup = (name: string) => {
+  const trimmed = name.trim()
+  if (!trimmed) return '#'
+  const firstChar = trimmed.charAt(0).toUpperCase()
+  if (firstChar >= 'A' && firstChar <= 'Z') {
+    return firstChar
+  }
+  return '#'
 }
 
 const getPathSegments = (path: string) => {
@@ -152,6 +174,32 @@ export const ProjectList = () => {
   const [dragDestinationIndex, setDragDestinationIndex] = useState<number | null>(null)
   const [scrollOffset, setScrollOffset] = useState(0)
   const [projectSortMode, setProjectSortMode] = useState<ProjectSortMode>('manual')
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    Promise.all([getItem('collapsed-sections'), getItem('favorites-collapsed')])
+      .then(([sectionsVal, favsVal]) => {
+        let initial: Record<string, boolean> = {}
+        if (sectionsVal) {
+          try {
+            initial = JSON.parse(sectionsVal)
+          } catch {}
+        }
+        if (favsVal === 'true') {
+          initial['header-favorites'] = true
+        }
+        setCollapsedSections(initial)
+      })
+      .catch(() => {})
+  }, [])
+
+  const handleToggleSectionCollapsed = useCallback((sectionId: string) => {
+    setCollapsedSections((prev) => {
+      const next = { ...prev, [sectionId]: !prev[sectionId] }
+      setItem('collapsed-sections', JSON.stringify(next)).catch(() => {})
+      return next
+    })
+  }, [])
   const listRef = useRef<FlatList<Project>>(null)
   const listContainerRef = useRef<View>(null)
   const projectsRef = useRef<Project[]>([])
@@ -198,6 +246,15 @@ export const ProjectList = () => {
     () => preferences.defaultTerminal ?? terminalOptions[0]?.command ?? 'open -a Terminal',
     [preferences.defaultTerminal, terminalOptions],
   )
+  const allExistingTags = useMemo(() => {
+    const tags = new Set<string>()
+    projects.forEach((p) => {
+      if (p.tag?.trim()) {
+        tags.add(p.tag.trim())
+      }
+    })
+    return Array.from(tags).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+  }, [projects])
   const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery])
   const filteredProjects = useMemo(() => {
     if (!normalizedSearchQuery) {
@@ -239,6 +296,220 @@ export const ProjectList = () => {
       }))
     }
 
+    const remainingProjects = favoritesList.length > 0 ? projects.filter((p) => !p.isFavorite) : projects
+
+    if (preferences.groupingMode === 'tag') {
+      const groups: Record<string, Project[]> = {}
+      for (const p of remainingProjects) {
+        const tag = p.tag?.trim() || ''
+        if (!groups[tag]) {
+          groups[tag] = []
+        }
+        groups[tag].push(p)
+      }
+
+      const sortedTags = Object.keys(groups)
+        .filter((tag) => tag !== '')
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+
+      const items: Array<
+        | { id: string; type: 'header'; label: string }
+        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+      > = []
+
+      if (favoritesList.length > 0) {
+        items.push({
+          id: 'header-favorites',
+          type: 'header',
+          label: t('favorites'),
+        })
+        if (!collapsedSections['header-favorites']) {
+          favoritesList.forEach((p, idx) => {
+            items.push({
+              id: `fav-${p.id}`,
+              type: 'project',
+              project: p,
+              isFavoriteSection: true,
+              displayIndex: idx,
+            })
+          })
+        }
+      }
+
+      let displayIdx = 0
+      for (const tag of sortedTags) {
+        const headerId = `header-tag-${tag}`
+        items.push({
+          id: headerId,
+          type: 'header',
+          label: tag,
+        })
+        if (!collapsedSections[headerId]) {
+          groups[tag].forEach((p) => {
+            items.push({
+              id: p.id,
+              type: 'project',
+              project: p,
+              isFavoriteSection: false,
+              displayIndex: displayIdx++,
+            })
+          })
+        }
+      }
+
+      if (groups[''] && groups[''].length > 0) {
+        const headerId = 'header-tag-uncategorized'
+        items.push({
+          id: headerId,
+          type: 'header',
+          label: t('uncategorized'),
+        })
+        if (!collapsedSections[headerId]) {
+          groups[''].forEach((p) => {
+            items.push({
+              id: p.id,
+              type: 'project',
+              project: p,
+              isFavoriteSection: false,
+              displayIndex: displayIdx++,
+            })
+          })
+        }
+      }
+
+      return items
+    }
+
+    if (preferences.groupingMode === 'parentFolder') {
+      const groups: Record<string, Project[]> = {}
+      for (const p of remainingProjects) {
+        const parentFolder = getParentFolderName(p.path)
+        if (!groups[parentFolder]) {
+          groups[parentFolder] = []
+        }
+        groups[parentFolder].push(p)
+      }
+
+      const sortedFolders = Object.keys(groups).sort((a, b) =>
+        a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }),
+      )
+
+      const items: Array<
+        | { id: string; type: 'header'; label: string }
+        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+      > = []
+
+      if (favoritesList.length > 0) {
+        items.push({
+          id: 'header-favorites',
+          type: 'header',
+          label: t('favorites'),
+        })
+        if (!collapsedSections['header-favorites']) {
+          favoritesList.forEach((p, idx) => {
+            items.push({
+              id: `fav-${p.id}`,
+              type: 'project',
+              project: p,
+              isFavoriteSection: true,
+              displayIndex: idx,
+            })
+          })
+        }
+      }
+
+      let displayIdx = 0
+      for (const folder of sortedFolders) {
+        const headerId = `header-folder-${folder}`
+        items.push({
+          id: headerId,
+          type: 'header',
+          label: folder,
+        })
+        if (!collapsedSections[headerId]) {
+          groups[folder].forEach((p) => {
+            items.push({
+              id: p.id,
+              type: 'project',
+              project: p,
+              isFavoriteSection: false,
+              displayIndex: displayIdx++,
+            })
+          })
+        }
+      }
+
+      return items
+    }
+
+    if (preferences.groupingMode === 'alphabetical') {
+      const groups: Record<string, Project[]> = {}
+      for (const p of remainingProjects) {
+        const letter = getAlphabeticalGroup(p.name)
+        if (!groups[letter]) {
+          groups[letter] = []
+        }
+        groups[letter].push(p)
+      }
+
+      const sortedLetters = Object.keys(groups).sort((a, b) => {
+        if (a === '#') return 1
+        if (b === '#') return -1
+        return a.localeCompare(b)
+      })
+
+      for (const letter of sortedLetters) {
+        groups[letter].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
+      }
+
+      const items: Array<
+        | { id: string; type: 'header'; label: string }
+        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+      > = []
+
+      if (favoritesList.length > 0) {
+        items.push({
+          id: 'header-favorites',
+          type: 'header',
+          label: t('favorites'),
+        })
+        if (!collapsedSections['header-favorites']) {
+          favoritesList.forEach((p, idx) => {
+            items.push({
+              id: `fav-${p.id}`,
+              type: 'project',
+              project: p,
+              isFavoriteSection: true,
+              displayIndex: idx,
+            })
+          })
+        }
+      }
+
+      let displayIdx = 0
+      for (const letter of sortedLetters) {
+        const headerId = `header-letter-${letter}`
+        items.push({
+          id: headerId,
+          type: 'header',
+          label: letter,
+        })
+        if (!collapsedSections[headerId]) {
+          groups[letter].forEach((p) => {
+            items.push({
+              id: p.id,
+              type: 'project',
+              project: p,
+              isFavoriteSection: false,
+              displayIndex: displayIdx++,
+            })
+          })
+        }
+      }
+
+      return items
+    }
+
     if (favoritesList.length > 0) {
       const items: Array<
         | { id: string; type: 'header'; label: string }
@@ -251,31 +522,36 @@ export const ProjectList = () => {
         label: t('favorites'),
       })
 
-      favoritesList.forEach((p, idx) => {
-        items.push({
-          id: `fav-${p.id}`,
-          type: 'project',
-          project: p,
-          isFavoriteSection: true,
-          displayIndex: idx,
+      if (!collapsedSections['header-favorites']) {
+        favoritesList.forEach((p, idx) => {
+          items.push({
+            id: `fav-${p.id}`,
+            type: 'project',
+            project: p,
+            isFavoriteSection: true,
+            displayIndex: idx,
+          })
         })
-      })
+      }
 
+      const allProjectsHeaderId = 'header-all-projects'
       items.push({
-        id: 'header-all-projects',
+        id: allProjectsHeaderId,
         type: 'header',
         label: t('projectsTitle'),
       })
 
-      projects.forEach((p, idx) => {
-        items.push({
-          id: p.id,
-          type: 'project',
-          project: p,
-          isFavoriteSection: false,
-          displayIndex: idx,
+      if (!collapsedSections[allProjectsHeaderId]) {
+        projects.forEach((p, idx) => {
+          items.push({
+            id: p.id,
+            type: 'project',
+            project: p,
+            isFavoriteSection: false,
+            displayIndex: idx,
+          })
         })
-      })
+      }
 
       return items
     }
@@ -287,7 +563,16 @@ export const ProjectList = () => {
       isFavoriteSection: false,
       displayIndex: idx,
     }))
-  }, [editMode, normalizedSearchQuery, filteredProjects, favoritesList, projects, t])
+  }, [
+    editMode,
+    normalizedSearchQuery,
+    filteredProjects,
+    favoritesList,
+    projects,
+    t,
+    preferences.groupingMode,
+    collapsedSections,
+  ])
 
   const loadProjects = useCallback(async () => {
     setLoading(true)
@@ -537,6 +822,22 @@ export const ProjectList = () => {
       await logError('project-list:handleSetProjectTerminalDefault', error, {
         projectId: project.id,
         command,
+      })
+    }
+  }
+
+  const handleSaveProjectTag = async (project: Project, tag: string) => {
+    try {
+      await projectStore.updateProject({
+        ...project,
+        tag: tag || undefined,
+        updatedAt: new Date().toISOString(),
+      })
+      await loadProjects()
+    } catch (error) {
+      await logError('project-list:handleSaveProjectTag', error, {
+        projectId: project.id,
+        tag,
       })
     }
   }
@@ -1053,6 +1354,8 @@ export const ProjectList = () => {
             scrollOffset,
             toolSelectionProjectId,
             flatListData,
+            allExistingTags,
+            collapsedSections,
           }}
           scrollEnabled={!activeDragProjectId}
           onScroll={handleListScroll}
@@ -1069,7 +1372,23 @@ export const ProjectList = () => {
           }
           renderItem={({ item }) => {
             if (item.type === 'header') {
-              return <SectionHeader label={item.label} />
+              const isCollapsed = Boolean(collapsedSections[item.id])
+              return (
+                <SectionHeader
+                  label={item.label}
+                  onPress={() => handleToggleSectionCollapsed(item.id)}
+                  accessoryRight={
+                    <View style={styles.collapseIconContainer}>
+                      <Ionicons
+                        name={isCollapsed ? 'chevron-forward-outline' : 'chevron-down-outline'}
+                        size={12}
+                        color="var(--text-color)"
+                        style={{ opacity: 0.6 }}
+                      />
+                    </View>
+                  }
+                />
+              )
             }
 
             const projectItem = item.project
@@ -1105,7 +1424,12 @@ export const ProjectList = () => {
                     selectProjectDefaults: t('selectProjectDefaults'),
                     done: t('done'),
                     close: t('close'),
+                    tagLabel: t('tagLabel'),
+                    editTagPlaceholder: t('editTagPlaceholder'),
+                    save: t('save'),
                   }}
+                  onSaveTag={(tag) => handleSaveProjectTag(projectItem, tag)}
+                  allExistingTags={allExistingTags}
                   editMode={editMode}
                   dragHandleProps={getDragPanResponder(item.id).panHandlers}
                   isDragging={activeDragProjectId === item.id}
@@ -1221,5 +1545,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.7,
     color: 'var(--text-color)',
+  },
+  collapseIconContainer: {
+    padding: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })

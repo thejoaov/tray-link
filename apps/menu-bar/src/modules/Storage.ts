@@ -16,6 +16,7 @@ export const defaultUserPreferences: UserPreferences = {
   hasInstalledCli: false,
   customEditors: [],
   customTerminals: [],
+  groupingMode: 'none',
 }
 
 export const getUserPreferences = async (): Promise<UserPreferences> => {

@@ -62,6 +62,14 @@ const es: typeof en = {
   unmarkAsFavorite: 'Quitar de favoritos',
   favoritesDescription: 'Arrastre para reordenar sus proyectos favoritos.',
   projectsTitle: 'Proyectos',
+  listGrouping: 'Agrupamiento de la Lista',
+  groupNone: 'Ninguno',
+  groupTag: 'Por Etiqueta',
+  groupParentFolder: 'Por Carpeta Superior',
+  groupAlphabetical: 'Orden Alfabético',
+  tagLabel: 'Etiqueta',
+  editTagPlaceholder: 'Escriba el nombre de la etiqueta',
+  uncategorized: 'Sin Etiqueta',
 }
 
 export default es

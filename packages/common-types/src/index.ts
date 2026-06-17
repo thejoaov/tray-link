@@ -11,6 +11,7 @@ export interface Project {
   defaultTerminal?: string | null
   migrated?: boolean
   source?: 'cli' | 'app'
+  tag?: string
 }
 
 export type Platform = 'darwin' | 'win32' | 'linux'
@@ -48,4 +49,5 @@ export interface Settings {
   hasInstalledCli: boolean
   customEditors: CustomTool[]
   customTerminals: CustomTool[]
+  groupingMode: 'none' | 'tag' | 'parentFolder' | 'alphabetical'
 }

@@ -526,6 +526,24 @@ export const Settings = () => {
         <Divider />
 
         <Row align="center" justify="between" style={styles.boxItem}>
+          <Text style={styles.itemLabel}>{t('listGrouping')}</Text>
+
+          <Picker
+            selectedValue={preferences.groupingMode ?? 'none'}
+            onValueChange={(value) => updatePreference('groupingMode', value)}
+            enabled={preferencesLoaded}
+            style={styles.picker}
+          >
+            <Picker.Item label={t('groupNone')} value="none" />
+            <Picker.Item label={t('groupTag')} value="tag" />
+            <Picker.Item label={t('groupParentFolder')} value="parentFolder" />
+            <Picker.Item label={t('groupAlphabetical')} value="alphabetical" />
+          </Picker>
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
           <Text style={styles.itemLabel}>{t('defaultEditor')}</Text>
           <Row align="center" style={styles.controlRow}>
             <Picker

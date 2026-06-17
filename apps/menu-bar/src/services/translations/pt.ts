@@ -92,4 +92,12 @@ export const pt: typeof en = {
   unmarkAsFavorite: 'Remover dos favoritos',
   favoritesDescription: 'Arraste para reordenar seus projetos favoritos.',
   projectsTitle: 'Projetos',
+  listGrouping: 'Agrupamento da Lista',
+  groupNone: 'Nenhum',
+  groupTag: 'Por Tag',
+  groupParentFolder: 'Por Pasta Acima',
+  groupAlphabetical: 'Ordem Alfabética',
+  tagLabel: 'Tag',
+  editTagPlaceholder: 'Digite o nome da tag',
+  uncategorized: 'Sem Tag',
 }

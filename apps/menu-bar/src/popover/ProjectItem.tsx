@@ -1,7 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Project } from '@tray-link/common-types'
-import React from 'react'
-import { GestureResponderHandlers, LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import {
+  GestureResponderHandlers,
+  LayoutChangeEvent,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
 import { AppIcon } from '../components'
 import { Text } from '../components/Text'
@@ -42,12 +49,17 @@ type Props = {
     selectProjectDefaults: string
     done: string
     close: string
+    tagLabel: string
+    editTagPlaceholder: string
+    save: string
   }
   editMode?: boolean
   onLayout?: (event: LayoutChangeEvent) => void
   dragHandleProps?: GestureResponderHandlers
   isDragging?: boolean
   onToggleFavorite?: () => void
+  onSaveTag?: (tag: string) => void
+  allExistingTags?: string[]
 }
 
 export const ProjectItem = ({
@@ -78,7 +90,17 @@ export const ProjectItem = ({
   dragHandleProps,
   isDragging = false,
   onToggleFavorite,
+  onSaveTag,
+  allExistingTags = [],
 }: Props) => {
+  const [tagInput, setTagInput] = useState(project.tag ?? '')
+  const [showNewTagInput, setShowNewTagInput] = useState(false)
+
+  useEffect(() => {
+    setTagInput(project.tag ?? '')
+    setShowNewTagInput(false)
+  }, [project.tag])
+
   const renderQuickActionIcon = (
     option: ToolOption | null | undefined,
     fallbackName: 'code-slash-outline' | 'terminal-outline',
@@ -111,6 +133,12 @@ export const ProjectItem = ({
           {project.source === 'cli' ? (
             <View style={styles.migratedChip}>
               <Text style={styles.migratedChipText}>cli</Text>
+            </View>
+          ) : null}
+          {project.tag ? (
+            <View style={styles.tagChip}>
+              <Ionicons name="pricetag" size={9} color="#007AFF" />
+              <Text style={styles.tagChipText}>{project.tag}</Text>
             </View>
           ) : null}
         </View>
@@ -234,6 +262,70 @@ export const ProjectItem = ({
               </TouchableOpacity>
             ))}
           </View>
+
+          <Text style={styles.contextTitle}>{labels.tagLabel}</Text>
+          {project.tag ? (
+            <View style={styles.tagChipActive}>
+              <Ionicons name="pricetag" size={11} color="#007AFF" />
+              <Text style={styles.tagChipTextActive}>{project.tag}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setTagInput('')
+                  onSaveTag?.('')
+                }}
+                style={styles.tagChipRemoveButton}
+                accessibilityLabel="Remove tag"
+              >
+                <Ionicons name="close-circle" size={14} color="#007AFF" />
+              </TouchableOpacity>
+            </View>
+          ) : showNewTagInput ? (
+            <View style={styles.tagInputRow}>
+              <TextInput
+                value={tagInput}
+                onChangeText={setTagInput}
+                placeholder={labels.editTagPlaceholder}
+                placeholderTextColor="#8E8E93"
+                style={styles.tagInput}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoFocus
+              />
+              <TouchableOpacity
+                style={styles.tagSaveButton}
+                onPress={() => {
+                  if (tagInput.trim()) {
+                    onSaveTag?.(tagInput.trim())
+                  }
+                }}
+              >
+                <Text style={styles.tagSaveButtonText}>{labels.save}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.tagRemoveButton}
+                onPress={() => {
+                  setTagInput('')
+                  setShowNewTagInput(false)
+                }}
+                accessibilityLabel="Cancel"
+              >
+                <Ionicons name="close" size={14} color="var(--text-color)" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.tagChipsContainer}>
+              {allExistingTags.map((tag) => (
+                <TouchableOpacity key={tag} style={styles.selectableTagChip} onPress={() => onSaveTag?.(tag)}>
+                  <Ionicons name="pricetag-outline" size={9} color="var(--text-color)" style={{ opacity: 0.6 }} />
+                  <Text style={styles.selectableTagChipText}>{tag}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity style={styles.addTagChipButton} onPress={() => setShowNewTagInput(true)}>
+                <Ionicons name="add" size={10} color="#007AFF" />
+                <Text style={styles.addTagChipButtonText}>{labels.tagLabel}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       ) : null}
     </View>
@@ -394,5 +486,126 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.45,
+  },
+  tagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: 999,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    backgroundColor: 'rgba(0, 122, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 122, 255, 0.25)',
+  },
+  tagChipText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#007AFF',
+  },
+  tagInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  tagInput: {
+    flex: 1,
+    height: 28,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    fontSize: 11,
+    color: 'var(--text-color)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  tagSaveButton: {
+    height: 28,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#007AFF',
+  },
+  tagSaveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  tagRemoveButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  tagChipActive: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(0, 122, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 122, 255, 0.35)',
+    alignSelf: 'flex-start',
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  tagChipTextActive: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#007AFF',
+  },
+  tagChipRemoveButton: {
+    padding: 2,
+    marginLeft: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tagChipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  selectableTagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  selectableTagChipText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'var(--text-color)',
+  },
+  addTagChipButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(0, 122, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 122, 255, 0.3)',
+  },
+  addTagChipButtonText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#007AFF',
   },
 })

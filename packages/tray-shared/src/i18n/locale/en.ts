@@ -60,4 +60,12 @@ export default {
   unmarkAsFavorite: 'Remove from favorites',
   favoritesDescription: 'Drag to reorder your favorite projects.',
   projectsTitle: 'Projects',
+  listGrouping: 'List Grouping',
+  groupNone: 'None',
+  groupTag: 'By Tag',
+  groupParentFolder: 'By Parent Folder',
+  groupAlphabetical: 'Alphabetical',
+  tagLabel: 'Tag',
+  editTagPlaceholder: 'Enter tag name',
+  uncategorized: 'Uncategorized',
 }

@@ -126,6 +126,7 @@ const defaultPreferences: Settings = {
   hasInstalledCli: false,
   customEditors: [],
   customTerminals: [],
+  groupingMode: 'none',
 }
 
 export const preferencesStore = {
