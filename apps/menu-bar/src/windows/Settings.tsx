@@ -810,6 +810,17 @@ export const Settings = () => {
         <Divider />
 
         <Row align="center" justify="between" style={styles.boxItem}>
+          <Text style={styles.itemLabel}>{t('showProjectPositions')}</Text>
+          <Switch
+            value={preferences.showProjectPositions ?? true}
+            disabled={!preferencesLoaded}
+            onValueChange={(value) => updatePreference('showProjectPositions', value)}
+          />
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
           <Text style={styles.itemLabel}>{t('deleteFilesFromDiskByDefault')}</Text>
           <Switch
             value={preferences.removeFromDiskByDefault}

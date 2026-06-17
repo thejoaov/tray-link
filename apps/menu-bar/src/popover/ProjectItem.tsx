@@ -60,6 +60,7 @@ type Props = {
   onToggleFavorite?: () => void
   onSaveTag?: (tag: string) => void
   allExistingTags?: string[]
+  showProjectPositions?: boolean
 }
 
 export function parseTag(tag: string | undefined | null): { name: string; color?: string } {
@@ -140,6 +141,7 @@ export const ProjectItem = ({
   onToggleFavorite,
   onSaveTag,
   allExistingTags = [],
+  showProjectPositions = true,
 }: Props) => {
   const currentTagParsed = parseTag(project.tag)
   const [tagInput, setTagInput] = useState(currentTagParsed.name)
@@ -221,7 +223,8 @@ export const ProjectItem = ({
       <View style={styles.info}>
         <View style={styles.nameRow}>
           <Text style={styles.name}>
-            {index + 1}. {project.name}
+            {showProjectPositions ? `${index + 1}. ` : ''}
+            {project.name}
           </Text>
           {project.migrated ? (
             <View style={styles.migratedChip}>

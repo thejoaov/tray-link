@@ -277,12 +277,12 @@ export const ProjectList = () => {
 
   const flatListData = useMemo(() => {
     if (editMode) {
-      return projects.map((p) => ({
+      return projects.map((p, idx) => ({
         id: p.id,
         type: 'project' as const,
         project: p,
         isFavoriteSection: false,
-        displayIndex: p.position,
+        displayIndex: idx,
       }))
     }
 
@@ -936,17 +936,21 @@ export const ProjectList = () => {
   )
 
   const cycleProjectSortMode = useCallback(() => {
-    const nextMode: Exclude<ProjectSortMode, 'manual'> =
+    const nextMode: ProjectSortMode =
       projectSortMode === 'manual'
         ? 'alphaAsc'
         : projectSortMode === 'alphaAsc'
           ? 'alphaDesc'
           : projectSortMode === 'alphaDesc'
             ? 'neighborhood'
-            : 'alphaAsc'
+            : 'manual'
 
     setProjectSortMode(nextMode)
-    void persistProjectOrder(sortProjectsByMode(projectsRef.current, nextMode))
+    if (nextMode !== 'manual') {
+      void persistProjectOrder(sortProjectsByMode(projectsRef.current, nextMode))
+    } else {
+      void persistProjectOrder(sortProjectsByMode(projectsRef.current, 'alphaAsc'))
+    }
   }, [persistProjectOrder, projectSortMode])
 
   const maybeAutoScrollDuringDrag = useCallback((absoluteY: number) => {
@@ -1200,7 +1204,7 @@ export const ProjectList = () => {
       return t('sortProjectsNeighborhood')
     }
 
-    return t('cycleProjectSortMode')
+    return t('sortProjectsDefault')
   }, [projectSortMode, t])
 
   const handleRequestRemove = (project: Project) => {
@@ -1304,7 +1308,13 @@ export const ProjectList = () => {
                 onPress={cycleProjectSortMode}
                 style={[styles.addButton, activeDragProjectId && styles.addButtonDisabled]}
               >
-                <Ionicons name={projectSortModeButtonIcon} size={16} color="var(--text-color)" />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                  <Ionicons name={projectSortModeButtonIcon} size={16} color="var(--text-color)" />
+                  {projectSortMode === 'alphaAsc' && <Ionicons name="arrow-up" size={12} color="var(--text-color)" />}
+                  {projectSortMode === 'alphaDesc' && (
+                    <Ionicons name="arrow-down" size={12} color="var(--text-color)" />
+                  )}
+                </View>
               </TouchableOpacity>
             ) : null}
             <TouchableOpacity onPress={handleAddProject} style={styles.addButton}>
@@ -1396,6 +1406,7 @@ export const ProjectList = () => {
               <View ref={(node) => setProjectWrapperRef(item.id, node)} onLayout={() => handleProjectLayout(item.id)}>
                 <ProjectItem
                   index={item.displayIndex}
+                  showProjectPositions={preferences.showProjectPositions}
                   project={projectItem}
                   onOpenEditor={() => handleOpenEditor(projectItem)}
                   onOpenTerminal={() => handleOpenTerminal(projectItem)}

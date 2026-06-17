@@ -50,4 +50,5 @@ export interface Settings {
   customEditors: CustomTool[]
   customTerminals: CustomTool[]
   groupingMode: 'none' | 'tag' | 'parentFolder' | 'alphabetical'
+  showProjectPositions?: boolean
 }

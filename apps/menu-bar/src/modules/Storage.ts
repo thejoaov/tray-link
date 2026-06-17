@@ -17,6 +17,7 @@ export const defaultUserPreferences: UserPreferences = {
   customEditors: [],
   customTerminals: [],
   groupingMode: 'none',
+  showProjectPositions: true,
 }
 
 export const getUserPreferences = async (): Promise<UserPreferences> => {
