@@ -13,7 +13,7 @@ import {
 } from '../../modules/shell-utils/src'
 import { getConfigPath } from '../../modules/storage-module/src'
 import Analytics, { AnalyticsEvent } from '../analytics'
-import { Divider, Row, ScrollView, Switch, Text, View } from '../components'
+import { Divider, Row, ScrollView, Switch, Text, TextInput, View } from '../components'
 import Alert from '../modules/Alert'
 import { Linking } from '../modules/Linking'
 import { defaultUserPreferences, UserPreferences } from '../modules/Storage'
@@ -72,8 +72,57 @@ const getUpdaterStatusMessage = (updaterState: AppUpdaterState, t: ReturnType<ty
   }
 }
 
+export function parseTag(tag: string | undefined | null): { name: string; color?: string } {
+  if (!tag?.trim()) {
+    return { name: '' }
+  }
+  const parts = tag.trim().split('||')
+  return {
+    name: parts[0],
+    color: parts[1] || undefined,
+  }
+}
+
+export function getTagColors(color: string) {
+  if (color.startsWith('#')) {
+    const baseHex = color.length === 9 ? color.slice(0, 7) : color
+    return {
+      bg: `${baseHex}1F`,
+      border: `${baseHex}40`,
+      text: baseHex,
+    }
+  }
+  if (color.startsWith('rgb')) {
+    return {
+      bg: color.replace(/rgb(a?)\(([^)]+)\)/, (match, isAlpha, values) => {
+        const parts = values.split(',')
+        if (parts.length === 4) {
+          parts[3] = '0.12'
+          return `rgba(${parts.join(',')})`
+        }
+        return `rgba(${values}, 0.12)`
+      }),
+      border: color.replace(/rgb(a?)\(([^)]+)\)/, (match, isAlpha, values) => {
+        const parts = values.split(',')
+        if (parts.length === 4) {
+          parts[3] = '0.25'
+          return `rgba(${parts.join(',')})`
+        }
+        return `rgba(${values}, 0.25)`
+      }),
+      text: color,
+    }
+  }
+  return {
+    bg: 'rgba(0, 122, 255, 0.12)',
+    border: 'rgba(0, 122, 255, 0.25)',
+    text: color || '#007AFF',
+  }
+}
+
 export const Settings = () => {
   const { t } = useTranslation()
+  const [projects, setProjects] = useState<Project[]>([])
   const [favoriteProjects, setFavoriteProjects] = useState<Project[]>([])
   const [activeDragProjectId, setActiveDragProjectId] = useState<string | null>(null)
   const [_dragDestinationIndex, setDragDestinationIndex] = useState<number | null>(null)
@@ -98,14 +147,22 @@ export const Settings = () => {
 
   const dragPanRespondersRef = useRef(new Map<string, ReturnType<typeof PanResponder.create>>())
 
-  useEffect(() => {
-    projectStore.getProjects().then((allProjects) => {
+  const loadProjects = useCallback(async () => {
+    try {
+      const allProjects = await projectStore.getProjects()
+      setProjects(allProjects)
       const favs = allProjects
         .filter((p) => p.isFavorite)
         .sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0))
       setFavoriteProjects(favs)
-    })
+    } catch (error) {
+      console.error('Error loading projects in settings:', error)
+    }
   }, [])
+
+  useEffect(() => {
+    loadProjects()
+  }, [loadProjects])
 
   useEffect(() => {
     favoriteProjectsRef.current = favoriteProjects
@@ -288,6 +345,117 @@ export const Settings = () => {
       console.error('Error saving favorites order:', error)
       await logError('settings:handleSaveFavoritesOrder', error)
     }
+  }
+
+  const [editingTag, setEditingTag] = useState<string | null>(null)
+  const [editTagName, setEditTagName] = useState('')
+  const [editTagColor, setEditTagColor] = useState('#007AFF')
+  const [showCustomColorInput, setShowCustomColorInput] = useState(false)
+  const [customColorText, setCustomColorText] = useState('')
+  const [sessionCustomColors, setSessionCustomColors] = useState<string[]>([])
+
+  const PRESET_COLORS = useMemo(
+    () => [
+      '#007AFF', // Blue
+      '#34C759', // Green
+      '#FF9500', // Orange
+      '#FF3B30', // Red
+      '#AF52DE', // Purple
+      '#FFCC00', // Yellow
+      '#5856D6', // Indigo
+    ],
+    [],
+  )
+
+  const tags = useMemo(() => {
+    const uniqueTags = new Set<string>()
+    projects.forEach((p) => {
+      if (p.tag?.trim()) {
+        uniqueTags.add(p.tag.trim())
+      }
+    })
+    return Array.from(uniqueTags).sort((a, b) => {
+      const nameA = parseTag(a).name
+      const nameB = parseTag(b).name
+      return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' })
+    })
+  }, [projects])
+
+  const customColors = useMemo(() => {
+    const colors = new Set<string>()
+    tags.forEach((tag) => {
+      const parsed = parseTag(tag)
+      if (parsed.color && !PRESET_COLORS.includes(parsed.color)) {
+        colors.add(parsed.color)
+      }
+    })
+    return Array.from(colors)
+  }, [tags, PRESET_COLORS])
+
+  const availableColors = useMemo(() => {
+    const combined = [...PRESET_COLORS, ...customColors, ...sessionCustomColors]
+    return Array.from(new Set(combined))
+  }, [customColors, sessionCustomColors, PRESET_COLORS])
+
+  const handleSaveTag = async (oldTagRaw: string) => {
+    const oldParsed = parseTag(oldTagRaw)
+    const newName = editTagName.trim()
+    if (!newName) return
+
+    const newTagRaw = `${newName}||${editTagColor}`
+
+    try {
+      const allProjects = await projectStore.getProjects()
+      const updated = allProjects.map((p) => {
+        if (p.tag && parseTag(p.tag).name === oldParsed.name) {
+          return {
+            ...p,
+            tag: newTagRaw,
+            updatedAt: new Date().toISOString(),
+          }
+        }
+        return p
+      })
+
+      await projectStore.saveProjects(updated)
+      setEditingTag(null)
+      await loadProjects()
+    } catch (error) {
+      console.error('Error saving tag in settings:', error)
+      await logError('settings:handleSaveTag', error)
+    }
+  }
+
+  const handleDeleteTag = (tagRaw: string) => {
+    const parsed = parseTag(tagRaw)
+    Alert.alert(t('deleteTag'), t('deleteTagConfirmation'), [
+      { text: t('cancel'), style: 'cancel' },
+      {
+        text: t('remove'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const allProjects = await projectStore.getProjects()
+            const updated = allProjects.map((p) => {
+              if (p.tag && parseTag(p.tag).name === parsed.name) {
+                return {
+                  ...p,
+                  tag: undefined,
+                  updatedAt: new Date().toISOString(),
+                }
+              }
+              return p
+            })
+
+            await projectStore.saveProjects(updated)
+            await loadProjects()
+          } catch (error) {
+            console.error('Error deleting tag in settings:', error)
+            await logError('settings:handleDeleteTag', error)
+          }
+        },
+      },
+    ])
   }
   const [preferences, setPreferences] = useState<UserPreferences>(defaultUserPreferences)
   const [preferencesLoaded, setPreferencesLoaded] = useState(false)
@@ -716,6 +884,168 @@ export const Settings = () => {
         </>
       ) : null}
 
+      <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('manageTags')}</Text>
+
+      <View border="light" rounded="medium" style={styles.box}>
+        {tags.length === 0 ? (
+          <View style={styles.boxItem}>
+            <Text style={styles.noTagsText}>{t('noTagsYet')}</Text>
+          </View>
+        ) : (
+          tags.map((tag, idx) => {
+            const parsed = parseTag(tag)
+            const colors = parsed.color ? getTagColors(parsed.color) : null
+            const isEditing = editingTag === tag
+
+            return (
+              <View key={tag}>
+                {idx > 0 ? <Divider /> : null}
+                {isEditing ? (
+                  <View style={styles.tagEditContainer}>
+                    <Row align="center" style={styles.tagEditInputRow}>
+                      <TextInput
+                        value={editTagName}
+                        onChangeText={setEditTagName}
+                        placeholder={t('tagName')}
+                        placeholderTextColor="#8E8E93"
+                        style={styles.settingsTagInput}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        autoFocus
+                      />
+                      <TouchableOpacity style={styles.tagSaveButton} onPress={() => handleSaveTag(tag)}>
+                        <Text style={styles.tagSaveButtonText}>{t('save')}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.tagCancelButton} onPress={() => setEditingTag(null)}>
+                        <Ionicons name="close" size={14} color="var(--text-color)" />
+                      </TouchableOpacity>
+                    </Row>
+
+                    <Row align="center" style={styles.settingsColorSelectorRow}>
+                      {availableColors.map((color) => {
+                        const isSelected = editTagColor === color
+                        const isCustom = !PRESET_COLORS.includes(color)
+                        return (
+                          <TouchableOpacity
+                            key={color}
+                            style={[
+                              styles.colorCircle,
+                              { backgroundColor: color },
+                              isSelected && styles.colorCircleSelected,
+                            ]}
+                            onPress={() => setEditTagColor(color)}
+                          >
+                            {isSelected && <Ionicons name="checkmark" size={10} color="#FFF" />}
+                            {isCustom && (
+                              <View style={styles.customColorBadge}>
+                                <Ionicons name="star" size={5} color="#FFF" />
+                              </View>
+                            )}
+                          </TouchableOpacity>
+                        )
+                      })}
+
+                      {showCustomColorInput ? (
+                        <Row align="center" style={styles.customColorInputWrapper}>
+                          <TextInput
+                            value={customColorText}
+                            onChangeText={setCustomColorText}
+                            placeholder="#HEX or rgb(a)"
+                            placeholderTextColor="#8E8E93"
+                            style={styles.customColorInput}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            autoFocus
+                            onSubmitEditing={() => {
+                              const cleaned = customColorText.trim()
+                              if (cleaned && (cleaned.startsWith('#') || cleaned.startsWith('rgb'))) {
+                                setSessionCustomColors((prev) => [...prev, cleaned])
+                                setEditTagColor(cleaned)
+                                setCustomColorText('')
+                                setShowCustomColorInput(false)
+                              }
+                            }}
+                          />
+                          <TouchableOpacity
+                            style={styles.customColorInputSave}
+                            onPress={() => {
+                              const cleaned = customColorText.trim()
+                              if (cleaned && (cleaned.startsWith('#') || cleaned.startsWith('rgb'))) {
+                                setSessionCustomColors((prev) => [...prev, cleaned])
+                                setEditTagColor(cleaned)
+                                setCustomColorText('')
+                                setShowCustomColorInput(false)
+                              }
+                            }}
+                          >
+                            <Ionicons name="checkmark" size={12} color="#007AFF" />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.customColorInputCancel}
+                            onPress={() => {
+                              setCustomColorText('')
+                              setShowCustomColorInput(false)
+                            }}
+                          >
+                            <Ionicons name="close" size={12} color="var(--text-color)" />
+                          </TouchableOpacity>
+                        </Row>
+                      ) : (
+                        <TouchableOpacity
+                          style={styles.addColorChipButton}
+                          onPress={() => setShowCustomColorInput(true)}
+                        >
+                          <Ionicons name="add" size={10} color="#007AFF" />
+                          <Ionicons name="color-palette-outline" size={10} color="#007AFF" />
+                        </TouchableOpacity>
+                      )}
+                    </Row>
+                  </View>
+                ) : (
+                  <Row align="center" justify="between" style={styles.boxItem}>
+                    <Row align="center" style={{ gap: 8 }}>
+                      <View
+                        style={[
+                          styles.tagPreviewChip,
+                          colors && { backgroundColor: colors.bg, borderColor: colors.border },
+                        ]}
+                      >
+                        <Ionicons name="pricetag" size={10} color={colors ? colors.text : '#007AFF'} />
+                        <Text style={[styles.tagPreviewChipText, colors && { color: colors.text }]}>{parsed.name}</Text>
+                      </View>
+                    </Row>
+
+                    <Row align="center" style={{ gap: 8 }}>
+                      <TouchableOpacity
+                        accessibilityLabel={t('editTag')}
+                        style={styles.tagActionButton}
+                        onPress={() => {
+                          setEditingTag(tag)
+                          setEditTagName(parsed.name)
+                          setEditTagColor(parsed.color ?? '#007AFF')
+                        }}
+                      >
+                        <Ionicons name="pencil-outline" size={14} color="var(--text-color)" />
+                        <Text style={styles.tagActionButtonText}>{t('editTag')}</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        accessibilityLabel={t('deleteTag')}
+                        style={styles.tagActionButton}
+                        onPress={() => handleDeleteTag(tag)}
+                      >
+                        <Ionicons name="trash-outline" size={14} color="var(--text-color)" />
+                        <Text style={styles.tagActionButtonText}>{t('deleteTag')}</Text>
+                      </TouchableOpacity>
+                    </Row>
+                  </Row>
+                )}
+              </View>
+            )
+          })
+        )}
+      </View>
+
       <Text style={[styles.sectionTitle, styles.sectionTitleMargin]}>{t('cli')}</Text>
 
       <View border="light" rounded="medium" style={styles.box}>
@@ -1073,6 +1403,159 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#FFFFFF',
     fontSize: 12,
+    fontWeight: '600',
+  },
+  noTagsText: {
+    fontSize: 12,
+    opacity: 0.6,
+    textAlign: 'center',
+    paddingVertical: 12,
+  },
+  tagEditContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  tagEditInputRow: {
+    gap: 8,
+  },
+  settingsTagInput: {
+    flex: 1,
+    height: 28,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 0,
+    fontSize: 12,
+    color: 'var(--text-color)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    textAlignVertical: 'center',
+    verticalAlign: 'middle',
+  },
+  tagSaveButton: {
+    height: 28,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#007AFF',
+  },
+  tagSaveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  tagCancelButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  settingsColorSelectorRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingVertical: 4,
+  },
+  colorCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  colorCircleSelected: {
+    borderColor: '#FFF',
+    borderWidth: 1.5,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+  },
+  customColorBadge: {
+    position: 'absolute',
+    top: -3,
+    right: -3,
+    backgroundColor: '#007AFF',
+    borderRadius: 999,
+    width: 8,
+    height: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 0.5,
+    borderColor: '#FFF',
+  },
+  customColorInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    paddingHorizontal: 4,
+    height: 22,
+  },
+  customColorInput: {
+    fontSize: 10,
+    color: 'var(--text-color)',
+    padding: 0,
+    width: 120,
+    height: '100%',
+  },
+  customColorInputSave: {
+    padding: 2,
+  },
+  customColorInputCancel: {
+    padding: 2,
+  },
+  addColorChipButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    borderRadius: 999,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    backgroundColor: 'rgba(0, 122, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 122, 255, 0.3)',
+    height: 18,
+  },
+  tagPreviewChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(0, 122, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 122, 255, 0.25)',
+  },
+  tagPreviewChipText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#007AFF',
+  },
+  tagActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(150, 150, 150, 0.1)',
+  },
+  tagActionButtonText: {
+    fontSize: 11,
     fontWeight: '600',
   },
 })

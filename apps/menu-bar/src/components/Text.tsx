@@ -32,6 +32,8 @@ export const Text = create(RNText, {
 export const TextInput = create(RNTextInput, {
   base: {
     fontSize: 16,
+    textAlignVertical: 'center',
+    verticalAlign: 'middle',
   },
 
   variants: {

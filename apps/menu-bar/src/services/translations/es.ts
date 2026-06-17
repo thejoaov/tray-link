@@ -101,4 +101,12 @@ export const es: typeof en = {
   tagLabel: 'Etiqueta',
   editTagPlaceholder: 'Escriba el nombre de la etiqueta',
   uncategorized: 'Sin Etiqueta',
+  manageTags: 'Gestionar Etiquetas',
+  editTag: 'Editar Etiqueta',
+  deleteTag: 'Eliminar Etiqueta',
+  deleteTagConfirmation:
+    '¿Está seguro de que desea eliminar esta etiqueta? Esto eliminará la etiqueta de todos los proyectos asociados.',
+  tagName: 'Nombre de la Etiqueta',
+  tagColor: 'Color de la Etiqueta',
+  noTagsYet: 'No se han creado etiquetas todavía.',
 }

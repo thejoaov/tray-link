@@ -100,4 +100,12 @@ export const pt: typeof en = {
   tagLabel: 'Tag',
   editTagPlaceholder: 'Digite o nome da tag',
   uncategorized: 'Sem Tag',
+  manageTags: 'Gerenciar Tags',
+  editTag: 'Editar Tag',
+  deleteTag: 'Excluir Tag',
+  deleteTagConfirmation:
+    'Tem certeza que deseja excluir esta tag? Isso removerá a tag de todos os projetos associados.',
+  tagName: 'Nome da Tag',
+  tagColor: 'Cor da Tag',
+  noTagsYet: 'Nenhuma tag criada ainda.',
 }

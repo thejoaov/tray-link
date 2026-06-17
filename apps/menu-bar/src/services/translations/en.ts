@@ -98,4 +98,12 @@ export const en = {
   tagLabel: 'Tag',
   editTagPlaceholder: 'Enter tag name',
   uncategorized: 'Uncategorized',
+  manageTags: 'Manage Tags',
+  editTag: 'Edit Tag',
+  deleteTag: 'Delete Tag',
+  deleteTagConfirmation:
+    'Are you sure you want to delete this tag? This will remove the tag from all associated projects.',
+  tagName: 'Tag Name',
+  tagColor: 'Tag Color',
+  noTagsYet: 'No tags created yet.',
 }
