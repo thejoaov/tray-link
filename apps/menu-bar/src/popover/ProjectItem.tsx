@@ -54,6 +54,7 @@ type Props = {
     save: string
   }
   editMode?: boolean
+  showDragHandle?: boolean
   onLayout?: (event: LayoutChangeEvent) => void
   dragHandleProps?: GestureResponderHandlers
   isDragging?: boolean
@@ -135,6 +136,7 @@ export const ProjectItem = ({
   onToggleProjectToolSelectionMode,
   labels,
   editMode = false,
+  showDragHandle = false,
   onLayout,
   dragHandleProps,
   isDragging = false,
@@ -276,7 +278,7 @@ export const ProjectItem = ({
             />
           </TouchableOpacity>
         ) : null}
-        {editMode ? (
+        {showDragHandle ? (
           <View
             style={[styles.button, styles.dragHandleButton, isDragging && styles.dragHandleButtonActive]}
             {...dragHandleProps}

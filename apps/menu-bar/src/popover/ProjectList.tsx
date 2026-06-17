@@ -28,6 +28,7 @@ import {
   getEditorOptions,
   getTerminalOptions,
   loadPreferences,
+  persistPreferences,
   subscribePreferencesChange,
   ToolOption,
 } from '../services/preferences'
@@ -36,7 +37,7 @@ import { setPendingProjectRemove, subscribeProjectRemoveConfirm } from '../servi
 import { MAX_UI_HEIGHT, PROJECT_LIST_HEIGHT } from '../utils/constants'
 import { WindowsNavigator } from '../windows'
 import Footer from './Footer'
-import { ProjectItem } from './ProjectItem'
+import { ProjectItem, parseTag } from './ProjectItem'
 import SectionHeader from './SectionHeader'
 
 const PROJECT_SEARCH_HEIGHT = 34
@@ -57,7 +58,7 @@ type ItemLayout = {
   height: number
 }
 
-type ProjectSortMode = 'manual' | 'alphaAsc' | 'alphaDesc' | 'neighborhood'
+type ProjectSortMode = 'manual' | 'alphaAsc' | 'alphaDesc' | 'dateAsc' | 'dateDesc'
 
 const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max)
@@ -102,36 +103,7 @@ const getAlphabeticalGroup = (name: string) => {
   return '#'
 }
 
-const getPathSegments = (path: string) => {
-  return path
-    .split('/')
-    .map((segment) => segment.trim())
-    .filter(Boolean)
-}
-
-const compareProjectsByNeighborhood = (left: Project, right: Project) => {
-  const leftSegments = getPathSegments(left.path)
-  const rightSegments = getPathSegments(right.path)
-  const maxSegmentCount = Math.max(leftSegments.length, rightSegments.length)
-
-  for (let index = 0; index < maxSegmentCount; index += 1) {
-    const leftSegment = leftSegments[index] ?? ''
-    const rightSegment = rightSegments[index] ?? ''
-    const comparison = compareText(leftSegment, rightSegment)
-
-    if (comparison !== 0) {
-      return comparison
-    }
-  }
-
-  const nameComparison = compareText(left.name, right.name)
-  if (nameComparison !== 0) {
-    return nameComparison
-  }
-
-  return compareText(left.path, right.path)
-}
-
+// biome-ignore lint/correctness/noUnusedVariables: sortProjectsByMode is used in other parts of the workspace or planned for CLI integration
 const sortProjectsByMode = (items: Project[], mode: Exclude<ProjectSortMode, 'manual'>) => {
   const sorted = [...items]
 
@@ -154,7 +126,15 @@ const sortProjectsByMode = (items: Project[], mode: Exclude<ProjectSortMode, 'ma
       return compareText(right.path, left.path)
     }
 
-    return compareProjectsByNeighborhood(left, right)
+    if (mode === 'dateAsc') {
+      return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
+    }
+
+    if (mode === 'dateDesc') {
+      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+    }
+
+    return 0
   })
 
   return sorted
@@ -164,7 +144,6 @@ export const ProjectList = () => {
   const { t } = useTranslation()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const [editMode, setEditMode] = useState(false)
   const [contextMenuProjectId, setContextMenuProjectId] = useState<string | null>(null)
   const [toolSelectionProjectId, setToolSelectionProjectId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -211,7 +190,6 @@ export const ProjectList = () => {
   const dragTouchOffsetWithinItemRef = useRef(0)
   const activeDragProjectIdRef = useRef<string | null>(null)
   const dragDestinationIndexRef = useRef<number | null>(null)
-  const editModeRef = useRef(false)
   const beginProjectDragRef = useRef<(projectId: string, absoluteY: number) => void>(() => {})
   const updateProjectDragRef = useRef<(absoluteY: number) => void>(() => {})
   const finishProjectDragRef = useRef<() => void>(() => {})
@@ -246,38 +224,68 @@ export const ProjectList = () => {
     () => preferences.defaultTerminal ?? terminalOptions[0]?.command ?? 'open -a Terminal',
     [preferences.defaultTerminal, terminalOptions],
   )
+  const sortedProjects = useMemo(() => {
+    const items = [...projects]
+    if (projectSortMode === 'manual') {
+      return items.sort((a, b) => a.position - b.position)
+    }
+    if (projectSortMode === 'alphaAsc') {
+      return items.sort((a, b) => {
+        const nameComp = compareText(a.name, b.name)
+        return nameComp !== 0 ? nameComp : compareText(a.path, b.path)
+      })
+    }
+    if (projectSortMode === 'alphaDesc') {
+      return items.sort((a, b) => {
+        const nameComp = compareText(b.name, a.name)
+        return nameComp !== 0 ? nameComp : compareText(b.path, a.path)
+      })
+    }
+    if (projectSortMode === 'dateAsc') {
+      return items.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    }
+    if (projectSortMode === 'dateDesc') {
+      return items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    }
+    return items
+  }, [projects, projectSortMode])
+
   const allExistingTags = useMemo(() => {
     const tags = new Set<string>()
-    projects.forEach((p) => {
+    sortedProjects.forEach((p) => {
       if (p.tag?.trim()) {
         tags.add(p.tag.trim())
       }
     })
     return Array.from(tags).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
-  }, [projects])
+  }, [sortedProjects])
   const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery])
   const filteredProjects = useMemo(() => {
     if (!normalizedSearchQuery) {
-      return projects
+      return sortedProjects
     }
 
-    return projects.filter((project) => {
+    return sortedProjects.filter((project) => {
       const searchableText = `${project.name} ${project.path}`.toLocaleLowerCase()
       return searchableText.includes(normalizedSearchQuery)
     })
-  }, [normalizedSearchQuery, projects])
+  }, [normalizedSearchQuery, sortedProjects])
   const displayedProjects = useMemo(() => {
-    return editMode ? projects : filteredProjects
-  }, [editMode, filteredProjects, projects])
-  const listEmptyHasSearchState = !editMode && Boolean(normalizedSearchQuery)
+    return filteredProjects
+  }, [filteredProjects])
+  const listEmptyHasSearchState = Boolean(normalizedSearchQuery)
 
   const favoritesList = useMemo(() => {
-    return projects.filter((p) => p.isFavorite).sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0))
-  }, [projects])
+    const favs = sortedProjects.filter((p) => p.isFavorite)
+    if (projectSortMode === 'manual') {
+      return favs.sort((a, b) => (a.favoritePosition ?? 0) - (b.favoritePosition ?? 0))
+    }
+    return favs
+  }, [sortedProjects, projectSortMode])
 
   const flatListData = useMemo(() => {
-    if (editMode) {
-      return projects.map((p, idx) => ({
+    if (projectSortMode === 'manual' && (!preferences.groupingMode || preferences.groupingMode === 'none')) {
+      return sortedProjects.map((p, idx) => ({
         id: p.id,
         type: 'project' as const,
         project: p,
@@ -296,7 +304,7 @@ export const ProjectList = () => {
       }))
     }
 
-    const remainingProjects = favoritesList.length > 0 ? projects.filter((p) => !p.isFavorite) : projects
+    const remainingProjects = favoritesList.length > 0 ? sortedProjects.filter((p) => !p.isFavorite) : sortedProjects
 
     if (preferences.groupingMode === 'tag') {
       const groups: Record<string, Project[]> = {}
@@ -458,10 +466,6 @@ export const ProjectList = () => {
         return a.localeCompare(b)
       })
 
-      for (const letter of sortedLetters) {
-        groups[letter].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
-      }
-
       const items: Array<
         | { id: string; type: 'header'; label: string }
         | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
@@ -564,7 +568,7 @@ export const ProjectList = () => {
       displayIndex: idx,
     }))
   }, [
-    editMode,
+    projectSortMode,
     normalizedSearchQuery,
     filteredProjects,
     favoritesList,
@@ -632,9 +636,10 @@ export const ProjectList = () => {
     itemLayoutsRef.current = itemLayouts
   }, [itemLayouts])
 
+  const projectSortModeRef = useRef<ProjectSortMode>('manual')
   useEffect(() => {
-    editModeRef.current = editMode
-  }, [editMode])
+    projectSortModeRef.current = projectSortMode
+  }, [projectSortMode])
 
   useEffect(() => {
     dragDestinationIndexRef.current = dragDestinationIndex
@@ -935,6 +940,20 @@ export const ProjectList = () => {
     [loadProjects],
   )
 
+  const cycleGroupingMode = useCallback(async () => {
+    const current = preferences.groupingMode ?? 'none'
+    const next: 'none' | 'tag' | 'parentFolder' =
+      current === 'none' ? 'tag' : current === 'tag' ? 'parentFolder' : 'none'
+
+    try {
+      const updatedPreferences = { ...preferences, groupingMode: next }
+      setPreferences(updatedPreferences)
+      await persistPreferences(updatedPreferences)
+    } catch (error) {
+      void logError('project-list:cycleGroupingMode', error)
+    }
+  }, [preferences])
+
   const cycleProjectSortMode = useCallback(() => {
     const nextMode: ProjectSortMode =
       projectSortMode === 'manual'
@@ -942,16 +961,13 @@ export const ProjectList = () => {
         : projectSortMode === 'alphaAsc'
           ? 'alphaDesc'
           : projectSortMode === 'alphaDesc'
-            ? 'neighborhood'
-            : 'manual'
+            ? 'dateAsc'
+            : projectSortMode === 'dateAsc'
+              ? 'dateDesc'
+              : 'manual'
 
     setProjectSortMode(nextMode)
-    if (nextMode !== 'manual') {
-      void persistProjectOrder(sortProjectsByMode(projectsRef.current, nextMode))
-    } else {
-      void persistProjectOrder(sortProjectsByMode(projectsRef.current, 'alphaAsc'))
-    }
-  }, [persistProjectOrder, projectSortMode])
+  }, [projectSortMode])
 
   const maybeAutoScrollDuringDrag = useCallback((absoluteY: number) => {
     const relativeY = absoluteY - listTopInWindowRef.current
@@ -979,7 +995,7 @@ export const ProjectList = () => {
 
   const beginProjectDrag = useCallback(
     (projectId: string, absoluteY: number) => {
-      if (!editModeRef.current) {
+      if (projectSortModeRef.current !== 'manual') {
         return
       }
 
@@ -1092,26 +1108,6 @@ export const ProjectList = () => {
     setScrollOffset(nextOffset)
   }, [])
 
-  const toggleEditMode = useCallback(() => {
-    setEditMode((current) => {
-      const next = !current
-
-      if (next) {
-        setContextMenuProjectId(null)
-        setToolSelectionProjectId(null)
-      } else {
-        activeDragProjectIdRef.current = null
-        dragDestinationIndexRef.current = null
-        dragTouchOffsetWithinItemRef.current = 0
-        setActiveDragProjectId(null)
-        setDragDestinationIndex(null)
-        setProjectSortMode('manual')
-      }
-
-      return next
-    })
-  }, [])
-
   const getDragPanResponder = useCallback((projectId: string) => {
     const cached = dragPanRespondersRef.current.get(projectId)
     if (cached) {
@@ -1121,7 +1117,7 @@ export const ProjectList = () => {
     const responder = PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_event, gestureState) => {
-        return editModeRef.current && Math.abs(gestureState.dy) >= DRAG_ACTIVATION_DISTANCE
+        return projectSortModeRef.current === 'manual' && Math.abs(gestureState.dy) >= DRAG_ACTIVATION_DISTANCE
       },
       onPanResponderGrant: (_event, gestureState) => {
         beginProjectDragRef.current(projectId, gestureState.moveY || gestureState.y0)
@@ -1153,7 +1149,7 @@ export const ProjectList = () => {
   }, [projects])
 
   const insertionIndicatorTop = useMemo(() => {
-    if (!editMode || activeDragProjectId === null || dragDestinationIndex === null) {
+    if (projectSortMode !== 'manual' || activeDragProjectId === null || dragDestinationIndex === null) {
       return null
     }
 
@@ -1173,19 +1169,37 @@ export const ProjectList = () => {
     }
 
     return destinationLayout.y + destinationLayout.height - scrollOffset
-  }, [activeDragProjectId, displayedProjects, dragDestinationIndex, editMode, itemLayouts, scrollOffset])
+  }, [activeDragProjectId, displayedProjects, dragDestinationIndex, projectSortMode, itemLayouts, scrollOffset])
+
+  const displayGroupingButtonIcon = useMemo(() => {
+    const current = preferences.groupingMode ?? 'none'
+    if (current === 'tag') {
+      return 'pricetag-outline'
+    }
+    if (current === 'parentFolder') {
+      return 'folder-outline'
+    }
+    return 'list-outline'
+  }, [preferences.groupingMode])
+
+  const displayGroupingButtonLabel = useMemo(() => {
+    const current = preferences.groupingMode ?? 'none'
+    if (current === 'tag') {
+      return t('groupTag')
+    }
+    if (current === 'parentFolder') {
+      return t('groupParentFolder')
+    }
+    return t('groupNone')
+  }, [preferences.groupingMode, t])
 
   const projectSortModeButtonIcon = useMemo(() => {
-    if (projectSortMode === 'alphaAsc') {
+    if (projectSortMode === 'alphaAsc' || projectSortMode === 'alphaDesc') {
       return 'text-outline'
     }
 
-    if (projectSortMode === 'alphaDesc') {
-      return 'text'
-    }
-
-    if (projectSortMode === 'neighborhood') {
-      return 'folder-open-outline'
+    if (projectSortMode === 'dateAsc' || projectSortMode === 'dateDesc') {
+      return 'calendar-outline'
     }
 
     return 'swap-vertical-outline'
@@ -1200,8 +1214,12 @@ export const ProjectList = () => {
       return t('sortProjectsAlphabeticalDesc')
     }
 
-    if (projectSortMode === 'neighborhood') {
-      return t('sortProjectsNeighborhood')
+    if (projectSortMode === 'dateAsc') {
+      return t('sortProjectsDateAsc')
+    }
+
+    if (projectSortMode === 'dateDesc') {
+      return t('sortProjectsDateDesc')
     }
 
     return t('sortProjectsDefault')
@@ -1298,48 +1316,48 @@ export const ProjectList = () => {
         label={t('projects')}
         accessoryRight={
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={toggleEditMode} style={styles.addButton}>
-              <Text style={styles.metaButtonText}>{editMode ? t('done') : t('reorder')}</Text>
+            <TouchableOpacity
+              accessibilityLabel={displayGroupingButtonLabel}
+              disabled={Boolean(activeDragProjectId)}
+              onPress={cycleGroupingMode}
+              style={[styles.addButton, activeDragProjectId && styles.addButtonDisabled]}
+            >
+              <Ionicons name={displayGroupingButtonIcon} size={16} color="var(--text-color)" />
             </TouchableOpacity>
-            {editMode ? (
-              <TouchableOpacity
-                accessibilityLabel={projectSortModeButtonLabel}
-                disabled={Boolean(activeDragProjectId)}
-                onPress={cycleProjectSortMode}
-                style={[styles.addButton, activeDragProjectId && styles.addButtonDisabled]}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-                  <Ionicons name={projectSortModeButtonIcon} size={16} color="var(--text-color)" />
-                  {projectSortMode === 'alphaAsc' && <Ionicons name="arrow-up" size={12} color="var(--text-color)" />}
-                  {projectSortMode === 'alphaDesc' && (
-                    <Ionicons name="arrow-down" size={12} color="var(--text-color)" />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ) : null}
+            <TouchableOpacity
+              accessibilityLabel={projectSortModeButtonLabel}
+              disabled={Boolean(activeDragProjectId)}
+              onPress={cycleProjectSortMode}
+              style={[styles.addButton, activeDragProjectId && styles.addButtonDisabled]}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                <Ionicons name={projectSortModeButtonIcon} size={16} color="var(--text-color)" />
+                {projectSortMode.endsWith('Asc') && <Ionicons name="arrow-up" size={12} color="var(--text-color)" />}
+                {projectSortMode.endsWith('Desc') && <Ionicons name="arrow-down" size={12} color="var(--text-color)" />}
+              </View>
+            </TouchableOpacity>
             <TouchableOpacity onPress={handleAddProject} style={styles.addButton}>
               <Ionicons name="add" size={16} color="var(--text-color)" />
             </TouchableOpacity>
           </View>
         }
       />
-      <View style={[styles.searchContainer, editMode && styles.searchContainerDisabled]}>
+      <View style={styles.searchContainer}>
         <Ionicons name="search-outline" size={14} color="var(--text-color)" />
         <TextInput
           value={searchQuery}
-          onChangeText={editMode ? undefined : setSearchQuery}
+          onChangeText={setSearchQuery}
           placeholder={t('searchProjects')}
           placeholderTextColor="#8E8E93"
-          style={[styles.searchInput, editMode && styles.searchInputDisabled]}
+          style={styles.searchInput}
           autoCapitalize="none"
           autoCorrect={false}
-          editable={!editMode}
         />
         {searchQuery ? (
           <TouchableOpacity
             accessibilityLabel={t('clearSearch')}
             onPress={() => setSearchQuery('')}
-            style={[styles.clearSearchButton, editMode && styles.clearSearchButtonDisabled]}
+            style={styles.clearSearchButton}
           >
             <Ionicons name="close-circle" size={16} color="var(--text-color)" />
           </TouchableOpacity>
@@ -1357,7 +1375,6 @@ export const ProjectList = () => {
             activeDragProjectId,
             contextMenuProjectId,
             dragDestinationIndex,
-            editMode,
             globalEditorCommand,
             globalTerminalCommand,
             itemLayouts,
@@ -1414,7 +1431,7 @@ export const ProjectList = () => {
                   onRemove={() => handleRequestRemove(projectItem)}
                   onToggleContextMenu={() => handleToggleContextMenu(projectItem.id)}
                   onCloseContextMenu={() => handleCloseContextMenu(projectItem.id)}
-                  contextMenuOpen={!editMode && contextMenuProjectId === projectItem.id}
+                  contextMenuOpen={contextMenuProjectId === projectItem.id}
                   editorOptions={editorOptions}
                   terminalOptions={terminalOptions}
                   editorQuickActionOption={resolveEditorOption(projectItem)}
@@ -1425,7 +1442,7 @@ export const ProjectList = () => {
                   onSelectProjectTerminalDefault={(command) => handleSetProjectTerminalDefault(projectItem, command)}
                   globalEditorCommand={globalEditorCommand}
                   globalTerminalCommand={globalTerminalCommand}
-                  toolSelectionMode={!editMode && toolSelectionProjectId === projectItem.id}
+                  toolSelectionMode={toolSelectionProjectId === projectItem.id}
                   onToggleProjectToolSelectionMode={() => handleToggleProjectToolSelectionMode(projectItem.id)}
                   onToggleFavorite={() => handleToggleFavorite(projectItem)}
                   labels={{
@@ -1441,7 +1458,12 @@ export const ProjectList = () => {
                   }}
                   onSaveTag={(tag) => handleSaveProjectTag(projectItem, tag)}
                   allExistingTags={allExistingTags}
-                  editMode={editMode}
+                  editMode={
+                    projectSortMode === 'manual' && (!preferences.groupingMode || preferences.groupingMode === 'none')
+                  }
+                  showDragHandle={
+                    projectSortMode === 'manual' && (!preferences.groupingMode || preferences.groupingMode === 'none')
+                  }
                   dragHandleProps={getDragPanResponder(item.id).panHandlers}
                   isDragging={activeDragProjectId === item.id}
                 />
