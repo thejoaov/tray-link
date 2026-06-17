@@ -647,8 +647,10 @@ export const ProjectList = () => {
 
   // Reload projects and preferences every time the popover becomes visible
   // This ensures CLI changes appear without a manual restart
+  // Also reset the search query when the popover is focused/reopened
   usePopoverFocusEffect(
     useCallback(() => {
+      setSearchQuery('')
       void loadProjects()
       loadPreferences()
         .then(setPreferences)
@@ -1352,6 +1354,8 @@ export const ProjectList = () => {
           style={styles.searchInput}
           autoCapitalize="none"
           autoCorrect={false}
+          editable={true}
+          onBlur={() => setSearchQuery('')}
         />
         {searchQuery ? (
           <TouchableOpacity
@@ -1539,7 +1543,7 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     textAlignVertical: 'center',
     verticalAlign: 'middle',
-    borderColor: 'none',
+    borderColor: 'transparent',
     borderWidth: 0,
   },
   searchContainerDisabled: {
