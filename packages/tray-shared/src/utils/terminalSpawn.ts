@@ -64,10 +64,10 @@ export const buildTerminalSpawnCommand = (
     }
 
     if (normalizedTerminal.includes('cmd')) {
-      return `start cmd.exe /k "cd /d ${winPath} && ${commandToRun}"`
+      return `start cmd.exe /k "cd /d ""${winPath}"" && ${commandToRun}"`
     }
 
-    return `start cmd.exe /k "cd /d ${winPath} && ${commandToRun}"`
+    return `start cmd.exe /k "cd /d ""${winPath}"" && ${commandToRun}"`
   }
 
   if (normalizedTerminal.includes('gnome-terminal')) {
