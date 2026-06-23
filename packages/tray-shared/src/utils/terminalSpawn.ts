@@ -58,7 +58,9 @@ export const buildTerminalSpawnCommand = (
     }
 
     if (normalizedTerminal.includes('powershell')) {
-      return `start powershell.exe -NoExit -Command "Set-Location -LiteralPath '${projectPath.replace(/'/g, "''")}'; ${commandToRun}"`
+      const escapedPath = projectPath.replace(/'/g, "''")
+      const escapedCommand = commandToRun.replace(/`/g, '``').replace(/"/g, '`"')
+      return `start powershell.exe -NoExit -Command "Set-Location -LiteralPath '${escapedPath}'; ${escapedCommand}"`
     }
 
     if (normalizedTerminal.includes('cmd')) {
