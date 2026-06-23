@@ -30,7 +30,6 @@ export const buildTerminalSpawnCommand = (
     }
 
     if (normalizedTerminal.includes('ghostty')) {
-      const _escapedSession = sessionCommand.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
       return `open -a Ghostty --args -e bash -lc ${shellEscapeDoubleQuotes(sessionCommand)}`
     }
 
