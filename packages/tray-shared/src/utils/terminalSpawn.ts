@@ -42,7 +42,7 @@ export const buildTerminalSpawnCommand = (
       return `osascript -e 'tell application "Terminal" to activate' -e 'tell application "Terminal" to do script "${escapedSession}"'`
     }
 
-    if (terminalCommand.startsWith('open')) {
+  if (/^open\s+-a\s+['\"]?terminal\b/i.test(terminalCommand.trim())) {
       const escapedSession = sessionCommand.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
       return `osascript -e 'tell application "Terminal" to activate' -e 'tell application "Terminal" to do script "${escapedSession}"'`
     }
