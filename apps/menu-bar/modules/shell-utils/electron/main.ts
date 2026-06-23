@@ -4,7 +4,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import util from 'util'
-import { buildTerminalSpawnCommand } from '../../../../../packages/tray-shared/src/utils/terminalSpawn'
+import { buildTerminalSpawnCommand } from '@tray-link/tray-shared'
 
 const execAsync = util.promisify(exec)
 
