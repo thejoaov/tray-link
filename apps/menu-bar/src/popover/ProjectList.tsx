@@ -1030,7 +1030,7 @@ export const ProjectList = () => {
         command: editorCommand,
       })
     },
-    [t, updateProjectLastOpened],
+    [t, updateProjectLastOpened, globalEditorCommand, globalTerminalCommand],
   )
 
   const executeProjectRemoval = async ({ id, path, deleteFromDisk }: RemoveProjectPayload) => {
