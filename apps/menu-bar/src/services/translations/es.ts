@@ -96,6 +96,7 @@ export const es: typeof en = {
   updaterInstalled: 'Actualización instalada. Tray Link se reiniciará ahora.',
   updaterError: 'Error de actualización: {{error}}',
   favorites: 'Favoritos',
+  recent: 'Recientes',
   save: 'Guardar',
   markAsFavorite: 'Marcar como favorito',
   unmarkAsFavorite: 'Quitar de favoritos',

@@ -51,6 +51,7 @@ export default new Command('open')
 
     const editorErrors: string[] = []
     const terminalErrors: string[] = []
+    let lastOpenedTool: { type: 'editor' | 'terminal'; command: string } | null = null
 
     if (openBoth || openEditorFlag) {
       let editorCommand: string | null = null
@@ -69,6 +70,7 @@ export default new Command('open')
       try {
         await openInEditor(project.path, editorCommand)
         console.log(`Opened "${project.name}" in editor (${editorCommand})`)
+        lastOpenedTool = { type: 'editor', command: editorCommand }
       } catch (err) {
         editorErrors.push(`Editor error: ${err instanceof Error ? err.message : String(err)}`)
       }
@@ -98,6 +100,7 @@ export default new Command('open')
       try {
         await openInTerminal(project.path, terminalCommand)
         console.log(`Opened "${project.name}" in terminal (${terminalCommand})`)
+        lastOpenedTool = { type: 'terminal', command: terminalCommand }
       } catch (err) {
         terminalErrors.push(`Terminal error: ${err instanceof Error ? err.message : String(err)}`)
       }
@@ -108,5 +111,14 @@ export default new Command('open')
         console.error(error)
       }
       process.exit(1)
+    }
+
+    if (lastOpenedTool) {
+      await projectStore.updateProject({
+        ...project,
+        lastOpenedAt: new Date().toISOString(),
+        lastOpenedTool,
+        updatedAt: new Date().toISOString(),
+      })
     }
   })

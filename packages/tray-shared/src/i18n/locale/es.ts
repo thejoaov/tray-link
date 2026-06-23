@@ -57,6 +57,7 @@ const es: typeof en = {
   cancel: 'Cancelar',
   reset: 'Restaurar',
   favorites: 'Favoritos',
+  recent: 'Recientes',
   save: 'Guardar',
   markAsFavorite: 'Marcar como favorito',
   unmarkAsFavorite: 'Quitar de favoritos',

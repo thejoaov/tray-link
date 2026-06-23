@@ -95,6 +95,7 @@ export const pt: typeof en = {
   updaterInstalled: 'Atualização instalada. O Tray Link será reiniciado agora.',
   updaterError: 'Falha na atualização: {{error}}',
   favorites: 'Favoritos',
+  recent: 'Recentes',
   save: 'Salvar',
   markAsFavorite: 'Marcar como favorito',
   unmarkAsFavorite: 'Remover dos favoritos',

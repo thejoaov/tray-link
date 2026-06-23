@@ -93,6 +93,7 @@ export const en = {
   updaterInstalled: 'Update installed. Tray Link will restart now.',
   updaterError: 'Update failed: {{error}}',
   favorites: 'Favorites',
+  recent: 'Recents',
   save: 'Save',
   markAsFavorite: 'Mark as favorite',
   unmarkAsFavorite: 'Remove from favorites',

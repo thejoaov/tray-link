@@ -7,3 +7,5 @@ out/
 build/
 .turbo
 tsconfig.tsbuildinfo
+docs/*
+!apps/docs

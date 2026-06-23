@@ -57,6 +57,7 @@ const pt: typeof en = {
   cancel: 'Cancelar',
   reset: 'Redefinir',
   favorites: 'Favoritos',
+  recent: 'Recentes',
   save: 'Salvar',
   markAsFavorite: 'Marcar como favorito',
   unmarkAsFavorite: 'Remover dos favoritos',

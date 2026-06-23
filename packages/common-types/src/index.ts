@@ -12,6 +12,11 @@ export interface Project {
   migrated?: boolean
   source?: 'cli' | 'app'
   tag?: string
+  lastOpenedAt?: string
+  lastOpenedTool?: {
+    type: 'editor' | 'terminal'
+    command: string
+  }
 }
 
 export type Platform = 'darwin' | 'win32' | 'linux'

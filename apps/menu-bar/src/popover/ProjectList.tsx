@@ -38,6 +38,7 @@ import { MAX_UI_HEIGHT, PROJECT_LIST_HEIGHT } from '../utils/constants'
 import { WindowsNavigator } from '../windows'
 import Footer from './Footer'
 import { ProjectItem, parseTag } from './ProjectItem'
+import { RECENT_SECTION_ID, RecentProjects } from './RecentProjects'
 import SectionHeader from './SectionHeader'
 
 const PROJECT_SEARCH_HEIGHT = 34
@@ -764,17 +765,23 @@ export const ProjectList = () => {
   }
 
   const handleOpenEditor = async (project: Project) => {
-    const opened = await openInEditor(project.path, resolveEditorCommand(project))
+    const editorCommand = resolveEditorCommand(project)
+    const opened = await openInEditor(project.path, editorCommand)
     if (!opened) {
       Alert.alert(t('invalidEditor'), t('invalidValues'))
+      return
     }
+    await updateProjectLastOpened(project, { type: 'editor', command: editorCommand })
   }
 
   const handleOpenTerminal = async (project: Project) => {
-    const opened = await openInTerminal(project.path, resolveTerminalCommand(project))
+    const terminalCommand = resolveTerminalCommand(project)
+    const opened = await openInTerminal(project.path, terminalCommand)
     if (!opened) {
       Alert.alert(t('invalidTerminal'), t('invalidValues'))
+      return
     }
+    await updateProjectLastOpened(project, { type: 'terminal', command: terminalCommand })
   }
 
   const handleOpenFinder = async (project: Project) => {
@@ -787,6 +794,7 @@ export const ProjectList = () => {
       Alert.alert(t('invalidEditor'), t('invalidValues'))
       return
     }
+    await updateProjectLastOpened(project, { type: 'editor', command })
     setContextMenuProjectId(null)
     setToolSelectionProjectId(null)
   }
@@ -797,6 +805,7 @@ export const ProjectList = () => {
       Alert.alert(t('invalidTerminal'), t('invalidValues'))
       return
     }
+    await updateProjectLastOpened(project, { type: 'terminal', command })
     setContextMenuProjectId(null)
     setToolSelectionProjectId(null)
   }
@@ -848,6 +857,58 @@ export const ProjectList = () => {
       })
     }
   }
+
+  const updateProjectLastOpened = useCallback(
+    async (project: Project, tool: { type: 'editor' | 'terminal'; command: string }) => {
+      try {
+        const updatedProject: Project = {
+          ...project,
+          lastOpenedAt: new Date().toISOString(),
+          lastOpenedTool: tool,
+          updatedAt: new Date().toISOString(),
+        }
+
+        await projectStore.updateProject(updatedProject)
+        setProjects((current) => current.map((item) => (item.id === project.id ? updatedProject : item)))
+        projectsRef.current = projectsRef.current.map((item) => (item.id === project.id ? updatedProject : item))
+      } catch (error) {
+        await logError('project-list:updateProjectLastOpened', error, {
+          projectId: project.id,
+          toolType: tool.type,
+          command: tool.command,
+        })
+      }
+    },
+    [],
+  )
+
+  const openProjectWithLastTool = useCallback(
+    async (project: Project) => {
+      const lastOpenedTool = project.lastOpenedTool
+
+      if (lastOpenedTool?.type === 'terminal') {
+        const opened = await openInTerminal(project.path, lastOpenedTool.command)
+        if (!opened) {
+          Alert.alert(t('invalidTerminal'), t('invalidValues'))
+          return
+        }
+        await updateProjectLastOpened(project, lastOpenedTool)
+        return
+      }
+
+      const editorCommand = lastOpenedTool?.command ?? resolveEditorCommand(project)
+      const opened = await openInEditor(project.path, editorCommand)
+      if (!opened) {
+        Alert.alert(t('invalidEditor'), t('invalidValues'))
+        return
+      }
+      await updateProjectLastOpened(project, {
+        type: 'editor',
+        command: editorCommand,
+      })
+    },
+    [t, updateProjectLastOpened],
+  )
 
   const executeProjectRemoval = async ({ id, path, deleteFromDisk }: RemoveProjectPayload) => {
     if (deleteFromDisk) {
@@ -1391,6 +1452,22 @@ export const ProjectList = () => {
           scrollEnabled={!activeDragProjectId}
           onScroll={handleListScroll}
           scrollEventThrottle={16}
+          ListHeaderComponent={
+            !normalizedSearchQuery ? (
+              <RecentProjects
+                projects={projects}
+                recentLabel={t('recent')}
+                showAppIcons={preferences.showAppIcons}
+                isCollapsed={Boolean(collapsedSections[RECENT_SECTION_ID])}
+                onToggleCollapsed={() => handleToggleSectionCollapsed(RECENT_SECTION_ID)}
+                editorOptionsByCommand={editorOptionsByCommand}
+                terminalOptionsByCommand={terminalOptionsByCommand}
+                globalEditorCommand={globalEditorCommand}
+                globalTerminalCommand={globalTerminalCommand}
+                onOpenRecent={openProjectWithLastTool}
+              />
+            ) : null
+          }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
