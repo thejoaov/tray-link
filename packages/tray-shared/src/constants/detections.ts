@@ -21,6 +21,7 @@ enum EDITORS {
   ZED = 'Zed',
   CURSOR = 'Cursor',
   WINDSURF = 'WindSurf',
+  DEVIN_DESKTOP = 'Devin Desktop',
 }
 
 enum TERMINALS {

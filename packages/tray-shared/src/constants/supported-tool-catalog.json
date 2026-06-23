@@ -52,6 +52,16 @@
         "alwaysAvailable": false
       },
       {
+        "name": "Devin Desktop",
+        "command": "devin-desktop",
+        "binary": "devin-desktop",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/Applications/Devin.app"],
+        "iconBasenames": ["Devin", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
         "name": "Antigravity IDE",
         "command": "open -a 'Antigravity IDE'",
         "binary": "agy-ide",
@@ -191,6 +201,16 @@
         "enableCommonPathCheck": true,
         "commonFilepaths": ["/usr/bin/windsurf"],
         "iconBasenames": ["Windsurf", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Devin Desktop",
+        "command": "devin-desktop",
+        "binary": "devin-desktop",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/devin-desktop"],
+        "iconBasenames": ["Devin", "AppIcon"],
         "alwaysAvailable": false
       },
       {
@@ -346,6 +366,19 @@
         "enableCommonPathCheck": true,
         "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Windsurf\\Windsurf.exe"],
         "iconBasenames": ["Windsurf", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Devin Desktop",
+        "command": "devin-desktop.exe",
+        "binary": "devin-desktop",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": [
+          "C:\\Users\\%USERNAME%\\AppData\\Local\\Programs\\Devin\\Devin.exe",
+          "C:\\Program Files\\Devin\\Devin.exe"
+        ],
+        "iconBasenames": ["Devin", "AppIcon"],
         "alwaysAvailable": false
       },
       {
