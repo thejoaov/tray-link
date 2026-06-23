@@ -1,7 +1,7 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "lib": ["es2019", "dom"]
+    "lib": ["ES2022", "DOM"]
   },
   "exclude": ["node_modules", "electron"]
 }
