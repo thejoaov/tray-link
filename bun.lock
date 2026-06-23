@@ -146,6 +146,7 @@
       "name": "shell-utils",
       "version": "2.2.19",
       "dependencies": {
+        "@tray-link/tray-shared": "workspace:*",
         "expo-modules-core": "*",
       },
     },

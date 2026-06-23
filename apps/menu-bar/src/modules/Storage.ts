@@ -11,13 +11,16 @@ export const defaultUserPreferences: UserPreferences = {
   locale: 'en',
   defaultEditor: null,
   defaultTerminal: null,
+  defaultAiTool: null,
   removeFromDiskByDefault: false,
   requireProjectDeletionConfirmation: true,
   hasInstalledCli: false,
   customEditors: [],
   customTerminals: [],
+  customAiTools: [],
   groupingMode: 'none',
   showProjectPositions: true,
+  showRecentProjects: true,
 }
 
 export const getUserPreferences = async (): Promise<UserPreferences> => {

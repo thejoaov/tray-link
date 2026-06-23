@@ -27,6 +27,7 @@ import {
 import { logError } from '../services/errorLogger'
 import { getLegacyMigrationPreview, hasLegacyMigrationCompleted, runLegacyMigration } from '../services/legacyMigration'
 import {
+  getAiToolOptions,
   getEditorOptions,
   getTerminalOptions,
   initializeToolOptions,
@@ -59,20 +60,27 @@ const getUpdaterStatusMessage = (updaterState: AppUpdaterState, t: ReturnType<ty
     case 'upToDate':
       return t('updaterUpToDate')
     case 'available':
-      return t('updaterAvailable', { version: updaterState.latestVersion ?? '' })
+      return t('updaterAvailable', {
+        version: updaterState.latestVersion ?? '',
+      })
     case 'installing':
       return t('updaterInstalling')
     case 'installed':
       return t('updaterInstalled')
     case 'error':
-      return t('updaterError', { error: updaterState.error ?? 'Unknown error' })
+      return t('updaterError', {
+        error: updaterState.error ?? 'Unknown error',
+      })
     case 'idle':
     default:
       return updaterState.lastCheckedAt ? t('updaterUpToDate') : t('checkForUpdates')
   }
 }
 
-export function parseTag(tag: string | undefined | null): { name: string; color?: string } {
+export function parseTag(tag: string | undefined | null): {
+  name: string
+  color?: string
+} {
   if (!tag?.trim()) {
     return { name: '' }
   }
@@ -377,7 +385,10 @@ export const Settings = () => {
     return Array.from(uniqueTags).sort((a, b) => {
       const nameA = parseTag(a).name
       const nameB = parseTag(b).name
-      return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' })
+      return nameA.localeCompare(nameB, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      })
     })
   }, [projects])
 
@@ -480,6 +491,12 @@ export const Settings = () => {
     () => getTerminalOptions(preferences.customTerminals),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [preferences.customTerminals, toolsVersion],
+  )
+
+  const aiToolOptions = useMemo(
+    () => getAiToolOptions(preferences.customAiTools ?? []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [preferences.customAiTools, toolsVersion],
   )
 
   const normalizePreferences = (next: UserPreferences): UserPreferences => {
@@ -771,6 +788,35 @@ export const Settings = () => {
         <Divider />
 
         <Row align="center" justify="between" style={styles.boxItem}>
+          <Text style={styles.itemLabel}>{t('defaultAiTool')}</Text>
+          <Row align="center" style={styles.controlRow}>
+            <Picker
+              selectedValue={preferences.defaultAiTool}
+              onValueChange={(value) => {
+                if (!toolsReady || !preferencesLoaded) return
+                updatePreference('defaultAiTool', value)
+              }}
+              enabled={toolsReady && preferencesLoaded}
+              style={styles.picker}
+            >
+              <Picker.Item label={t('systemDefault')} value={null} />
+              {aiToolOptions.map((option) => (
+                <Picker.Item key={option.command} label={option.label} value={option.command} />
+              ))}
+            </Picker>
+            <TouchableOpacity
+              accessibilityLabel={t('addCustomAiTool')}
+              onPress={() => WindowsNavigator.open('CustomAiToolWindow')}
+              style={styles.iconButton}
+            >
+              <Ionicons name="add" size={16} color="var(--text-color)" />
+            </TouchableOpacity>
+          </Row>
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
           <View style={styles.itemTextContainer}>
             <Text style={styles.itemLabel}>{t('openConfigFile')}</Text>
             <Text style={styles.itemDescription}>{t('openConfigFileDescription')}</Text>
@@ -815,6 +861,17 @@ export const Settings = () => {
             value={preferences.showProjectPositions ?? true}
             disabled={!preferencesLoaded}
             onValueChange={(value) => updatePreference('showProjectPositions', value)}
+          />
+        </Row>
+
+        <Divider />
+
+        <Row align="center" justify="between" style={styles.boxItem}>
+          <Text style={styles.itemLabel}>{t('showRecentProjects')}</Text>
+          <Switch
+            value={preferences.showRecentProjects ?? true}
+            disabled={!preferencesLoaded}
+            onValueChange={(value) => updatePreference('showRecentProjects', value)}
           />
         </Row>
 
@@ -1018,7 +1075,10 @@ export const Settings = () => {
                       <View
                         style={[
                           styles.tagPreviewChip,
-                          colors && { backgroundColor: colors.bg, borderColor: colors.border },
+                          colors && {
+                            backgroundColor: colors.bg,
+                            borderColor: colors.border,
+                          },
                         ]}
                       >
                         <Ionicons name="pricetag" size={10} color={colors ? colors.text : '#007AFF'} />
@@ -1137,7 +1197,9 @@ export const Settings = () => {
                 try {
                   await checkForUpdates()
                 } catch (error) {
-                  Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+                  Analytics.track(AnalyticsEvent.ERROR, {
+                    error: String(error),
+                  })
                 }
               }}
               style={[styles.button, (isCheckingUpdates || isInstallingUpdate) && styles.buttonDisabled]}
@@ -1153,7 +1215,9 @@ export const Settings = () => {
                 try {
                   await installLatestUpdate()
                 } catch (error) {
-                  Analytics.track(AnalyticsEvent.ERROR, { error: String(error) })
+                  Analytics.track(AnalyticsEvent.ERROR, {
+                    error: String(error),
+                  })
                 }
               }}
               style={[styles.button, (!canInstallUpdate || isInstallingUpdate) && styles.buttonDisabled]}
@@ -1170,7 +1234,7 @@ export const Settings = () => {
       <View border="light" rounded="medium" style={styles.box}>
         <Row align="center" justify="between" style={styles.boxItem}>
           <View style={styles.itemTextContainer}>
-            <Text style={styles.itemLabel}>{t('reloadToolList') || 'Reload tool list'}</Text>
+            <Text style={styles.itemLabel}>{t('reloadToolList') || 'Reload tools list'}</Text>
           </View>
           <TouchableOpacity
             accessibilityLabel={t('reloadToolList')}

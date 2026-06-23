@@ -119,6 +119,7 @@ const defaultPreferences: Settings = {
   locale: 'en',
   defaultEditor: null,
   defaultTerminal: null,
+  defaultAiTool: null,
   launchOnLogin: false,
   showAppIcons: false,
   removeFromDiskByDefault: false,
@@ -126,7 +127,9 @@ const defaultPreferences: Settings = {
   hasInstalledCli: false,
   customEditors: [],
   customTerminals: [],
+  customAiTools: [],
   groupingMode: 'none',
+  showRecentProjects: true,
 }
 
 export const preferencesStore = {
@@ -158,5 +161,10 @@ export const preferencesStore = {
   setDefaultTerminal: (command: string | null): void => {
     const prefs = preferencesStore.getPreferences()
     preferencesStore.savePreferences({ ...prefs, defaultTerminal: command })
+  },
+
+  setDefaultAiTool: (command: string | null): void => {
+    const prefs = preferencesStore.getPreferences()
+    preferencesStore.savePreferences({ ...prefs, defaultAiTool: command })
   },
 }

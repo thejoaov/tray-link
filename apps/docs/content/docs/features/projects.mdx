@@ -1,0 +1,60 @@
+---
+title: Projects
+description: Add, remove, reorder, and favorite projects in Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Overview
+
+Projects are the core of Tray Link. Each project points to a folder on disk and can be opened in your preferred editor, terminal, or AI tool with one click.
+
+## Adding Projects
+
+Click the **+** button in the project list header to add a new project. A native folder picker dialog opens — select the folder you want to add.
+
+The project name defaults to the folder name. You can also add projects with custom names using the [CLI](../cli):
+
+```bash
+tlink add /Users/me/projects/my-app --name "My App"
+```
+
+{/* // TODO: Inserir print do seletor de pastas */}
+
+## Removing Projects
+
+Click the **trash icon** on a project to remove it from the list. A confirmation dialog appears with an option to **delete files from disk** as well.
+
+{/* // TODO: Inserir print da janela de confirmação de remoção */}
+
+<Callout type="warn" title="Disk Deletion">
+  When "Delete files from disk" is enabled, the project folder is permanently deleted. This action cannot be undone.
+</Callout>
+
+In **Settings**, you can enable **Delete files from disk by default** so the checkbox is pre-checked in the removal dialog.
+
+## Reordering Projects
+
+Click the **Edit** button to enter reorder mode. Use the **up/down arrows** to change project positions, or drag projects when drag handles are visible. Click **Done** when finished.
+
+In Settings, **Show project positions** displays position numbers next to each project in the list.
+
+{/* // TODO: Inserir print do modo de reordenação */}
+
+## Favorites
+
+Mark a project as a favorite using the **star icon** on its row. Favorited projects appear in a dedicated **Favorites** section at the top of the project list.
+
+To reorder favorites globally, open **Settings** and drag projects in the **Favorites** section. Favorite order is independent from the main project list order.
+
+Favorites can also be toggled from the CLI — the `tlink list` command shows a **Favorite** column for each project.
+
+## Shared Configuration
+
+Projects added in the app appear in the [CLI](../cli) and vice-versa. Both read and write the same `config.json` file:
+
+| Platform | Path |
+| --- | --- |
+| macOS | `~/Library/Application Support/TrayLink/config.json` |
+| Windows | `%APPDATA%/TrayLink/config.json` |
+| Linux | `~/.config/TrayLink/config.json` |

@@ -9,9 +9,15 @@ export interface Project {
   favoritePosition?: number
   defaultEditor?: string | null
   defaultTerminal?: string | null
+  defaultAiTool?: string | null
   migrated?: boolean
   source?: 'cli' | 'app'
   tag?: string
+  lastOpenedAt?: string
+  lastOpenedTool?: {
+    type: 'editor' | 'terminal' | 'aiTool'
+    command: string
+  }
 }
 
 export type Platform = 'darwin' | 'win32' | 'linux'
@@ -42,6 +48,7 @@ export interface Settings {
   locale: 'en' | 'pt' | 'es'
   defaultEditor: string | null
   defaultTerminal: string | null
+  defaultAiTool: string | null
   launchOnLogin: boolean
   showAppIcons: boolean
   removeFromDiskByDefault: boolean
@@ -49,6 +56,8 @@ export interface Settings {
   hasInstalledCli: boolean
   customEditors: CustomTool[]
   customTerminals: CustomTool[]
+  customAiTools: CustomTool[]
   groupingMode: 'none' | 'tag' | 'parentFolder' | 'alphabetical'
   showProjectPositions?: boolean
+  showRecentProjects?: boolean
 }

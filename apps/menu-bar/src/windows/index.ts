@@ -3,6 +3,7 @@ import { AppRegistry, Platform } from 'react-native'
 import { FluentProvider } from '../providers/FluentProvider'
 import { ThemeProvider } from '../providers/ThemeProvider'
 import { i18n, subscribeLanguageSync, syncI18nLanguageFromPreferences } from '../services/i18n'
+import { CustomAiToolWindow } from './CustomAiToolWindow'
 import { CustomEditorWindow } from './CustomEditorWindow'
 import { CustomTerminalWindow } from './CustomTerminalWindow'
 import { RemoveProjectWindow } from './RemoveProjectWindow'
@@ -29,6 +30,16 @@ export const WindowsList = [
     component: CustomTerminalWindow,
     options: {
       title: i18n.t('addCustomTerminal'),
+      width: 420,
+      height: 470,
+      resizable: false,
+    },
+  },
+  {
+    name: 'CustomAiToolWindow',
+    component: CustomAiToolWindow,
+    options: {
+      title: i18n.t('addCustomAiTool'),
       width: 420,
       height: 470,
       resizable: false,

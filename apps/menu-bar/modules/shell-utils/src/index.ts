@@ -5,6 +5,7 @@ const isElectron = Platform.OS === 'web'
 type ShellUtilsModuleType = {
   openInEditor: (path: string, editorCommand: string) => Promise<boolean>
   openInTerminal: (path: string, terminalCommand: string) => Promise<boolean>
+  openInTerminalWithCommand: (path: string, terminalCommand: string, commandToRun: string) => Promise<boolean>
   openInFinder: (path: string) => Promise<boolean>
   openPathWithSystem: (path: string) => Promise<boolean>
   which: (binary: string) => Promise<string | null>
@@ -50,6 +51,7 @@ if (isElectron) {
     ShellUtilsModule = {
       openInEditor: async () => false,
       openInTerminal: async () => false,
+      openInTerminalWithCommand: async () => false,
       openInFinder: async () => false,
       openPathWithSystem: async () => false,
       which: async () => null,
@@ -71,6 +73,14 @@ export function openInEditor(path: string, editorCommand: string): Promise<boole
 
 export function openInTerminal(path: string, terminalCommand: string): Promise<boolean> {
   return ShellUtilsModule.openInTerminal(path, terminalCommand)
+}
+
+export function openInTerminalWithCommand(
+  path: string,
+  terminalCommand: string,
+  commandToRun: string,
+): Promise<boolean> {
+  return ShellUtilsModule.openInTerminalWithCommand(path, terminalCommand, commandToRun)
 }
 
 export function openInFinder(path: string): Promise<boolean> {

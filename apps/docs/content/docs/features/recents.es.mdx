@@ -1,0 +1,43 @@
+---
+title: Proyectos Recientes
+description: Reabre rápidamente tus últimos proyectos abiertos desde el popover de Tray Link.
+---
+
+## Descripción General
+
+La sección **Recientes** aparece en la parte superior del popover de proyectos y muestra hasta **5** proyectos abiertos más recientemente. Ofrece acceso con un clic para retomar el trabajo sin desplazarte por la lista completa.
+
+{/* // TODO: Inserir print da seção de projetos recentes */}
+
+## Cómo se Actualizan los Recientes
+
+Un proyecto entra en la lista de recientes cuando lo abres usando cualquiera de estas acciones:
+
+- Botón de acción rápida de **editor**, **terminal** o **herramienta de IA**
+- Opción **Abrir con** del menú de contexto
+- Toque en una **burbuja reciente** (reabre con la misma lógica de herramienta)
+- [`tlink open`](../cli) desde la CLI
+
+Cada apertura actualiza `lastOpenedAt` y registra qué herramienta se usó (`lastOpenedTool`).
+
+## Apariencia de las Burbujas
+
+Cada proyecto reciente se muestra como una burbuja circular con el nombre del proyecto debajo. La burbuja refleja:
+
+- **Color de etiqueta** — fondo y borde usan el color de la etiqueta del proyecto (o azul predeterminado)
+- **Ícono de herramienta** — cuando **Mostrar iconos reales de las apps** está habilitado, la burbuja muestra el ícono de la última herramienta usada; de lo contrario, un ícono genérico de editor, terminal o IA
+
+## Reabrir un Proyecto Reciente
+
+Toca una burbuja reciente para reabrir el proyecto. Tray Link usa la **última herramienta abierta** de ese proyecto:
+
+1. Si la última acción fue editor, terminal o herramienta de IA, se usa nuevamente el mismo tipo
+2. Si no hay herramienta registrada, se usa el editor predeterminado efectivo
+
+## Colapsar la Sección
+
+Haz clic en el encabezado **Recientes** para colapsar o expandir el área de desplazamiento horizontal. El estado colapsado se recuerda entre sesiones del popover.
+
+## Configuración
+
+En **Configuración**, activa o desactiva **Mostrar proyectos recientes** para ocultar o mostrar toda la sección de Recientes. Cuando está deshabilitado, no aparecen burbujas recientes sin importar el historial de aperturas.

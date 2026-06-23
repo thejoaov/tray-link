@@ -34,7 +34,7 @@ const toSettings = (definition: SupportedToolDefinition): Settings => ({
   commonFilepaths: definition.commonFilepaths.length ? definition.commonFilepaths : null,
 })
 
-const resolveSettingsList = (type: 'editors' | 'terminals'): Settings[] => {
+const resolveSettingsList = (type: 'editors' | 'terminals' | 'aiTools'): Settings[] => {
   const platform = resolveCatalogPlatform()
   if (!platform) {
     return []
@@ -47,6 +47,8 @@ export const terminalList: Settings[] = resolveSettingsList('terminals')
 
 export const editorList: Settings[] = resolveSettingsList('editors')
 
+export const aiToolList: Settings[] = resolveSettingsList('aiTools')
+
 export function getTerminalList(): Promise<SettingsItem[]> {
   return getFilteredSettingsList(terminalList)
 }
@@ -55,9 +57,14 @@ export function getEditorList(): Promise<SettingsItem[]> {
   return getFilteredSettingsList(editorList)
 }
 
+export function getAiToolList(): Promise<SettingsItem[]> {
+  return getFilteredSettingsList(aiToolList)
+}
+
 export const defaultConfig = {
   editorList,
   terminalList,
+  aiToolList,
   defaultTerminal: DefaultTerminal,
   defaultEditor: DefaultEditor,
 }

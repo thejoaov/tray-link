@@ -6,10 +6,9 @@ export default {
   moveTop: '△ Move to the start',
   moveBottom: '▽ Move to the end',
   resetDefaults: 'Restore defaults',
-  reloadList: 'Reload editor and terminal list',
+  reloadList: 'Reload tools list',
   reload: 'Reload',
-  reloadListMessage:
-    'This action will reload the terminal and editors list that are installed on your machine. Do you want to continue?',
+  reloadListMessage: 'This action will reload the list of tools installed on your machine. Do you want to continue?',
   selectProjectFolder: 'Select project folder',
   setDefaultTerminal: 'Set default terminal',
   addProject: '+ Add new project...',
@@ -38,6 +37,10 @@ export default {
   terminalNotFound: 'Terminal not found in PATH',
   openDefaultTerminal: 'Open with ',
   openEditor: 'IDEs/Editors',
+  openAiTool: 'AI Tools',
+  openWithAiTool: 'Open with AI tool',
+  defaultAiTool: 'Default AI tool',
+  invalidAiTool: 'AI tool not found in PATH',
   aboutTitle: 'About',
   aboutMessage: `
   Tray Link
@@ -50,11 +53,11 @@ export default {
   openIssue: 'Report an issue',
   about: 'About',
   closeAbout: 'Close',
-  resetDefaultsMessage:
-    'This action will reload the terminal and editors list that are installed on your machine. Do you want to continue?',
+  resetDefaultsMessage: 'This action will reload the list of tools installed on your machine. Do you want to continue?',
   cancel: 'Cancel',
   reset: 'Reset',
   favorites: 'Favorites',
+  recent: 'Recents',
   save: 'Save',
   markAsFavorite: 'Mark as favorite',
   unmarkAsFavorite: 'Remove from favorites',

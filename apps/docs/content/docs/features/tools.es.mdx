@@ -1,0 +1,123 @@
+---
+title: Herramientas
+description: Abrir proyectos en editores, terminales y CLIs de agentes de IA con Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Descripción General
+
+Tray Link detecta editores, terminales y CLIs de agentes de IA instalados en tu sistema. Cada fila de proyecto tiene botones de acción rápida, y el menú de contexto (⋯) permite abrir con una herramienta específica o definir valores predeterminados por proyecto.
+
+## Acciones Rápidas
+
+Cada proyecto en la lista tiene íconos de acción rápida:
+
+- **Ícono del editor** — abre el proyecto en el editor predeterminado efectivo
+- **Ícono del terminal** — abre el proyecto en la terminal predeterminada efectiva
+- **Ícono de herramienta de IA** — inicia el CLI de agente de IA predeterminado efectivo dentro de la terminal predeterminada
+- **Ícono de carpeta** — abre la carpeta del proyecto en Finder (macOS), Explorador (Windows) o el gestor de archivos predeterminado (Linux)
+
+{/* // TODO: Inserir print dos ícones de ação rápida */}
+
+## Abrir con una Herramienta Específica
+
+Haz clic en el **menú de puntos suspensivos** (⋯) de un proyecto para ver opciones adicionales:
+
+- **Abrir con \<editor\>** — elige entre cualquier editor detectado o personalizado
+- **Abrir con \<terminal\>** — elige entre cualquier terminal detectada o personalizada
+- **Abrir con \<herramienta de IA\>** — elige entre cualquier CLI de agente de IA detectado o personalizado
+- **Seleccionar predeterminados** — cambia el menú al modo de selección de predeterminados por proyecto
+
+Cuando el modo de selección está activo, elegir una herramienta la guarda como predeterminada solo para ese proyecto, en lugar de abrirla inmediatamente. El override seleccionado se marca con `*` en el menú. Si el proyecto no tiene override, Tray Link usa los valores predeterminados globales de Configuración.
+
+{/* // TODO: Inserir print do menu de contexto */}
+
+## Orden de Resolución de Predeterminados
+
+Tray Link resuelve qué herramienta usar en este orden:
+
+1. Elección explícita en el menú de contexto o slug en la CLI
+2. Predeterminado específico del proyecto
+3. Predeterminado global de Configuración o `tlink config set`
+4. Fallback de la plataforma (ej.: `code` para editores, `open -a Terminal` en macOS)
+
+## Predeterminados Globales en Configuración
+
+Abre **Configuración** (ícono de engranaje en el pie de página) para configurar:
+
+- **Editor Predeterminado** — editor fallback global
+- **Terminal Predeterminada** — terminal fallback global
+- **Herramienta de IA predeterminada** — CLI de agente de IA fallback global
+- **Mostrar iconos reales de las apps** — usa iconos detectados en los botones de acción rápida y las burbujas de proyectos recientes
+
+Usa **Recargar lista de herramientas** en Avanzado para volver a escanear el sistema en busca de herramientas recién instaladas.
+
+## Herramientas Personalizadas
+
+Puedes agregar editores, terminales y herramientas de IA personalizadas que no se detectan automáticamente:
+
+1. Haz clic en **Agregar Editor Personalizado**, **Agregar Terminal Personalizada** o **Agregar Herramienta de IA Personalizada**
+2. Completa los campos:
+   - **Nombre** — nombre para mostrar de la herramienta
+   - **Binario** — nombre del ejecutable (ej.: `mi-editor`)
+   - **Comando de Apertura** — plantilla de comando usada para abrir un proyecto (ej.: `mi-editor {{path}}`)
+3. Haz clic en **Guardar**
+
+{/* // TODO: Inserir print da janela de editor/terminal customizado */}
+
+<Callout type="info">
+  Las herramientas de IA se inician dentro de la terminal predeterminada. Tray Link ejecuta el comando del CLI de IA en el directorio del proyecto usando la terminal configurada.
+</Callout>
+
+## Editores Soportados
+
+| Editor | Slug | Plataformas |
+| --- | --- | --- |
+| Visual Studio Code | `visual-studio-code` | macOS, Windows, Linux |
+| VS Code Insiders | `visual-studio-code-insiders` | macOS, Windows, Linux |
+| Visual Studio | `visual-studio` | macOS, Windows |
+| Cursor | `cursor` | macOS, Windows, Linux |
+| Windsurf | `windsurf` | macOS, Windows, Linux |
+| Devin Desktop | `devin-desktop` | macOS, Windows, Linux |
+| Antigravity IDE | `antigravity-ide` | macOS, Windows, Linux |
+| Sublime Text | `sublime-text` | macOS, Windows, Linux |
+| Atom | `atom` | macOS, Windows, Linux |
+| IntelliJ IDEA CE | `intellij-idea-ce` | macOS, Windows, Linux |
+| PyCharm CE | `pycharm-ce` | macOS, Windows, Linux |
+| PyCharm | `pycharm` | macOS, Windows, Linux |
+| Android Studio | `android-studio` | macOS, Windows, Linux |
+| Xcode | `xcode` | macOS |
+| Geany | `geany` | Linux |
+| Gedit | `gedit` | Linux |
+
+## Terminales Soportadas
+
+| Terminal | Slug | Plataformas |
+| --- | --- | --- |
+| Terminal | `terminal` | macOS |
+| iTerm | `iterm` | macOS |
+| Warp | `warp` | macOS, Windows, Linux |
+| Hyper | `hyper` | macOS, Windows, Linux |
+| Ghostty | `ghostty` | macOS, Linux |
+| CMD | `cmd` | Windows |
+| PowerShell | `powershell` | Windows |
+| Windows Terminal | `windows-terminal` | Windows |
+| GNOME Terminal | `gnome-terminal` | Linux |
+
+## Herramientas de IA Soportadas
+
+| Herramienta de IA | Slug | Plataformas |
+| --- | --- | --- |
+| OpenClaw | `openclaw` | macOS, Windows, Linux |
+| Hermes | `hermes` | macOS, Windows, Linux |
+| OpenCode | `opencode` | macOS, Windows, Linux |
+| Claude Code | `claude-code` | macOS, Windows, Linux |
+| Cursor CLI | `cursor-cli` | macOS, Windows, Linux |
+| Devin | `devin` | macOS, Windows, Linux |
+| GitHub Copilot CLI | `github-copilot-cli` | macOS, Windows, Linux |
+| Antigravity CLI | `antigravity-cli` | macOS, Windows, Linux |
+
+## Integración con la CLI
+
+Puedes abrir proyectos y gestionar predeterminados desde la terminal. Consulta la [referencia de la CLI](../cli) para los comandos `tlink open`, `tlink config list` y `tlink config set` — incluyendo la flag `-a, --ai` para herramientas de IA.

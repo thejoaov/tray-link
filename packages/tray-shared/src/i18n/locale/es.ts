@@ -8,10 +8,9 @@ const es: typeof en = {
   moveTop: 'Mover al inicio',
   moveBottom: 'Mover al final',
   resetDefaults: 'Restaurar predeterminados',
-  reloadList: 'Recargar lista de editores y terminales',
+  reloadList: 'Recargar lista de herramientas',
   reload: 'Recargar',
-  reloadListMessage:
-    'Esta acción recargará la lista de terminales y editores que están instalados en su máquina. ¿Desea continuar?',
+  reloadListMessage: 'Esta acción recargará la lista de herramientas instaladas en su máquina. ¿Desea continuar?',
   selectProjectFolder: 'Seleccione la carpeta del proyecto',
   setDefaultTerminal: 'Definir terminal padrón',
   addProject: 'Agregar un nuevo proyecto...',
@@ -40,6 +39,10 @@ const es: typeof en = {
   terminalNotFound: 'Terminal no encontrado en el PATH',
   openDefaultTerminal: 'Abrir con ',
   openEditor: 'IDEs/Editores',
+  openAiTool: 'Herramientas de IA',
+  openWithAiTool: 'Abrir con herramienta de IA',
+  defaultAiTool: 'Herramienta de IA predeterminada',
+  invalidAiTool: 'Herramienta de IA no encontrada en PATH',
   aboutTitle: 'Sobre',
   aboutMessage: `
   Tray Link
@@ -52,11 +55,11 @@ const es: typeof en = {
   openIssue: 'Reportar um problema',
   about: 'Sobre',
   closeAbout: 'Cerrar',
-  resetDefaultsMessage:
-    'Esta acción recargará la lista de terminales y editores que están instalados en su máquina. ¿Desea continuar?',
+  resetDefaultsMessage: 'Esta acción recargará la lista de herramientas instaladas en su máquina. ¿Desea continuar?',
   cancel: 'Cancelar',
   reset: 'Restaurar',
   favorites: 'Favoritos',
+  recent: 'Recientes',
   save: 'Guardar',
   markAsFavorite: 'Marcar como favorito',
   unmarkAsFavorite: 'Quitar de favoritos',

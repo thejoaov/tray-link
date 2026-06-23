@@ -26,6 +26,14 @@ export function openInTerminal(path: string, terminalCommand: string): Promise<b
   return ShellUtilsModule.openInTerminal(path, terminalCommand)
 }
 
+export function openInTerminalWithCommand(
+  path: string,
+  terminalCommand: string,
+  commandToRun: string,
+): Promise<boolean> {
+  return ShellUtilsModule.openInTerminalWithCommand(path, terminalCommand, commandToRun)
+}
+
 export function openInFinder(path: string): Promise<boolean> {
   return ShellUtilsModule.openInFinder(path)
 }

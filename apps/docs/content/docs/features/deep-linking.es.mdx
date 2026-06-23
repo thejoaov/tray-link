@@ -1,0 +1,67 @@
+---
+title: Deep Linking
+description: Integra Tray Link con herramientas externas mediante esquemas de URL y servidor local.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Descripción General
+
+Tray Link registra un esquema de URL personalizado para que herramientas externas, scripts y flujos de desarrollo puedan interactuar con la app en ejecución. En builds Electron, un pequeño **servidor HTTP local** también expone endpoints para integraciones confiables, como Expo CLI.
+
+## Esquemas de URL
+
+| Plataforma | Esquema | Notas |
+| --- | --- | --- |
+| Windows / Linux | `tlink://` | Registrado como manejador de protocolo predeterminado |
+| macOS (Electron) | `tlink-debug://` | Usado para evitar conflicto con la build nativa de macOS |
+| macOS (nativo) | Usa el registro de protocolo de React Native macOS | Separado del esquema debug de Electron |
+
+Cuando Tray Link recibe una URL, emite un evento `open-url` a la ventana de la app. Solo una instancia de la app corre a la vez — lanzamientos adicionales reenvían la URL a la instancia existente.
+
+## Servidor Local (Electron)
+
+Cuando Tray Link inicia, un servidor Express escucha en uno de estos puertos (el primero disponible):
+
+`35783`, `47909`, `44171`, `50799`
+
+### `GET /tlink/status`
+
+Indica si Tray Link está en ejecución y su versión:
+
+```json
+{ "ok": true, "version": "2.2.19" }
+```
+
+### `GET /tlink/open?url=<encoded-url>`
+
+Reenvía una URL a Tray Link como deep link. El parámetro `url` debe pertenecer a un dominio permitido:
+
+- `expo.dev`
+- `expo.test`
+- `exp.host`
+
+El servidor convierte URLs `https://` y `exp://` en deep links `tlink://` y los emite a la app.
+
+<Callout type="info">
+  Las solicitudes al servidor local deben incluir un header `Origin` de uno de los dominios permitidos. Otros orígenes reciben `403 Forbidden`.
+</Callout>
+
+## Integración con Expo CLI
+
+El servidor local está diseñado para flujos de desarrollo Expo. Cuando Expo CLI necesita entregar una URL de proyecto a Tray Link, puede llamar al endpoint local `/tlink/open` en lugar de requerir interacción manual con la app.
+
+Flujo de ejemplo:
+
+1. Tray Link está en ejecución en la bandeja del sistema
+2. Expo CLI envía una solicitud a `http://localhost:35783/tlink/open?url=...`
+3. Tray Link recibe el deep link convertido y lo procesa en la ventana de la app
+
+## Abrir URLs Externas desde la App
+
+Tray Link usa la API `Linking` de la plataforma para abrir URLs externas (páginas de release, repositorio GitHub, perfil del creador) desde Configuración. En Electron, esto delega a `shell.openExternal`.
+
+## Relacionado
+
+- [CLI](../cli) — gestiona proyectos desde la terminal con `tlink`
+- [Herramientas](./tools) — abre proyectos en editores, terminales y CLIs de agentes de IA

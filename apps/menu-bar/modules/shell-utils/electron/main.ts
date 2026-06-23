@@ -1,3 +1,4 @@
+import { buildTerminalSpawnCommand } from '@tray-link/tray-shared'
 import { exec } from 'child_process'
 import { app } from 'electron'
 import fs from 'fs'
@@ -6,6 +7,34 @@ import path from 'path'
 import util from 'util'
 
 const execAsync = util.promisify(exec)
+
+function resolveUserShell(): string {
+  const shellFromEnv = process.env.SHELL?.trim()
+  if (shellFromEnv && fs.existsSync(shellFromEnv)) {
+    return shellFromEnv
+  }
+
+  return process.platform === 'darwin' ? '/bin/zsh' : '/bin/bash'
+}
+
+function buildLoginShellCommand(userShell: string, script: string): string {
+  const shellName = path.basename(userShell).toLowerCase()
+  const escapedScript = script.replace(/'/g, `'\\''`)
+
+  if (shellName === 'fish') {
+    return `${userShell} -l -c '${escapedScript}'`
+  }
+
+  return `${userShell} -lc '${escapedScript}'`
+}
+
+function shellEscapeSingleQuotes(value: string): string {
+  return `'${value.replace(/'/g, `'\\''`)}'`
+}
+
+function isSafeBinaryName(binary: string): boolean {
+  return /^[a-zA-Z0-9._+-]+$/.test(binary)
+}
 
 const CLI_BINARY_NAME = 'tlink'
 
@@ -227,6 +256,15 @@ export const ShellUtilsMain = {
       return false
     }
   },
+  openInTerminalWithCommand: async (path: string, terminalCommand: string, commandToRun: string) => {
+    try {
+      const spawnCommand = buildTerminalSpawnCommand(path, terminalCommand, commandToRun)
+      await execAsync(spawnCommand)
+      return true
+    } catch {
+      return false
+    }
+  },
   openInFinder: async (path: string) => {
     try {
       const { shell } = require('electron')
@@ -238,10 +276,47 @@ export const ShellUtilsMain = {
   },
   which: async (binary: string) => {
     try {
+      if (!isSafeBinaryName(binary)) {
+        return null
+      }
+
       const isWindows = process.platform === 'win32'
-      const command = isWindows ? `where ${binary}` : `which ${binary}`
-      const { stdout } = await execAsync(command)
-      return stdout.trim()
+      if (isWindows) {
+        const { stdout } = await execAsync(`where ${binary}`)
+        return stdout.trim().split('\n')[0] || null
+      }
+
+      const home = process.env.HOME ?? ''
+      const candidatePaths = [
+        `/opt/homebrew/bin/${binary}`,
+        `/usr/local/bin/${binary}`,
+        `${home}/.local/bin/${binary}`,
+        `${home}/.cursor/bin/${binary}`,
+        `${home}/.npm-global/bin/${binary}`,
+        `${home}/.cargo/bin/${binary}`,
+      ]
+
+      for (const candidate of candidatePaths) {
+        if (candidate && fs.existsSync(candidate)) {
+          return candidate
+        }
+      }
+
+      const pathPrefix = [
+        '/opt/homebrew/bin',
+        '/usr/local/bin',
+        `${home}/.local/bin`,
+        `${home}/.cursor/bin`,
+        `${home}/.npm-global/bin`,
+        `${home}/.cargo/bin`,
+      ]
+        .filter(Boolean)
+        .join(':')
+
+      const userShell = resolveUserShell()
+      const lookupScript = `env PATH="${pathPrefix}:$PATH" command -v ${shellEscapeSingleQuotes(binary)}`
+      const { stdout } = await execAsync(buildLoginShellCommand(userShell, lookupScript))
+      return stdout.trim() || null
     } catch {
       return null
     }

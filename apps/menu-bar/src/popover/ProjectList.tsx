@@ -18,13 +18,20 @@ import {
   View,
 } from 'react-native'
 import { pickFolders } from '../../modules/file-picker'
-import { openInEditor, openInFinder, openInTerminal, removeFromDisk } from '../../modules/shell-utils/src'
+import {
+  openInEditor,
+  openInFinder,
+  openInTerminal,
+  openInTerminalWithCommand,
+  removeFromDisk,
+} from '../../modules/shell-utils/src'
 import { getItem, setItem } from '../../modules/storage-module/src'
 import { usePopoverFocusEffect } from '../hooks/usePopoverFocus'
 import Alert from '../modules/Alert'
 import { defaultUserPreferences } from '../modules/Storage'
 import { logError } from '../services/errorLogger'
 import {
+  getAiToolOptions,
   getEditorOptions,
   getTerminalOptions,
   loadPreferences,
@@ -38,6 +45,7 @@ import { MAX_UI_HEIGHT, PROJECT_LIST_HEIGHT } from '../utils/constants'
 import { WindowsNavigator } from '../windows'
 import Footer from './Footer'
 import { ProjectItem, parseTag } from './ProjectItem'
+import { RECENT_SECTION_ID, RecentProjects } from './RecentProjects'
 import SectionHeader from './SectionHeader'
 
 const PROJECT_SEARCH_HEIGHT = 34
@@ -194,19 +202,27 @@ export const ProjectList = () => {
   const updateProjectDragRef = useRef<(absoluteY: number) => void>(() => {})
   const finishProjectDragRef = useRef<() => void>(() => {})
   const dragPanRespondersRef = useRef(new Map<string, ReturnType<typeof PanResponder.create>>())
+  const [toolsVersion, setToolsVersion] = useState(0)
   const editorOptions = useMemo(
     () =>
       getEditorOptions(preferences.customEditors).map((option) =>
         preferences.showAppIcons ? option : { ...option, iconPath: null },
       ),
-    [preferences.customEditors, preferences.showAppIcons],
+    [preferences.customEditors, preferences.showAppIcons, toolsVersion],
   )
   const terminalOptions = useMemo(
     () =>
       getTerminalOptions(preferences.customTerminals).map((option) =>
         preferences.showAppIcons ? option : { ...option, iconPath: null },
       ),
-    [preferences.customTerminals, preferences.showAppIcons],
+    [preferences.customTerminals, preferences.showAppIcons, toolsVersion],
+  )
+  const aiToolOptions = useMemo(
+    () =>
+      getAiToolOptions(preferences.customAiTools ?? []).map((option) =>
+        preferences.showAppIcons ? option : { ...option, iconPath: null },
+      ),
+    [preferences.customAiTools, preferences.showAppIcons, toolsVersion],
   )
   const editorOptionsByCommand = useMemo(
     () => new Map(editorOptions.map((option) => [option.command, option])),
@@ -216,6 +232,10 @@ export const ProjectList = () => {
     () => new Map(terminalOptions.map((option) => [option.command, option])),
     [terminalOptions],
   )
+  const aiToolOptionsByCommand = useMemo(
+    () => new Map(aiToolOptions.map((option) => [option.command, option])),
+    [aiToolOptions],
+  )
   const globalEditorCommand = useMemo(
     () => preferences.defaultEditor ?? editorOptions[0]?.command ?? 'code',
     [editorOptions, preferences.defaultEditor],
@@ -223,6 +243,10 @@ export const ProjectList = () => {
   const globalTerminalCommand = useMemo(
     () => preferences.defaultTerminal ?? terminalOptions[0]?.command ?? 'open -a Terminal',
     [preferences.defaultTerminal, terminalOptions],
+  )
+  const globalAiToolCommand = useMemo(
+    () => preferences.defaultAiTool ?? aiToolOptions[0]?.command ?? null,
+    [preferences.defaultAiTool, aiToolOptions],
   )
   const sortedProjects = useMemo(() => {
     const items = [...projects]
@@ -322,7 +346,13 @@ export const ProjectList = () => {
 
       const items: Array<
         | { id: string; type: 'header'; label: string }
-        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+        | {
+            id: string
+            type: 'project'
+            project: Project
+            isFavoriteSection: boolean
+            displayIndex: number
+          }
       > = []
 
       if (favoritesList.length > 0) {
@@ -404,7 +434,13 @@ export const ProjectList = () => {
 
       const items: Array<
         | { id: string; type: 'header'; label: string }
-        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+        | {
+            id: string
+            type: 'project'
+            project: Project
+            isFavoriteSection: boolean
+            displayIndex: number
+          }
       > = []
 
       if (favoritesList.length > 0) {
@@ -468,7 +504,13 @@ export const ProjectList = () => {
 
       const items: Array<
         | { id: string; type: 'header'; label: string }
-        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+        | {
+            id: string
+            type: 'project'
+            project: Project
+            isFavoriteSection: boolean
+            displayIndex: number
+          }
       > = []
 
       if (favoritesList.length > 0) {
@@ -517,7 +559,13 @@ export const ProjectList = () => {
     if (favoritesList.length > 0) {
       const items: Array<
         | { id: string; type: 'header'; label: string }
-        | { id: string; type: 'project'; project: Project; isFavoriteSection: boolean; displayIndex: number }
+        | {
+            id: string
+            type: 'project'
+            project: Project
+            isFavoriteSection: boolean
+            displayIndex: number
+          }
       > = []
 
       items.push({
@@ -603,6 +651,7 @@ export const ProjectList = () => {
       })
 
     const preferencesSubscription = subscribePreferencesChange(() => {
+      setToolsVersion((version) => version + 1)
       loadPreferences()
         .then(setPreferences)
         .catch((error) => {
@@ -747,13 +796,20 @@ export const ProjectList = () => {
     [loadProjects],
   )
 
-  const resolveEditorCommand = (project: Project) => {
-    return project.defaultEditor ?? globalEditorCommand
-  }
+  const resolveEditorCommand = useCallback(
+    (project: Project) => project.defaultEditor ?? globalEditorCommand,
+    [globalEditorCommand],
+  )
 
-  const resolveTerminalCommand = (project: Project) => {
-    return project.defaultTerminal ?? globalTerminalCommand
-  }
+  const resolveTerminalCommand = useCallback(
+    (project: Project) => project.defaultTerminal ?? globalTerminalCommand,
+    [globalTerminalCommand],
+  )
+
+  const resolveAiToolCommand = useCallback(
+    (project: Project) => project.defaultAiTool ?? globalAiToolCommand,
+    [globalAiToolCommand],
+  )
 
   const resolveEditorOption = (project: Project): ToolOption | null => {
     return editorOptionsByCommand.get(resolveEditorCommand(project)) ?? null
@@ -763,18 +819,56 @@ export const ProjectList = () => {
     return terminalOptionsByCommand.get(resolveTerminalCommand(project)) ?? null
   }
 
+  const resolveAiToolOption = (project: Project): ToolOption | null => {
+    const command = resolveAiToolCommand(project)
+    if (!command) {
+      return null
+    }
+    return aiToolOptionsByCommand.get(command) ?? null
+  }
+
   const handleOpenEditor = async (project: Project) => {
-    const opened = await openInEditor(project.path, resolveEditorCommand(project))
+    const editorCommand = resolveEditorCommand(project)
+    const opened = await openInEditor(project.path, editorCommand)
     if (!opened) {
       Alert.alert(t('invalidEditor'), t('invalidValues'))
+      return
     }
+    await updateProjectLastOpened(project, {
+      type: 'editor',
+      command: editorCommand,
+    })
   }
 
   const handleOpenTerminal = async (project: Project) => {
-    const opened = await openInTerminal(project.path, resolveTerminalCommand(project))
+    const terminalCommand = resolveTerminalCommand(project)
+    const opened = await openInTerminal(project.path, terminalCommand)
     if (!opened) {
       Alert.alert(t('invalidTerminal'), t('invalidValues'))
+      return
     }
+    await updateProjectLastOpened(project, {
+      type: 'terminal',
+      command: terminalCommand,
+    })
+  }
+
+  const handleOpenAiTool = async (project: Project) => {
+    const aiToolCommand = resolveAiToolCommand(project)
+    if (!aiToolCommand) {
+      Alert.alert(t('invalidAiTool'), t('invalidValues'))
+      return
+    }
+    const terminalCommand = resolveTerminalCommand(project)
+    const opened = await openInTerminalWithCommand(project.path, terminalCommand, aiToolCommand)
+    if (!opened) {
+      Alert.alert(t('invalidAiTool'), t('invalidValues'))
+      return
+    }
+    await updateProjectLastOpened(project, {
+      type: 'aiTool',
+      command: aiToolCommand,
+    })
   }
 
   const handleOpenFinder = async (project: Project) => {
@@ -787,6 +881,7 @@ export const ProjectList = () => {
       Alert.alert(t('invalidEditor'), t('invalidValues'))
       return
     }
+    await updateProjectLastOpened(project, { type: 'editor', command })
     setContextMenuProjectId(null)
     setToolSelectionProjectId(null)
   }
@@ -797,6 +892,19 @@ export const ProjectList = () => {
       Alert.alert(t('invalidTerminal'), t('invalidValues'))
       return
     }
+    await updateProjectLastOpened(project, { type: 'terminal', command })
+    setContextMenuProjectId(null)
+    setToolSelectionProjectId(null)
+  }
+
+  const handleOpenWithAiTool = async (project: Project, command: string) => {
+    const terminalCommand = resolveTerminalCommand(project)
+    const opened = await openInTerminalWithCommand(project.path, terminalCommand, command)
+    if (!opened) {
+      Alert.alert(t('invalidAiTool'), t('invalidValues'))
+      return
+    }
+    await updateProjectLastOpened(project, { type: 'aiTool', command })
     setContextMenuProjectId(null)
     setToolSelectionProjectId(null)
   }
@@ -833,6 +941,22 @@ export const ProjectList = () => {
     }
   }
 
+  const handleSetProjectAiToolDefault = async (project: Project, command: string) => {
+    try {
+      await projectStore.updateProject({
+        ...project,
+        defaultAiTool: command,
+        updatedAt: new Date().toISOString(),
+      })
+      await loadProjects()
+    } catch (error) {
+      await logError('project-list:handleSetProjectAiToolDefault', error, {
+        projectId: project.id,
+        command,
+      })
+    }
+  }
+
   const handleSaveProjectTag = async (project: Project, tag: string) => {
     try {
       await projectStore.updateProject({
@@ -848,6 +972,69 @@ export const ProjectList = () => {
       })
     }
   }
+
+  const updateProjectLastOpened = useCallback(
+    async (project: Project, tool: { type: 'editor' | 'terminal' | 'aiTool'; command: string }) => {
+      try {
+        const updatedProject: Project = {
+          ...project,
+          lastOpenedAt: new Date().toISOString(),
+          lastOpenedTool: tool,
+          updatedAt: new Date().toISOString(),
+        }
+
+        await projectStore.updateProject(updatedProject)
+        setProjects((current) => current.map((item) => (item.id === project.id ? updatedProject : item)))
+        projectsRef.current = projectsRef.current.map((item) => (item.id === project.id ? updatedProject : item))
+      } catch (error) {
+        await logError('project-list:updateProjectLastOpened', error, {
+          projectId: project.id,
+          toolType: tool.type,
+          command: tool.command,
+        })
+      }
+    },
+    [],
+  )
+
+  const openProjectWithLastTool = useCallback(
+    async (project: Project) => {
+      const lastOpenedTool = project.lastOpenedTool
+
+      if (lastOpenedTool?.type === 'terminal') {
+        const opened = await openInTerminal(project.path, lastOpenedTool.command)
+        if (!opened) {
+          Alert.alert(t('invalidTerminal'), t('invalidValues'))
+          return
+        }
+        await updateProjectLastOpened(project, lastOpenedTool)
+        return
+      }
+
+      if (lastOpenedTool?.type === 'aiTool') {
+        const terminalCommand = resolveTerminalCommand(project)
+        const opened = await openInTerminalWithCommand(project.path, terminalCommand, lastOpenedTool.command)
+        if (!opened) {
+          Alert.alert(t('invalidAiTool'), t('invalidValues'))
+          return
+        }
+        await updateProjectLastOpened(project, lastOpenedTool)
+        return
+      }
+
+      const editorCommand = lastOpenedTool?.command ?? resolveEditorCommand(project)
+      const opened = await openInEditor(project.path, editorCommand)
+      if (!opened) {
+        Alert.alert(t('invalidEditor'), t('invalidValues'))
+        return
+      }
+      await updateProjectLastOpened(project, {
+        type: 'editor',
+        command: editorCommand,
+      })
+    },
+    [t, updateProjectLastOpened, resolveEditorCommand, resolveTerminalCommand],
+  )
 
   const executeProjectRemoval = async ({ id, path, deleteFromDisk }: RemoveProjectPayload) => {
     if (deleteFromDisk) {
@@ -981,7 +1168,10 @@ export const ProjectList = () => {
       const nextOffset = clamp(scrollOffsetRef.current - DRAG_AUTO_SCROLL_STEP, 0, maxOffset)
       if (nextOffset !== scrollOffsetRef.current) {
         scrollOffsetRef.current = nextOffset
-        listRef.current?.scrollToOffset({ offset: nextOffset, animated: false })
+        listRef.current?.scrollToOffset({
+          offset: nextOffset,
+          animated: false,
+        })
       }
       return
     }
@@ -990,7 +1180,10 @@ export const ProjectList = () => {
       const nextOffset = clamp(scrollOffsetRef.current + DRAG_AUTO_SCROLL_STEP, 0, maxOffset)
       if (nextOffset !== scrollOffsetRef.current) {
         scrollOffsetRef.current = nextOffset
-        listRef.current?.scrollToOffset({ offset: nextOffset, animated: false })
+        listRef.current?.scrollToOffset({
+          offset: nextOffset,
+          animated: false,
+        })
       }
     }
   }, [])
@@ -1381,6 +1574,7 @@ export const ProjectList = () => {
             dragDestinationIndex,
             globalEditorCommand,
             globalTerminalCommand,
+            globalAiToolCommand,
             itemLayouts,
             scrollOffset,
             toolSelectionProjectId,
@@ -1391,6 +1585,24 @@ export const ProjectList = () => {
           scrollEnabled={!activeDragProjectId}
           onScroll={handleListScroll}
           scrollEventThrottle={16}
+          ListHeaderComponent={
+            !normalizedSearchQuery && (preferences.showRecentProjects ?? true) ? (
+              <RecentProjects
+                projects={projects}
+                recentLabel={t('recent')}
+                showAppIcons={preferences.showAppIcons}
+                isCollapsed={Boolean(collapsedSections[RECENT_SECTION_ID])}
+                onToggleCollapsed={() => handleToggleSectionCollapsed(RECENT_SECTION_ID)}
+                editorOptionsByCommand={editorOptionsByCommand}
+                terminalOptionsByCommand={terminalOptionsByCommand}
+                aiToolOptionsByCommand={aiToolOptionsByCommand}
+                globalEditorCommand={globalEditorCommand}
+                globalTerminalCommand={globalTerminalCommand}
+                globalAiToolCommand={globalAiToolCommand}
+                onOpenRecent={openProjectWithLastTool}
+              />
+            ) : null
+          }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
@@ -1431,6 +1643,7 @@ export const ProjectList = () => {
                   project={projectItem}
                   onOpenEditor={() => handleOpenEditor(projectItem)}
                   onOpenTerminal={() => handleOpenTerminal(projectItem)}
+                  onOpenAiTool={() => handleOpenAiTool(projectItem)}
                   onOpenFinder={() => handleOpenFinder(projectItem)}
                   onRemove={() => handleRequestRemove(projectItem)}
                   onToggleContextMenu={() => handleToggleContextMenu(projectItem.id)}
@@ -1438,14 +1651,19 @@ export const ProjectList = () => {
                   contextMenuOpen={contextMenuProjectId === projectItem.id}
                   editorOptions={editorOptions}
                   terminalOptions={terminalOptions}
+                  aiToolOptions={aiToolOptions}
                   editorQuickActionOption={resolveEditorOption(projectItem)}
                   terminalQuickActionOption={resolveTerminalOption(projectItem)}
+                  aiToolQuickActionOption={resolveAiToolOption(projectItem)}
                   onOpenWithEditor={(command) => handleOpenWithEditor(projectItem, command)}
                   onOpenWithTerminal={(command) => handleOpenWithTerminal(projectItem, command)}
+                  onOpenWithAiTool={(command) => handleOpenWithAiTool(projectItem, command)}
                   onSelectProjectEditorDefault={(command) => handleSetProjectEditorDefault(projectItem, command)}
                   onSelectProjectTerminalDefault={(command) => handleSetProjectTerminalDefault(projectItem, command)}
+                  onSelectProjectAiToolDefault={(command) => handleSetProjectAiToolDefault(projectItem, command)}
                   globalEditorCommand={globalEditorCommand}
                   globalTerminalCommand={globalTerminalCommand}
+                  globalAiToolCommand={globalAiToolCommand}
                   toolSelectionMode={toolSelectionProjectId === projectItem.id}
                   onToggleProjectToolSelectionMode={() => handleToggleProjectToolSelectionMode(projectItem.id)}
                   onToggleFavorite={() => handleToggleFavorite(projectItem)}
@@ -1453,6 +1671,7 @@ export const ProjectList = () => {
                     moreActions: t('moreActions'),
                     openWithEditor: t('openWithEditor'),
                     openWithTerminal: t('openWithTerminal'),
+                    openWithAiTool: t('openWithAiTool'),
                     selectProjectDefaults: t('selectProjectDefaults'),
                     done: t('done'),
                     close: t('close'),

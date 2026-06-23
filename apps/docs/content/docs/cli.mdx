@@ -133,9 +133,10 @@ tlink open <project> [options]
 | --- | --- |
 | `-e, --editor [slug]` | Open in editor. Optionally pass a slug to choose a specific editor. |
 | `-t, --terminal [slug]` | Open in terminal. Optionally pass a slug to choose a specific terminal. |
+| `-a, --ai [slug]` | Open in AI agent CLI. Optionally pass a slug (e.g. `claude-code`). Omit slug to use default. |
 
 <Callout type="info">
-  When neither `-e` nor `-t` is provided, the project opens in **both** the effective default editor and the effective default terminal.
+  When no `-e`, `-t`, or `-a` flag is provided, the project opens in **both** the effective default editor and the effective default terminal.
 </Callout>
 
 The resolution order is:
@@ -158,14 +159,20 @@ tlink open my-app -e cursor
 tlink open my-app -t iterm
 
 # Open in a specific editor and terminal
-tlink open my-app -e code -t warp
+tlink open my-app -e cursor -t warp
+
+# Open only in an AI agent CLI
+tlink open my-app -a claude-code
+
+# Open in a specific AI tool by slug
+tlink open my-app --ai cursor-cli
 ```
 
 ---
 
 ### `tlink config list`
 
-List available editors or terminals.
+List available editors, terminals, or AI tools.
 
 ```bash
 tlink config list <type> [options]
@@ -175,7 +182,7 @@ tlink config list <type> [options]
 
 | Argument | Description |
 | --- | --- |
-| `type` | `editor` or `terminal` |
+| `type` | `editor`, `terminal`, or `ai` |
 
 **Options:**
 
@@ -195,16 +202,20 @@ tlink config list editor
 # List only detected/installed terminals
 tlink config list terminal --detected
 
+# List only detected/installed AI tools
+tlink config list ai --detected
+
 # Show effective defaults for a specific project
 tlink config list editor --project my-app
 tlink config list terminal --project my-app
+tlink config list ai --project my-app
 ```
 
 ---
 
 ### `tlink config set`
 
-Set the default editor or terminal.
+Set the default editor, terminal, or AI tool.
 
 ```bash
 tlink config set <type> [slug] [options]
@@ -214,7 +225,7 @@ tlink config set <type> [slug] [options]
 
 | Argument | Description |
 | --- | --- |
-| `type` | `editor` or `terminal` |
+| `type` | `editor`, `terminal`, or `ai` |
 | `slug` | (Optional) Slug of the tool to set as default |
 
 **Options:**
@@ -240,8 +251,12 @@ tlink config set editor cursor --project my-app
 # Set a project-specific terminal default
 tlink config set terminal warp --project my-app
 
+# Set a project-specific AI tool default
+tlink config set ai claude-code --project my-app
+
 # Clear a project-specific override and fall back to the global default
 tlink config set editor --project my-app --clear
+tlink config set ai --project my-app --clear
 ```
 
 ---

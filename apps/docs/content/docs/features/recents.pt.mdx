@@ -1,0 +1,43 @@
+---
+title: Projetos Recentes
+description: Reabra rapidamente seus últimos projetos abertos a partir do popover do Tray Link.
+---
+
+## Visão Geral
+
+A seção **Recentes** aparece no topo do popover de projetos e exibe até **5** projetos abertos mais recentemente. Ela oferece acesso com um clique para retomar o trabalho sem rolar a lista completa.
+
+{/* // TODO: Inserir print da seção de projetos recentes */}
+
+## Como os Recentes São Atualizados
+
+Um projeto entra na lista de recentes quando você o abre usando qualquer uma destas ações:
+
+- Botão de ação rápida de **editor**, **terminal** ou **ferramenta de IA**
+- Opção **Abrir com** no menu de contexto
+- Toque em uma **bolha recente** (reabre com a mesma lógica de ferramenta)
+- [`tlink open`](../cli) pela CLI
+
+Cada abertura atualiza `lastOpenedAt` e registra qual ferramenta foi usada (`lastOpenedTool`).
+
+## Aparência das Bolhas
+
+Cada projeto recente é exibido como uma bolha circular com o nome do projeto abaixo. A bolha reflete:
+
+- **Cor da tag** — fundo e borda usam a cor da tag do projeto (ou azul padrão)
+- **Ícone da ferramenta** — quando **Mostrar ícones reais dos apps** está habilitado, a bolha mostra o ícone da última ferramenta usada; caso contrário, um ícone genérico de editor, terminal ou IA
+
+## Reabrindo um Projeto Recente
+
+Toque em uma bolha recente para reabrir o projeto. O Tray Link usa a **última ferramenta aberta** daquele projeto:
+
+1. Se a última ação foi editor, terminal ou ferramenta de IA, o mesmo tipo de ferramenta é usado novamente
+2. Se não houver ferramenta registrada, o editor padrão efetivo é usado
+
+## Recolhendo a Seção
+
+Clique no cabeçalho da seção **Recentes** para recolher ou expandir a área de rolagem horizontal. O estado recolhido é lembrado entre sessões do popover.
+
+## Configurações
+
+Em **Configurações**, alterne **Mostrar projetos recentes** para ocultar ou exibir toda a seção de Recentes. Quando desabilitado, nenhuma bolha recente aparece, independentemente do histórico de aberturas.

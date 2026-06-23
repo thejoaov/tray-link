@@ -1,0 +1,60 @@
+---
+title: Proyectos
+description: Agregar, eliminar, reordenar y marcar como favoritos los proyectos en Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Descripción General
+
+Los proyectos son el núcleo de Tray Link. Cada proyecto apunta a una carpeta en el disco y puede abrirse en tu editor, terminal o herramienta de IA preferidos con un clic.
+
+## Agregar Proyectos
+
+Haz clic en el botón **+** en el encabezado de la lista de proyectos para agregar un nuevo proyecto. Se abrirá un diálogo nativo de selección de carpetas — selecciona la carpeta que deseas agregar.
+
+El nombre del proyecto usa el nombre de la carpeta por defecto. También puedes agregar proyectos con nombres personalizados usando la [CLI](../cli):
+
+```bash
+tlink add /Users/me/projects/my-app --name "My App"
+```
+
+{/* // TODO: Inserir print do seletor de pastas */}
+
+## Eliminar Proyectos
+
+Haz clic en el **ícono de la papelera** en un proyecto para eliminarlo de la lista. Aparecerá un diálogo de confirmación con la opción de **eliminar los archivos del disco** también.
+
+{/* // TODO: Inserir print da janela de confirmação de remoção */}
+
+<Callout type="warn" title="Eliminación del Disco">
+  Cuando "Eliminar archivos del disco" está habilitado, la carpeta del proyecto se eliminará permanentemente. Esta acción no se puede deshacer.
+</Callout>
+
+En **Configuración**, puedes habilitar **Eliminar archivos del disco por defecto** para que la opción aparezca premarcada en el diálogo de eliminación.
+
+## Reordenar Proyectos
+
+Haz clic en el botón **Editar** para entrar en el modo de reordenación. Usa las **flechas arriba/abajo** para cambiar la posición de los proyectos o arrástralos cuando los controles de arrastre estén visibles. Haz clic en **Listo** cuando termines.
+
+En Configuración, **Mostrar posiciones de proyectos** muestra números de posición junto a cada proyecto en la lista.
+
+{/* // TODO: Inserir print do modo de reordenação */}
+
+## Favoritos
+
+Marca un proyecto como favorito usando el **ícono de estrella** en su fila. Los proyectos favoritos aparecen en una sección dedicada de **Favoritos** en la parte superior de la lista.
+
+Para reordenar favoritos globalmente, abre **Configuración** y arrastra los proyectos en la sección **Favoritos**. El orden de favoritos es independiente del orden de la lista principal.
+
+Los favoritos también se pueden consultar desde la CLI — el comando `tlink list` muestra una columna **Favorite** para cada proyecto.
+
+## Configuración Compartida
+
+Los proyectos agregados en la app aparecen en la [CLI](../cli) y viceversa. Ambos leen y escriben el mismo archivo `config.json`:
+
+| Plataforma | Ruta |
+| --- | --- |
+| macOS | `~/Library/Application Support/TrayLink/config.json` |
+| Windows | `%APPDATA%/TrayLink/config.json` |
+| Linux | `~/.config/TrayLink/config.json` |

@@ -115,7 +115,7 @@ tlink remove 550e8400-e29b-41d4-a716-446655440000
 
 ### `tlink open`
 
-Abre um projeto no editor e/ou terminal.
+Abre um projeto no editor, terminal e/ou ferramenta de IA.
 
 ```bash
 tlink open <projeto> [opções]
@@ -133,9 +133,10 @@ tlink open <projeto> [opções]
 | --- | --- |
 | `-e, --editor [slug]` | Abrir no editor. Opcionalmente, passe um slug para escolher um editor específico. |
 | `-t, --terminal [slug]` | Abrir no terminal. Opcionalmente, passe um slug para escolher um terminal específico. |
+| `-a, --ai [slug]` | Abrir em CLI de agente de IA. Opcionalmente, passe um slug (ex.: `claude-code`). Omita o slug para usar o padrão. |
 
 <Callout type="info">
-  Quando nem `-e` nem `-t` são informados, o projeto abre tanto no editor padrão efetivo quanto no terminal padrão efetivo.
+  Quando nenhuma flag `-e`, `-t` ou `-a` é informada, o projeto abre tanto no editor padrão efetivo quanto no terminal padrão efetivo.
 </Callout>
 
 A ordem de resolução é:
@@ -158,14 +159,20 @@ tlink open my-app -e cursor
 tlink open my-app -t iterm
 
 # Abrir em um editor e terminal específicos
-tlink open my-app -e code -t warp
+tlink open my-app -e cursor -t warp
+
+# Abrir somente em um CLI de agente de IA
+tlink open my-app -a claude-code
+
+# Abrir em uma ferramenta de IA específica por slug
+tlink open my-app --ai cursor-cli
 ```
 
 ---
 
 ### `tlink config list`
 
-Lista editores ou terminais disponíveis.
+Lista editores, terminais ou ferramentas de IA disponíveis.
 
 ```bash
 tlink config list <tipo> [opções]
@@ -175,7 +182,7 @@ tlink config list <tipo> [opções]
 
 | Argumento | Descrição |
 | --- | --- |
-| `tipo` | `editor` ou `terminal` |
+| `tipo` | `editor`, `terminal` ou `ai` |
 
 **Opções:**
 
@@ -195,16 +202,20 @@ tlink config list editor
 # Listar apenas terminais detectados/instalados
 tlink config list terminal --detected
 
+# Listar apenas ferramentas de IA detectadas/instaladas
+tlink config list ai --detected
+
 # Mostrar os padrões efetivos de um projeto específico
 tlink config list editor --project my-app
 tlink config list terminal --project my-app
+tlink config list ai --project my-app
 ```
 
 ---
 
 ### `tlink config set`
 
-Definir o editor ou terminal padrão.
+Definir o editor, terminal ou ferramenta de IA padrão.
 
 ```bash
 tlink config set <tipo> [slug] [opções]
@@ -214,7 +225,7 @@ tlink config set <tipo> [slug] [opções]
 
 | Argumento | Descrição |
 | --- | --- |
-| `tipo` | `editor` ou `terminal` |
+| `tipo` | `editor`, `terminal` ou `ai` |
 | `slug` | (Opcional) Slug da ferramenta a ser definida como padrão |
 
 **Opções:**
@@ -240,8 +251,12 @@ tlink config set editor cursor --project my-app
 # Definir um terminal padrão específico para um projeto
 tlink config set terminal warp --project my-app
 
+# Definir uma ferramenta de IA padrão específica para um projeto
+tlink config set ai claude-code --project my-app
+
 # Limpar um override específico de projeto e voltar ao padrão global
 tlink config set editor --project my-app --clear
+tlink config set ai --project my-app --clear
 ```
 
 ---

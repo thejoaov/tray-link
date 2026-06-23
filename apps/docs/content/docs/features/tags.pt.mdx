@@ -1,0 +1,59 @@
+---
+title: Tags e Agrupamento
+description: Organize projetos com tags, cores e agrupamento na lista do Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Visão Geral
+
+Tags ajudam a categorizar projetos visualmente e estruturalmente. Cada tag tem um nome e uma cor opcional, e os projetos podem ser agrupados ou ordenados por tag na lista.
+
+## Atribuindo Tags a Projetos
+
+Abra o **menu de reticências** (⋯) em um projeto e role até a seção **Tag**:
+
+1. Digite um nome de tag ou escolha uma tag existente na lista de chips
+2. Escolha uma cor na paleta predefinida
+3. Clique em **Salvar**
+
+As tags são armazenadas no formato `nome||#cor` (por exemplo, `trabalho||#007AFF`). Projetos sem tag aparecem como sem categoria ao agrupar por tag.
+
+{/* // TODO: Inserir print da seção de tag no menu de contexto */}
+
+## Gerenciando Tags nas Configurações
+
+Abra **Configurações** e role até a seção **Tags** para:
+
+- **Editar** nome ou cor de uma tag — as alterações se aplicam a todos os projetos que usam essa tag
+- **Excluir** uma tag — remove a tag de todos os projetos associados
+
+<Callout type="warn" title="Exclusão de Tags">
+  Excluir uma tag a remove de todos os projetos que a utilizam. Isso não pode ser desfeito apenas pelo gerenciador de tags.
+</Callout>
+
+## Agrupando Projetos
+
+Em **Configurações → Agrupar projetos por**, escolha como a lista de projetos é organizada:
+
+| Modo | Descrição |
+| --- | --- |
+| **Nenhum** | Lista plana (a seção de favoritos ainda aparece quando aplicável) |
+| **Por Tag** | Agrupa projetos sob cabeçalhos de tag; projetos sem categoria aparecem em seção separada |
+| **Por Pasta Pai** | Agrupa projetos pelo diretório pai no disco |
+
+Você também pode alternar modos de agrupamento pelo botão de agrupamento no cabeçalho da lista de projetos.
+
+## Ordenando por Tag
+
+Use o botão de ordenação no cabeçalho da lista para ordenar projetos alfabeticamente pelo nome da tag. Isso funciona independentemente do modo de agrupamento.
+
+## Cores de Tag na Interface
+
+As cores das tags aparecem em vários lugares:
+
+- **Chips de tag** ao lado dos nomes dos projetos na lista
+- **Bolhas de projetos recentes** — o fundo e a borda da bolha usam a cor da tag
+- **Pré-visualização de tag nas Configurações** — ao editar nomes e cores de tags
+
+Se um projeto não tiver cor de tag, o Tray Link usa um azul padrão (`#007AFF`).

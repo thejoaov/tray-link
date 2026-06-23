@@ -1,4 +1,5 @@
 import { AppRegistry, NativeModules } from 'react-native'
+import { CustomAiToolWindow } from './CustomAiToolWindow'
 import { CustomEditorWindow } from './CustomEditorWindow'
 import { CustomTerminalWindow } from './CustomTerminalWindow'
 import { RemoveProjectWindow } from './RemoveProjectWindow'
@@ -26,6 +27,14 @@ const WINDOW_OPTIONS: Record<string, Record<string, unknown>> = {
   },
   CustomTerminalWindow: {
     title: 'Custom Terminal',
+    windowStyle: {
+      width: 420,
+      height: 360,
+      mask: NON_RESIZABLE_MASK,
+    },
+  },
+  CustomAiToolWindow: {
+    title: 'Custom AI Tool',
     windowStyle: {
       width: 420,
       height: 360,
@@ -74,6 +83,11 @@ export const WindowsList = [
     name: 'CustomTerminalWindow',
     component: CustomTerminalWindow,
     options: WINDOW_OPTIONS.CustomTerminalWindow,
+  },
+  {
+    name: 'CustomAiToolWindow',
+    component: CustomAiToolWindow,
+    options: WINDOW_OPTIONS.CustomAiToolWindow,
   },
   {
     name: 'RemoveProjectWindow',
