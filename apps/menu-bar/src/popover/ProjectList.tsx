@@ -796,17 +796,20 @@ export const ProjectList = () => {
     [loadProjects],
   )
 
-  const resolveEditorCommand = (project: Project) => {
-    return project.defaultEditor ?? globalEditorCommand
-  }
+  const resolveEditorCommand = useCallback(
+    (project: Project) => project.defaultEditor ?? globalEditorCommand,
+    [globalEditorCommand],
+  )
 
-  const resolveTerminalCommand = (project: Project) => {
-    return project.defaultTerminal ?? globalTerminalCommand
-  }
+  const resolveTerminalCommand = useCallback(
+    (project: Project) => project.defaultTerminal ?? globalTerminalCommand,
+    [globalTerminalCommand],
+  )
 
-  const resolveAiToolCommand = (project: Project) => {
-    return project.defaultAiTool ?? globalAiToolCommand
-  }
+  const resolveAiToolCommand = useCallback(
+    (project: Project) => project.defaultAiTool ?? globalAiToolCommand,
+    [globalAiToolCommand],
+  )
 
   const resolveEditorOption = (project: Project): ToolOption | null => {
     return editorOptionsByCommand.get(resolveEditorCommand(project)) ?? null
@@ -1030,7 +1033,7 @@ export const ProjectList = () => {
         command: editorCommand,
       })
     },
-    [t, updateProjectLastOpened, globalEditorCommand, globalTerminalCommand],
+    [t, updateProjectLastOpened, resolveEditorCommand, resolveTerminalCommand],
   )
 
   const executeProjectRemoval = async ({ id, path, deleteFromDisk }: RemoveProjectPayload) => {

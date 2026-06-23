@@ -28,6 +28,14 @@ function buildLoginShellCommand(userShell: string, script: string): string {
   return `${userShell} -lc '${escapedScript}'`
 }
 
+function shellEscapeSingleQuotes(value: string): string {
+  return `'${value.replace(/'/g, `'\\''`)}'`
+}
+
+function isSafeBinaryName(binary: string): boolean {
+  return /^[a-zA-Z0-9._+-]+$/.test(binary)
+}
+
 const CLI_BINARY_NAME = 'tlink'
 
 function getCliWrapperDir(): string {
@@ -268,6 +276,10 @@ export const ShellUtilsMain = {
   },
   which: async (binary: string) => {
     try {
+      if (!isSafeBinaryName(binary)) {
+        return null
+      }
+
       const isWindows = process.platform === 'win32'
       if (isWindows) {
         const { stdout } = await execAsync(`where ${binary}`)
@@ -302,7 +314,7 @@ export const ShellUtilsMain = {
         .join(':')
 
       const userShell = resolveUserShell()
-      const lookupScript = `env PATH="${pathPrefix}:$PATH" command -v ${binary}`
+      const lookupScript = `env PATH="${pathPrefix}:$PATH" command -v ${shellEscapeSingleQuotes(binary)}`
       const { stdout } = await execAsync(buildLoginShellCommand(userShell, lookupScript))
       return stdout.trim() || null
     } catch {
