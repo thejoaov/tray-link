@@ -1,12 +1,32 @@
+import { buildTerminalSpawnCommand } from '@tray-link/tray-shared'
 import { exec } from 'child_process'
 import { app } from 'electron'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import util from 'util'
-import { buildTerminalSpawnCommand } from '@tray-link/tray-shared'
 
 const execAsync = util.promisify(exec)
+
+function resolveUserShell(): string {
+  const shellFromEnv = process.env.SHELL?.trim()
+  if (shellFromEnv && fs.existsSync(shellFromEnv)) {
+    return shellFromEnv
+  }
+
+  return process.platform === 'darwin' ? '/bin/zsh' : '/bin/bash'
+}
+
+function buildLoginShellCommand(userShell: string, script: string): string {
+  const shellName = path.basename(userShell).toLowerCase()
+  const escapedScript = script.replace(/'/g, `'\\''`)
+
+  if (shellName === 'fish') {
+    return `${userShell} -l -c '${escapedScript}'`
+  }
+
+  return `${userShell} -lc '${escapedScript}'`
+}
 
 const CLI_BINARY_NAME = 'tlink'
 
@@ -281,7 +301,9 @@ export const ShellUtilsMain = {
         .filter(Boolean)
         .join(':')
 
-      const { stdout } = await execAsync(`/bin/zsh -lc 'export PATH="${pathPrefix}:$PATH"; command -v ${binary}'`)
+      const userShell = resolveUserShell()
+      const lookupScript = `env PATH="${pathPrefix}:$PATH" command -v ${binary}`
+      const { stdout } = await execAsync(buildLoginShellCommand(userShell, lookupScript))
       return stdout.trim() || null
     } catch {
       return null

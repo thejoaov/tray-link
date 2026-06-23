@@ -55,8 +55,7 @@ const es: typeof en = {
   openIssue: 'Reportar um problema',
   about: 'Sobre',
   closeAbout: 'Cerrar',
-  resetDefaultsMessage:
-    'Esta acción recargará la lista de terminales y editores que están instalados en su máquina. ¿Desea continuar?',
+  resetDefaultsMessage: 'Esta acción recargará la lista de herramientas instaladas en su máquina. ¿Desea continuar?',
   cancel: 'Cancelar',
   reset: 'Restaurar',
   favorites: 'Favoritos',

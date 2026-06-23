@@ -1,11 +1,9 @@
 {
   "biome.enabled": true,
   "editor.defaultFormatter": "biomejs.biome",
-  "[json]": {
-    "editor.defaultFormatter": "biomejs.biome",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.biome": "always"
-    }
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always"
   },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"

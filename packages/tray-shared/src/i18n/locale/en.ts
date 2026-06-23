@@ -53,8 +53,7 @@ export default {
   openIssue: 'Report an issue',
   about: 'About',
   closeAbout: 'Close',
-  resetDefaultsMessage:
-    'This action will reload the terminal and editors list that are installed on your machine. Do you want to continue?',
+  resetDefaultsMessage: 'This action will reload the list of tools installed on your machine. Do you want to continue?',
   cancel: 'Cancel',
   reset: 'Reset',
   favorites: 'Favorites',

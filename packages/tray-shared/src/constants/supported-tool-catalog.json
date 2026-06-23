@@ -513,7 +513,7 @@
         "binary": "gnome-terminal",
         "enableBinaryCheck": true,
         "enableCommonPathCheck": true,
-        "commonFilepaths": ["/usr/bin/openclaw", "/usr/local/bin/openclaw"],
+        "commonFilepaths": ["/usr/bin/gnome-terminal"],
         "iconBasenames": ["org.gnome.Terminal", "utilities-terminal", "AppIcon"],
         "alwaysAvailable": false
       },

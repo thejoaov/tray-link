@@ -64,6 +64,7 @@ export function getAiToolList(): Promise<SettingsItem[]> {
 export const defaultConfig = {
   editorList,
   terminalList,
+  aiToolList,
   defaultTerminal: DefaultTerminal,
   defaultEditor: DefaultEditor,
 }

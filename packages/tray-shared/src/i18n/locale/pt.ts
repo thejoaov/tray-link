@@ -55,8 +55,7 @@ const pt: typeof en = {
   openIssue: 'Reportar um problema',
   about: 'Sobre',
   closeAbout: 'Fechar',
-  resetDefaultsMessage:
-    'Esta ação recarregará a lista de terminais e editores que estão instalados em sua máquina. Deseja continuar?',
+  resetDefaultsMessage: 'Esta ação recarregará a lista de ferramentas instaladas em sua máquina. Deseja continuar?',
   cancel: 'Cancelar',
   reset: 'Redefinir',
   favorites: 'Favoritos',
