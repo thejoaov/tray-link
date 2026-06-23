@@ -376,7 +376,7 @@ public class ShellUtilsModule: Module {
       let pathPrefix = "/opt/homebrew/bin:/usr/local/bin:\(home)/.local/bin:\(home)/.cursor/bin:\(home)/.npm-global/bin:\(home)/.cargo/bin"
 
       task.executableURL = URL(fileURLWithPath: "/bin/zsh")
-      task.arguments = ["-lc", "export PATH=\"\(pathPrefix):$PATH\"; command -v \(binary)"]
+      task.arguments = ["-lc", "export PATH=\"\(pathPrefix):$PATH\"; command -v \(shellEscape(binary))"]
       task.standardOutput = pipe
 
       do {
