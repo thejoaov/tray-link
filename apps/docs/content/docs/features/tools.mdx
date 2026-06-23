@@ -1,0 +1,123 @@
+---
+title: Tools
+description: Open projects in editors, terminals, and AI agent CLIs with Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Overview
+
+Tray Link detects installed editors, terminals, and AI agent CLIs on your system. Each project row has quick-action buttons, and the context menu (⋯) lets you open with a specific tool or set project-specific defaults.
+
+## Quick Actions
+
+Each project in the list has quick-action icons:
+
+- **Editor icon** — opens the project in the effective default editor
+- **Terminal icon** — opens the project in the effective default terminal
+- **AI tool icon** — launches the effective default AI agent CLI inside your default terminal
+- **Folder icon** — opens the project folder in Finder (macOS), Explorer (Windows), or the default file manager (Linux)
+
+{/* // TODO: Inserir print dos ícones de ação rápida */}
+
+## Opening with a Specific Tool
+
+Click the **ellipsis menu** (⋯) on a project to see additional options:
+
+- **Open with \<editor\>** — choose from any detected or custom editor
+- **Open with \<terminal\>** — choose from any detected or custom terminal
+- **Open with \<AI tool\>** — choose from any detected or custom AI agent CLI
+- **Select defaults** — switch the menu into project-default selection mode
+
+When selection mode is active, choosing a tool saves it as the default for that specific project instead of opening it immediately. The selected override is marked with `*` in the menu. If a project has no override, Tray Link falls back to the global defaults from Settings.
+
+{/* // TODO: Inserir print do menu de contexto */}
+
+## Default Resolution Order
+
+Tray Link resolves which tool to use in this order:
+
+1. Explicit choice in the context menu or CLI slug
+2. Project-specific default
+3. Global default from Settings or `tlink config set`
+4. Platform fallback (e.g. `code` for editors, `open -a Terminal` on macOS)
+
+## Global Defaults in Settings
+
+Open **Settings** (gear icon in the footer) to configure:
+
+- **Default Editor** — global fallback editor
+- **Default Terminal** — global fallback terminal
+- **Default AI tool** — global fallback AI agent CLI
+- **Show real app icons** — use detected app icons on quick-action buttons and recent project bubbles
+
+Use **Reload editors/terminals list** in Advanced to re-scan your system for newly installed tools.
+
+## Custom Tools
+
+You can add custom editors, terminals, and AI tools that are not automatically detected:
+
+1. Click **Add Custom Editor**, **Add Custom Terminal**, or **Add Custom AI Tool**
+2. Fill in the fields:
+   - **Name** — display name for the tool
+   - **Binary** — the executable binary name (e.g., `my-editor`)
+   - **Open Command** — the command template used to open a project (e.g., `my-editor {{path}}`)
+3. Click **Save**
+
+{/* // TODO: Inserir print da janela de editor/terminal customizado */}
+
+<Callout type="info">
+  AI tools are launched inside your default terminal. Tray Link runs the AI CLI command in the project directory using your configured terminal.
+</Callout>
+
+## Supported Editors
+
+| Editor | Slug | Platforms |
+| --- | --- | --- |
+| Visual Studio Code | `visual-studio-code` | macOS, Windows, Linux |
+| VS Code Insiders | `visual-studio-code-insiders` | macOS, Windows, Linux |
+| Visual Studio | `visual-studio` | macOS, Windows |
+| Cursor | `cursor` | macOS, Windows, Linux |
+| Windsurf | `windsurf` | macOS, Windows, Linux |
+| Devin Desktop | `devin-desktop` | macOS, Windows, Linux |
+| Antigravity IDE | `antigravity-ide` | macOS, Windows, Linux |
+| Sublime Text | `sublime-text` | macOS, Windows, Linux |
+| Atom | `atom` | macOS, Windows, Linux |
+| IntelliJ IDEA CE | `intellij-idea-ce` | macOS, Windows, Linux |
+| PyCharm CE | `pycharm-ce` | macOS, Windows, Linux |
+| PyCharm | `pycharm` | macOS, Windows, Linux |
+| Android Studio | `android-studio` | macOS, Windows, Linux |
+| Xcode | `xcode` | macOS |
+| Geany | `geany` | Linux |
+| Gedit | `gedit` | Linux |
+
+## Supported Terminals
+
+| Terminal | Slug | Platforms |
+| --- | --- | --- |
+| Terminal | `terminal` | macOS |
+| iTerm | `iterm` | macOS |
+| Warp | `warp` | macOS, Windows, Linux |
+| Hyper | `hyper` | macOS, Windows, Linux |
+| Ghostty | `ghostty` | macOS, Linux |
+| CMD | `cmd` | Windows |
+| PowerShell | `powershell` | Windows |
+| Windows Terminal | `windows-terminal` | Windows |
+| GNOME Terminal | `gnome-terminal` | Linux |
+
+## Supported AI Tools
+
+| AI Tool | Slug | Platforms |
+| --- | --- | --- |
+| OpenClaw | `openclaw` | macOS, Windows, Linux |
+| Hermes | `hermes` | macOS, Windows, Linux |
+| OpenCode | `opencode` | macOS, Windows, Linux |
+| Claude Code | `claude-code` | macOS, Windows, Linux |
+| Cursor CLI | `cursor-cli` | macOS, Windows, Linux |
+| Devin | `devin` | macOS, Windows, Linux |
+| GitHub Copilot CLI | `github-copilot-cli` | macOS, Windows, Linux |
+| Antigravity CLI | `antigravity-cli` | macOS, Windows, Linux |
+
+## CLI Integration
+
+You can open projects and manage defaults from the terminal. See the [CLI reference](../cli) for `tlink open`, `tlink config list`, and `tlink config set` commands — including the `-a, --ai` flag for AI tools.

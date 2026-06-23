@@ -1,0 +1,67 @@
+---
+title: Deep Linking
+description: Integrate Tray Link with external tools via URL schemes and the local server.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Overview
+
+Tray Link registers a custom URL scheme so external tools, scripts, and development workflows can interact with the running app. On Electron builds, a small **local HTTP server** also exposes endpoints for trusted integrations such as Expo CLI.
+
+## URL Schemes
+
+| Platform | Scheme | Notes |
+| --- | --- | --- |
+| Windows / Linux | `tlink://` | Registered as the default protocol handler |
+| macOS (Electron) | `tlink-debug://` | Used to avoid conflicting with the native macOS build |
+| macOS (native) | Uses the React Native macOS protocol registration | Separate from the Electron debug scheme |
+
+When Tray Link receives a URL, it broadcasts an `open-url` event to the app window. Only one app instance runs at a time — additional launches forward the URL to the existing instance.
+
+## Local Server (Electron)
+
+When Tray Link starts, an Express server listens on one of these ports (first available):
+
+`35783`, `47909`, `44171`, `50799`
+
+### `GET /tlink/status`
+
+Returns whether Tray Link is running and its version:
+
+```json
+{ "ok": true, "version": "2.2.19" }
+```
+
+### `GET /tlink/open?url=<encoded-url>`
+
+Forwards a URL to Tray Link as a deep link. The `url` query parameter must belong to an allowed domain:
+
+- `expo.dev`
+- `expo.test`
+- `exp.host`
+
+The server converts `https://` and `exp://` URLs into `tlink://` deep links and emits them to the app.
+
+<Callout type="info">
+  Requests to the local server must include an `Origin` header from one of the whitelisted domains. Other origins receive `403 Forbidden`.
+</Callout>
+
+## Expo CLI Integration
+
+The local server is designed for Expo development workflows. When Expo CLI needs to hand off a project URL to Tray Link, it can call the local `/tlink/open` endpoint instead of requiring manual app interaction.
+
+Example flow:
+
+1. Tray Link is running in the system tray
+2. Expo CLI sends a request to `http://localhost:35783/tlink/open?url=...`
+3. Tray Link receives the converted deep link and processes it in the app window
+
+## Opening External URLs from the App
+
+Tray Link uses the platform `Linking` API to open external URLs (release pages, GitHub repository, creator profile) from Settings. On Electron, this delegates to `shell.openExternal`.
+
+## Related
+
+- [CLI](../cli) — manage projects from the terminal with `tlink`
+- [Tools](./tools) — open projects in editors, terminals, and AI agent CLIs

@@ -1,0 +1,59 @@
+---
+title: Etiquetas y Agrupación
+description: Organiza proyectos con etiquetas, colores y agrupación en la lista de Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Descripción General
+
+Las etiquetas ayudan a categorizar proyectos visual y estructuralmente. Cada etiqueta tiene un nombre y un color opcional, y los proyectos pueden agruparse u ordenarse por etiqueta en la lista.
+
+## Asignar Etiquetas a Proyectos
+
+Abre el **menú de puntos suspensivos** (⋯) de un proyecto y desplázate hasta la sección **Etiqueta**:
+
+1. Escribe un nombre de etiqueta o elige una existente en la lista de chips
+2. Elige un color de la paleta predefinida
+3. Haz clic en **Guardar**
+
+Las etiquetas se almacenan en el formato `nombre||#color` (por ejemplo, `trabajo||#007AFF`). Los proyectos sin etiqueta aparecen como sin categoría al agrupar por etiqueta.
+
+{/* // TODO: Inserir print da seção de tag no menu de contexto */}
+
+## Gestionar Etiquetas en Configuración
+
+Abre **Configuración** y desplázate hasta la sección **Etiquetas** para:
+
+- **Editar** el nombre o color de una etiqueta — los cambios se aplican a todos los proyectos que la usan
+- **Eliminar** una etiqueta — la quita de todos los proyectos asociados
+
+<Callout type="warn" title="Eliminar Etiquetas">
+  Eliminar una etiqueta la quita de todos los proyectos que la utilizan. Esto no se puede deshacer solo desde el gestor de etiquetas.
+</Callout>
+
+## Agrupar Proyectos
+
+En **Configuración → Agrupar proyectos por**, elige cómo se organiza la lista:
+
+| Modo | Descripción |
+| --- | --- |
+| **Ninguno** | Lista plana (la sección de favoritos sigue apareciendo cuando corresponde) |
+| **Por Etiqueta** | Agrupa proyectos bajo encabezados de etiqueta; los sin categoría aparecen en sección separada |
+| **Por Carpeta Padre** | Agrupa proyectos por su directorio padre en el disco |
+
+También puedes alternar modos de agrupación desde el botón de agrupación en el encabezado de la lista.
+
+## Ordenar por Etiqueta
+
+Usa el botón de ordenación en el encabezado de la lista para ordenar proyectos alfabéticamente por nombre de etiqueta. Funciona independientemente del modo de agrupación.
+
+## Colores de Etiqueta en la Interfaz
+
+Los colores de etiqueta aparecen en varios lugares:
+
+- **Chips de etiqueta** junto a los nombres de proyecto en la lista
+- **Burbujas de proyectos recientes** — el fondo y borde de la burbuja usan el color de la etiqueta
+- **Vista previa de etiqueta en Configuración** — al editar nombres y colores
+
+Si un proyecto no tiene color de etiqueta, Tray Link usa un azul predeterminado (`#007AFF`).

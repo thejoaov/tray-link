@@ -1,0 +1,59 @@
+---
+title: Tags & Grouping
+description: Organize projects with tags, colors, and list grouping in Tray Link.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Overview
+
+Tags help you categorize projects visually and structurally. Each tag has a name and an optional color, and projects can be grouped or sorted by tag in the project list.
+
+## Assigning Tags to Projects
+
+Open the **ellipsis menu** (⋯) on a project and scroll to the **Tag** section:
+
+1. Type a tag name or pick an existing tag from the chip list
+2. Choose a color from the preset palette
+3. Click **Save**
+
+Tags are stored in the format `name||#color` (for example, `work||#007AFF`). Projects without a tag appear as uncategorized when grouping by tag.
+
+{/* // TODO: Inserir print da seção de tag no menu de contexto */}
+
+## Managing Tags in Settings
+
+Open **Settings** and scroll to the **Tags** section to:
+
+- **Edit** a tag name or color — changes apply to all projects using that tag
+- **Delete** a tag — removes the tag from every associated project
+
+<Callout type="warn" title="Deleting Tags">
+  Deleting a tag removes it from all projects that use it. This cannot be undone from the tag manager alone.
+</Callout>
+
+## Grouping Projects
+
+In **Settings → Group projects by**, choose how the project list is organized:
+
+| Mode | Description |
+| --- | --- |
+| **None** | Flat list (favorites section still appears when applicable) |
+| **By Tag** | Groups projects under tag headers; uncategorized projects appear in a separate section |
+| **By Parent Folder** | Groups projects by their parent directory on disk |
+
+You can also cycle grouping modes from the project list header using the grouping toggle button.
+
+## Sorting by Tag
+
+Use the sort toggle in the project list header to sort projects alphabetically by tag name. This works independently from grouping mode.
+
+## Tag Colors in the UI
+
+Tag colors appear in several places:
+
+- **Tag chips** next to project names in the list
+- **Recent project bubbles** — the bubble background and border use the tag color
+- **Settings tag preview** — when editing tag names and colors
+
+If a project has no tag color, Tray Link uses a default blue accent (`#007AFF`).

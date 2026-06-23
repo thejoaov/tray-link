@@ -1,0 +1,43 @@
+---
+title: Recent Projects
+description: Quickly reopen your last opened projects from the Tray Link popover.
+---
+
+## Overview
+
+The **Recents** section appears at the top of the project popover and shows up to **5** projects you opened most recently. It gives you one-click access to resume work without scrolling through the full list.
+
+{/* // TODO: Inserir print da seção de projetos recentes */}
+
+## How Recents Are Updated
+
+A project enters the recents list when you open it using any of these actions:
+
+- Quick-action **editor**, **terminal**, or **AI tool** button
+- **Open with** option from the context menu
+- **Recent bubble** tap (reopens with the same tool logic)
+- [`tlink open`](../cli) from the CLI
+
+Each open updates `lastOpenedAt` and records which tool was used (`lastOpenedTool`).
+
+## Bubble Appearance
+
+Each recent project is shown as a circular bubble with the project name below it. The bubble reflects:
+
+- **Tag color** — background and border use the project tag color (or default blue)
+- **Tool icon** — when **Show real app icons** is enabled, the bubble shows the icon of the last-used tool; otherwise a generic editor, terminal, or AI icon is shown
+
+## Reopening a Recent Project
+
+Tap a recent bubble to reopen the project. Tray Link uses the **last opened tool** for that project:
+
+1. If the last action was an editor, terminal, or AI tool, that same tool type is used again
+2. If no last-opened tool is recorded, the effective default editor is used
+
+## Collapsing the Section
+
+Click the **Recents** section header to collapse or expand the horizontal scroll area. Collapsed state is remembered between popover sessions.
+
+## Settings
+
+In **Settings**, toggle **Show recent projects** to hide or show the entire Recents section. When disabled, no recent bubbles appear regardless of open history.
