@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "ai-release-notes": {
+      "source": "thejoaov/skills",
+      "sourceType": "github",
+      "skillPath": "skills/ai-release-notes/SKILL.md",
+      "computedHash": "b3e33d37ce082fbe28fadc5b5e906736e21afa33ff82460540fd791b83151951"
+    },
+    "draft-first-approval": {
+      "source": "thejoaov/skills",
+      "sourceType": "github",
+      "skillPath": "skills/draft-first-approval/SKILL.md",
+      "computedHash": "a15a060a698e70eb41d14dcc5341256cb13319978b4fe0b05fbb22c067fb3ca2"
+    },
+    "electron-tray-app": {
+      "source": "thejoaov/skills",
+      "sourceType": "github",
+      "skillPath": "skills/electron-tray-app/SKILL.md",
+      "computedHash": "9266d16ed10b5a2429694106b0e2e594e8d5dfcc81ea7f26fb57d14f0c7105a9"
+    },
+    "feature-management": {
+      "source": "thejoaov/skills",
+      "sourceType": "github",
+      "skillPath": "skills/feature-management/SKILL.md",
+      "computedHash": "60b1cb3cd6905ca23397b8f53068526e5e042d89094f65482cb9d7619131741d"
+    },
+    "monorepo-architecture": {
+      "source": "thejoaov/skills",
+      "sourceType": "github",
+      "skillPath": "skills/monorepo-architecture/SKILL.md",
+      "computedHash": "97993558478d7d9d2be3f39a1c97ba2f5db870e5e40a7b01829f55ca09cf5ed7"
+    },
+    "to-prd": {
+      "source": "thejoaov/skills",
+      "sourceType": "github",
+      "skillPath": "skills/to-prd/SKILL.md",
+      "computedHash": "3be5ceb63310f74d7a2d3400df0da2b826a2830b3fccca31a7b16b8c1e89a516"
+    }
+  }
+}
