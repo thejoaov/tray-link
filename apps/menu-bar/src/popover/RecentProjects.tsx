@@ -24,8 +24,10 @@ type Props = {
   onToggleCollapsed: () => void
   editorOptionsByCommand: Map<string, ToolOption>
   terminalOptionsByCommand: Map<string, ToolOption>
+  aiToolOptionsByCommand: Map<string, ToolOption>
   globalEditorCommand: string
   globalTerminalCommand: string
+  globalAiToolCommand: string | null
   onOpenRecent: (project: Project) => void
 }
 
@@ -33,8 +35,10 @@ const resolveRecentToolOption = (
   project: Project,
   editorOptionsByCommand: Map<string, ToolOption>,
   terminalOptionsByCommand: Map<string, ToolOption>,
+  aiToolOptionsByCommand: Map<string, ToolOption>,
   globalEditorCommand: string,
   globalTerminalCommand: string,
+  globalAiToolCommand: string | null,
 ): ToolOption | null => {
   const lastOpenedTool = project.lastOpenedTool
 
@@ -46,6 +50,14 @@ const resolveRecentToolOption = (
     return (
       terminalOptionsByCommand.get(lastOpenedTool.command) ??
       terminalOptionsByCommand.get(globalTerminalCommand) ??
+      null
+    )
+  }
+
+  if (lastOpenedTool?.type === 'aiTool') {
+    return (
+      aiToolOptionsByCommand.get(lastOpenedTool.command) ??
+      (globalAiToolCommand ? aiToolOptionsByCommand.get(globalAiToolCommand) : null) ??
       null
     )
   }
@@ -65,7 +77,11 @@ const RecentProjectBubble = ({ project, showAppIcons, toolOption, onPress }: Rec
   const tagColor = parsedTag.color ?? DEFAULT_TAG_COLOR
   const tagColors = getTagColors(tagColor)
   const fallbackIconName =
-    project.lastOpenedTool?.type === 'terminal' ? ('terminal-outline' as const) : ('code-slash-outline' as const)
+    project.lastOpenedTool?.type === 'terminal'
+      ? ('terminal-outline' as const)
+      : project.lastOpenedTool?.type === 'aiTool'
+        ? ('sparkles-outline' as const)
+        : ('code-slash-outline' as const)
 
   return (
     <TouchableOpacity accessibilityLabel={project.name} onPress={onPress} style={styles.bubbleContainer}>
@@ -105,8 +121,10 @@ export const RecentProjects = ({
   onToggleCollapsed,
   editorOptionsByCommand,
   terminalOptionsByCommand,
+  aiToolOptionsByCommand,
   globalEditorCommand,
   globalTerminalCommand,
+  globalAiToolCommand,
   onOpenRecent,
 }: Props) => {
   const recentProjects = useMemo(() => {
@@ -148,8 +166,10 @@ export const RecentProjects = ({
               project,
               editorOptionsByCommand,
               terminalOptionsByCommand,
+              aiToolOptionsByCommand,
               globalEditorCommand,
               globalTerminalCommand,
+              globalAiToolCommand,
             )
 
             return (

@@ -16,6 +16,7 @@ export type SupportedToolDefinition = {
 export type SupportedToolCatalog = {
   editors: Record<ToolCatalogPlatform, SupportedToolDefinition[]>
   terminals: Record<ToolCatalogPlatform, SupportedToolDefinition[]>
+  aiTools: Record<ToolCatalogPlatform, SupportedToolDefinition[]>
 }
 
 const supportedToolCatalog = supportedToolCatalogJson as SupportedToolCatalog

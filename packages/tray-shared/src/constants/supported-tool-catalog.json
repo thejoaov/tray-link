@@ -512,8 +512,8 @@
         "command": "gnome-terminal",
         "binary": "gnome-terminal",
         "enableBinaryCheck": true,
-        "enableCommonPathCheck": false,
-        "commonFilepaths": [],
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/openclaw", "/usr/local/bin/openclaw"],
         "iconBasenames": ["org.gnome.Terminal", "utilities-terminal", "AppIcon"],
         "alwaysAvailable": false
       },
@@ -597,6 +597,254 @@
         "enableCommonPathCheck": true,
         "commonFilepaths": ["C:\\Users\\%USERNAME%\\AppData\\Local\\hyper\\hyper.exe"],
         "iconBasenames": ["Hyper", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ]
+  },
+  "aiTools": {
+    "darwin": [
+      {
+        "name": "OpenClaw",
+        "command": "openclaw",
+        "binary": "openclaw",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/openclaw", "/usr/local/bin/openclaw"],
+        "iconBasenames": ["OpenClaw", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Hermes",
+        "command": "hermes",
+        "binary": "hermes",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/hermes", "/usr/local/bin/hermes"],
+        "iconBasenames": ["Hermes", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "OpenCode",
+        "command": "opencode",
+        "binary": "opencode",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/opencode", "/usr/local/bin/opencode"],
+        "iconBasenames": ["OpenCode", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Claude Code",
+        "command": "claude",
+        "binary": "claude",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/claude", "/usr/local/bin/claude"],
+        "iconBasenames": ["Claude", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Cursor CLI",
+        "command": "agent",
+        "binary": "agent",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/agent", "/usr/local/bin/agent"],
+        "iconBasenames": ["Cursor", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Devin",
+        "command": "devin",
+        "binary": "devin",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/devin", "/usr/local/bin/devin"],
+        "iconBasenames": ["Devin", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "GitHub Copilot CLI",
+        "command": "copilot",
+        "binary": "copilot",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/copilot", "/usr/local/bin/copilot"],
+        "iconBasenames": ["Copilot", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Antigravity CLI",
+        "command": "agy",
+        "binary": "agy",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/opt/homebrew/bin/agy", "/usr/local/bin/agy"],
+        "iconBasenames": ["Antigravity", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ],
+    "linux": [
+      {
+        "name": "OpenClaw",
+        "command": "openclaw",
+        "binary": "openclaw",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/openclaw", "/usr/local/bin/openclaw"],
+        "iconBasenames": ["OpenClaw", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Hermes",
+        "command": "hermes",
+        "binary": "hermes",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/hermes", "/usr/local/bin/hermes"],
+        "iconBasenames": ["Hermes", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "OpenCode",
+        "command": "opencode",
+        "binary": "opencode",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/opencode", "/usr/local/bin/opencode"],
+        "iconBasenames": ["OpenCode", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Claude Code",
+        "command": "claude",
+        "binary": "claude",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/claude", "/usr/local/bin/claude"],
+        "iconBasenames": ["Claude", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Cursor CLI",
+        "command": "agent",
+        "binary": "agent",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/agent", "/usr/local/bin/agent"],
+        "iconBasenames": ["Cursor", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Devin",
+        "command": "devin",
+        "binary": "devin",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/devin", "/usr/local/bin/devin"],
+        "iconBasenames": ["Devin", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "GitHub Copilot CLI",
+        "command": "copilot",
+        "binary": "copilot",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/copilot", "/usr/local/bin/copilot"],
+        "iconBasenames": ["Copilot", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Antigravity CLI",
+        "command": "agy",
+        "binary": "agy",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": true,
+        "commonFilepaths": ["/usr/bin/agy", "/usr/local/bin/agy"],
+        "iconBasenames": ["Antigravity", "AppIcon"],
+        "alwaysAvailable": false
+      }
+    ],
+    "win32": [
+      {
+        "name": "OpenClaw",
+        "command": "openclaw",
+        "binary": "openclaw",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["OpenClaw", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Hermes",
+        "command": "hermes",
+        "binary": "hermes",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["Hermes", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "OpenCode",
+        "command": "opencode",
+        "binary": "opencode",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["OpenCode", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Claude Code",
+        "command": "claude",
+        "binary": "claude",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["Claude", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Cursor CLI",
+        "command": "agent",
+        "binary": "agent",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["Cursor", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Devin",
+        "command": "devin",
+        "binary": "devin",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["Devin", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "GitHub Copilot CLI",
+        "command": "copilot",
+        "binary": "copilot",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["Copilot", "AppIcon"],
+        "alwaysAvailable": false
+      },
+      {
+        "name": "Antigravity CLI",
+        "command": "agy",
+        "binary": "agy",
+        "enableBinaryCheck": true,
+        "enableCommonPathCheck": false,
+        "commonFilepaths": [],
+        "iconBasenames": ["Antigravity", "AppIcon"],
         "alwaysAvailable": false
       }
     ]

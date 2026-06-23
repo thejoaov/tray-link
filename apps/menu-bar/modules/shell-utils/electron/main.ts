@@ -4,6 +4,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import util from 'util'
+import { buildTerminalSpawnCommand } from '../../../../../packages/tray-shared/src/utils/terminalSpawn'
 
 const execAsync = util.promisify(exec)
 
@@ -227,6 +228,15 @@ export const ShellUtilsMain = {
       return false
     }
   },
+  openInTerminalWithCommand: async (path: string, terminalCommand: string, commandToRun: string) => {
+    try {
+      const spawnCommand = buildTerminalSpawnCommand(path, terminalCommand, commandToRun)
+      await execAsync(spawnCommand)
+      return true
+    } catch {
+      return false
+    }
+  },
   openInFinder: async (path: string) => {
     try {
       const { shell } = require('electron')
@@ -239,9 +249,40 @@ export const ShellUtilsMain = {
   which: async (binary: string) => {
     try {
       const isWindows = process.platform === 'win32'
-      const command = isWindows ? `where ${binary}` : `which ${binary}`
-      const { stdout } = await execAsync(command)
-      return stdout.trim()
+      if (isWindows) {
+        const { stdout } = await execAsync(`where ${binary}`)
+        return stdout.trim().split('\n')[0] || null
+      }
+
+      const home = process.env.HOME ?? ''
+      const candidatePaths = [
+        `/opt/homebrew/bin/${binary}`,
+        `/usr/local/bin/${binary}`,
+        `${home}/.local/bin/${binary}`,
+        `${home}/.cursor/bin/${binary}`,
+        `${home}/.npm-global/bin/${binary}`,
+        `${home}/.cargo/bin/${binary}`,
+      ]
+
+      for (const candidate of candidatePaths) {
+        if (candidate && fs.existsSync(candidate)) {
+          return candidate
+        }
+      }
+
+      const pathPrefix = [
+        '/opt/homebrew/bin',
+        '/usr/local/bin',
+        `${home}/.local/bin`,
+        `${home}/.cursor/bin`,
+        `${home}/.npm-global/bin`,
+        `${home}/.cargo/bin`,
+      ]
+        .filter(Boolean)
+        .join(':')
+
+      const { stdout } = await execAsync(`/bin/zsh -lc 'export PATH="${pathPrefix}:$PATH"; command -v ${binary}'`)
+      return stdout.trim() || null
     } catch {
       return null
     }

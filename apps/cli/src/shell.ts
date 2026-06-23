@@ -1,3 +1,4 @@
+import { buildTerminalSpawnCommand } from '@tray-link/tray-shared'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 
@@ -17,4 +18,16 @@ export async function openInEditor(projectPath: string, editorCommand: string): 
  */
 export async function openInTerminal(projectPath: string, terminalCommand: string): Promise<void> {
   await execAsync(`cd "${projectPath}" && ${terminalCommand}`)
+}
+
+/**
+ * Open a terminal in the given project path and run a command (e.g. an AI agent CLI).
+ */
+export async function openInTerminalWithCommand(
+  projectPath: string,
+  terminalCommand: string,
+  commandToRun: string,
+): Promise<void> {
+  const spawnCommand = buildTerminalSpawnCommand(projectPath, terminalCommand, commandToRun)
+  await execAsync(spawnCommand)
 }

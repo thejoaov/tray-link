@@ -16,7 +16,7 @@ import { Text } from '../components/Text'
 type ToolOption = {
   label: string
   command: string
-  iconName?: 'code-slash-outline' | 'terminal-outline'
+  iconName?: 'code-slash-outline' | 'terminal-outline' | 'sparkles-outline'
   iconPath?: string | null
 }
 
@@ -25,6 +25,7 @@ type Props = {
   project: Project
   onOpenEditor: () => void
   onOpenTerminal: () => void
+  onOpenAiTool: () => void
   onOpenFinder: () => void
   onRemove: () => void
   onToggleContextMenu: () => void
@@ -32,20 +33,26 @@ type Props = {
   contextMenuOpen?: boolean
   editorOptions: ToolOption[]
   terminalOptions: ToolOption[]
+  aiToolOptions: ToolOption[]
   editorQuickActionOption?: ToolOption | null
   terminalQuickActionOption?: ToolOption | null
+  aiToolQuickActionOption?: ToolOption | null
   onOpenWithEditor: (command: string) => void
   onOpenWithTerminal: (command: string) => void
+  onOpenWithAiTool: (command: string) => void
   onSelectProjectEditorDefault: (command: string) => void
   onSelectProjectTerminalDefault: (command: string) => void
+  onSelectProjectAiToolDefault: (command: string) => void
   globalEditorCommand?: string | null
   globalTerminalCommand?: string | null
+  globalAiToolCommand?: string | null
   toolSelectionMode?: boolean
   onToggleProjectToolSelectionMode: () => void
   labels: {
     moreActions: string
     openWithEditor: string
     openWithTerminal: string
+    openWithAiTool: string
     selectProjectDefaults: string
     done: string
     close: string
@@ -117,6 +124,7 @@ export const ProjectItem = ({
   project,
   onOpenEditor,
   onOpenTerminal,
+  onOpenAiTool,
   onOpenFinder,
   onRemove,
   onToggleContextMenu,
@@ -124,14 +132,19 @@ export const ProjectItem = ({
   contextMenuOpen = false,
   editorOptions,
   terminalOptions,
+  aiToolOptions,
   editorQuickActionOption,
   terminalQuickActionOption,
+  aiToolQuickActionOption,
   onOpenWithEditor,
   onOpenWithTerminal,
+  onOpenWithAiTool,
   onSelectProjectEditorDefault,
   onSelectProjectTerminalDefault,
+  onSelectProjectAiToolDefault,
   globalEditorCommand,
   globalTerminalCommand,
+  globalAiToolCommand,
   toolSelectionMode = false,
   onToggleProjectToolSelectionMode,
   labels,
@@ -205,7 +218,7 @@ export const ProjectItem = ({
 
   const renderQuickActionIcon = (
     option: ToolOption | null | undefined,
-    fallbackName: 'code-slash-outline' | 'terminal-outline',
+    fallbackName: 'code-slash-outline' | 'terminal-outline' | 'sparkles-outline',
   ) => {
     return (
       <AppIcon
@@ -262,6 +275,11 @@ export const ProjectItem = ({
         <TouchableOpacity accessibilityLabel="Open in terminal" style={styles.button} onPress={onOpenTerminal}>
           {renderQuickActionIcon(terminalQuickActionOption, 'terminal-outline')}
         </TouchableOpacity>
+        {aiToolOptions.length > 0 ? (
+          <TouchableOpacity accessibilityLabel="Open in AI tool" style={styles.button} onPress={onOpenAiTool}>
+            {renderQuickActionIcon(aiToolQuickActionOption, 'sparkles-outline')}
+          </TouchableOpacity>
+        ) : null}
         <TouchableOpacity accessibilityLabel="Open in finder" style={styles.button} onPress={onOpenFinder}>
           <Ionicons name="folder-open-outline" size={14} color="var(--text-color)" />
         </TouchableOpacity>
@@ -371,6 +389,39 @@ export const ProjectItem = ({
               </TouchableOpacity>
             ))}
           </View>
+
+          {aiToolOptions.length > 0 ? (
+            <>
+              <Text style={styles.contextTitle}>{labels.openWithAiTool}</Text>
+              <View style={styles.contextActions}>
+                {aiToolOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option.command}
+                    style={[
+                      styles.contextActionButton,
+                      option.command === project.defaultAiTool && styles.contextActionButtonProjectDefault,
+                    ]}
+                    onPress={() =>
+                      toolSelectionMode
+                        ? onSelectProjectAiToolDefault(option.command)
+                        : onOpenWithAiTool(option.command)
+                    }
+                  >
+                    <AppIcon
+                      uri={option.iconPath ?? ''}
+                      style={styles.contextActionIconImage}
+                      fallback={
+                        <Ionicons name={option.iconName ?? 'sparkles-outline'} size={12} color="var(--text-color)" />
+                      }
+                    />
+                    <Text style={styles.contextActionText}>
+                      {renderOptionLabel(option.label, option.command === globalAiToolCommand)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          ) : null}
 
           <Text style={styles.contextTitle}>{labels.tagLabel}</Text>
           {project.tag ? (

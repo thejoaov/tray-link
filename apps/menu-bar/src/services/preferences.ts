@@ -31,7 +31,7 @@ export type ToolOption = {
   label: string
   command: string
   slug: string
-  iconName?: 'code-slash-outline' | 'terminal-outline'
+  iconName?: 'code-slash-outline' | 'terminal-outline' | 'sparkles-outline'
   iconPath?: string | null
 }
 
@@ -66,6 +66,11 @@ const supportedToolCatalogSchema = z.object({
     win32: z.array(supportedToolDefinitionSchema),
   }),
   terminals: z.object({
+    darwin: z.array(supportedToolDefinitionSchema),
+    linux: z.array(supportedToolDefinitionSchema),
+    win32: z.array(supportedToolDefinitionSchema),
+  }),
+  aiTools: z.object({
     darwin: z.array(supportedToolDefinitionSchema),
     linux: z.array(supportedToolDefinitionSchema),
     win32: z.array(supportedToolDefinitionSchema),
@@ -150,6 +155,7 @@ export const PREFERENCES_CHANGED_EVENT = 'preferencesChanged'
 
 let discoveredEditorOptions: ToolOption[] = []
 let discoveredTerminalOptions: ToolOption[] = []
+let discoveredAiToolOptions: ToolOption[] = []
 let supportedToolCatalog: SupportedToolCatalog = getSupportedToolCatalog()
 let refreshSupportedToolCatalogPromise: Promise<void> | null = null
 
@@ -220,9 +226,12 @@ const toDiscoverableTool = (definition: SupportedToolDefinition): DiscoverableTo
 
 const getDiscoverableTools = (type: keyof SupportedToolCatalog): DiscoverableTool[] => {
   const platform = resolveCatalogPlatform()
-  return (supportedToolCatalog[type][platform] ?? [])
-    .map(toDiscoverableTool)
-    .filter((item): item is DiscoverableTool => item !== null)
+  const bundledCatalog = getSupportedToolCatalog()
+  const discovered = supportedToolCatalog[type][platform] ?? []
+  const bundled = bundledCatalog[type][platform] ?? []
+  const definitions = discovered.length > 0 ? discovered : bundled
+
+  return definitions.map(toDiscoverableTool).filter((item): item is DiscoverableTool => item !== null)
 }
 
 const fetchRemoteSupportedToolCatalog = async (): Promise<SupportedToolCatalog> => {
@@ -346,13 +355,15 @@ export const reloadToolOptions = async () => {
   await refreshSupportedToolCatalog()
 
   try {
-    const [editors, terminals] = await Promise.all([
+    const [editors, terminals, aiTools] = await Promise.all([
       discoverTools(getDiscoverableTools('editors'), 'code-slash-outline'),
       discoverTools(getDiscoverableTools('terminals'), 'terminal-outline'),
+      discoverTools(getDiscoverableTools('aiTools'), 'sparkles-outline'),
     ])
 
     discoveredEditorOptions = dedupeOptions(editors)
     discoveredTerminalOptions = dedupeOptions(terminals)
+    discoveredAiToolOptions = dedupeOptions(aiTools)
   } catch {
     // Tool discovery failed — keep whatever was previously discovered
   }
@@ -360,7 +371,7 @@ export const reloadToolOptions = async () => {
 }
 
 export const initializeToolOptions = async () => {
-  if (discoveredEditorOptions.length || discoveredTerminalOptions.length) {
+  if (discoveredEditorOptions.length || discoveredTerminalOptions.length || discoveredAiToolOptions.length) {
     return
   }
 
@@ -387,6 +398,17 @@ export const getTerminalOptions = (customTerminals: CustomTool[] = []): ToolOpti
     iconPath: item.iconPath ?? null,
   }))
   return dedupeOptions([...discoveredTerminalOptions, ...custom])
+}
+
+export const getAiToolOptions = (customAiTools: CustomTool[] = []): ToolOption[] => {
+  const custom = customAiTools.map((item) => ({
+    label: item.name,
+    command: item.command,
+    slug: generateSlug(item.name),
+    iconName: 'sparkles-outline' as const,
+    iconPath: item.iconPath ?? null,
+  }))
+  return dedupeOptions([...discoveredAiToolOptions, ...custom])
 }
 
 const dedupeOptions = (options: ToolOption[]) => {

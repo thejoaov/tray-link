@@ -314,17 +314,69 @@ public class ShellUtilsModule: Module {
       }
     }
 
+    AsyncFunction("openInTerminalWithCommand") { (path: String, terminalCommand: String, commandToRun: String) -> Bool in
+      do {
+        let sessionCommand = "cd \(shellEscape(path)) && \(commandToRun)"
+        let normalizedTerminal = terminalCommand.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let command: String
+
+        if normalizedTerminal.contains("iterm") {
+          let escapedSession = sessionCommand
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+          command = """
+          osascript -e 'tell application "iTerm" to activate' -e 'tell application "iTerm" to tell current window to create tab with default profile' -e 'tell application "iTerm" to tell current session of current window to write text "\(escapedSession)"'
+          """
+        } else if normalizedTerminal.contains("ghostty") {
+          command = "open -a Ghostty --args -e bash -lc \(shellEscape(sessionCommand))"
+        } else if normalizedTerminal.contains("warp") {
+          command = "open -a Warp --args -e bash -lc \(shellEscape(sessionCommand))"
+        } else if normalizedTerminal.contains("terminal") || terminalCommand.starts(with: "open") {
+          let escapedSession = sessionCommand
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+          command = """
+          osascript -e 'tell application "Terminal" to activate' -e 'tell application "Terminal" to do script "\(escapedSession)"'
+          """
+        } else {
+          command = sessionCommand
+        }
+
+        let task = try runShell(command)
+        return task.terminationStatus == 0
+      } catch {
+        return false
+      }
+    }
+
     AsyncFunction("openInFinder") { (path: String) -> Bool in
       let url = URL(fileURLWithPath: path)
       return NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
     }
 
     AsyncFunction("which") { (binary: String) -> String? in
+      let home = FileManager.default.homeDirectoryForCurrentUser.path
+      let candidatePaths = [
+        "/opt/homebrew/bin/\(binary)",
+        "/usr/local/bin/\(binary)",
+        "\(home)/.local/bin/\(binary)",
+        "\(home)/.cursor/bin/\(binary)",
+        "\(home)/.npm-global/bin/\(binary)",
+        "\(home)/.cargo/bin/\(binary)",
+      ]
+
+      for path in candidatePaths {
+        if FileManager.default.isExecutableFile(atPath: path) {
+          return path
+        }
+      }
+
       let task = Process()
       let pipe = Pipe()
+      let pathPrefix = "/opt/homebrew/bin:/usr/local/bin:\(home)/.local/bin:\(home)/.cursor/bin:\(home)/.npm-global/bin:\(home)/.cargo/bin"
 
       task.executableURL = URL(fileURLWithPath: "/bin/zsh")
-      task.arguments = ["-lc", "which \(binary)"]
+      task.arguments = ["-lc", "export PATH=\"\(pathPrefix):$PATH\"; command -v \(binary)"]
       task.standardOutput = pipe
 
       do {

@@ -1,10 +1,18 @@
 import { createInterface } from 'node:readline/promises'
 import { Project } from '@tray-link/common-types'
-import { editorList, generateSlug, getEditorList, getTerminalList, terminalList } from '@tray-link/tray-shared'
+import {
+  aiToolList,
+  editorList,
+  generateSlug,
+  getAiToolList,
+  getEditorList,
+  getTerminalList,
+  terminalList,
+} from '@tray-link/tray-shared'
 import { Command } from 'commander'
 import { preferencesStore, projectStore } from '../storage'
 
-type ToolType = 'editor' | 'terminal'
+type ToolType = 'editor' | 'terminal' | 'ai'
 
 type ToolEntry = {
   name: string
@@ -61,7 +69,7 @@ async function selectOption(message: string, options: InteractiveOption[]): Prom
 /** Returns all known entries (static list + custom tools) with name, slug, and command. */
 function getAllEntries(type: ToolType): ToolEntry[] {
   const preferences = preferencesStore.getPreferences()
-  const builtInList = type === 'editor' ? editorList : terminalList
+  const builtInList = type === 'editor' ? editorList : type === 'terminal' ? terminalList : aiToolList
   const builtInEntries = builtInList
     .filter((item) => item.command !== null)
     .map((item) => ({
@@ -69,6 +77,16 @@ function getAllEntries(type: ToolType): ToolEntry[] {
       slug: generateSlug(item.name),
       command: item.command as string,
     }))
+
+  if (type === 'ai') {
+    const customEntries = preferences.customAiTools.map((item) => ({
+      name: item.name,
+      slug: generateSlug(item.name),
+      command: item.command,
+    }))
+
+    return [...new Map([...builtInEntries, ...customEntries].map((entry) => [entry.command, entry])).values()]
+  }
 
   const customEntries = (type === 'editor' ? preferences.customEditors : preferences.customTerminals).map((item) => ({
     name: item.name,
@@ -96,11 +114,23 @@ function resolveProject(projects: Project[], projectArg: string): Project | null
 
 function getGlobalCommand(type: ToolType): string | null {
   const preferences = preferencesStore.getPreferences()
-  return type === 'editor' ? preferences.defaultEditor : preferences.defaultTerminal
+  if (type === 'editor') {
+    return preferences.defaultEditor
+  }
+  if (type === 'terminal') {
+    return preferences.defaultTerminal
+  }
+  return preferences.defaultAiTool
 }
 
 function getProjectCommand(project: Project, type: ToolType): string | null {
-  return type === 'editor' ? (project.defaultEditor ?? null) : (project.defaultTerminal ?? null)
+  if (type === 'editor') {
+    return project.defaultEditor ?? null
+  }
+  if (type === 'terminal') {
+    return project.defaultTerminal ?? null
+  }
+  return project.defaultAiTool ?? null
 }
 
 function getEffectiveCommand(type: ToolType, project: Project | null): string | null {
@@ -115,18 +145,26 @@ async function updateProjectCommand(project: Project, type: ToolType, command: s
   await projectStore.updateProject({
     ...project,
     updatedAt: new Date().toISOString(),
-    ...(type === 'editor' ? { defaultEditor: command } : { defaultTerminal: command }),
+    ...(type === 'editor'
+      ? { defaultEditor: command }
+      : type === 'terminal'
+        ? { defaultTerminal: command }
+        : { defaultAiTool: command }),
   })
 }
 
+function isSupportedToolType(type: string): type is ToolType {
+  return type === 'editor' || type === 'terminal' || type === 'ai'
+}
+
 const listCommand = new Command('list')
-  .description('List known editors or terminals')
-  .argument('<type>', 'What to list: editor | terminal')
+  .description('List known editors, terminals, or AI tools')
+  .argument('<type>', 'What to list: editor | terminal | ai')
   .option('--detected', 'Only show installed/detected tools')
   .option('-p, --project <project>', 'Show defaults in the context of a specific project')
   .action(async (type: string, options: { detected?: boolean; project?: string }) => {
-    if (type !== 'editor' && type !== 'terminal') {
-      console.error(`Error: type must be "editor" or "terminal", got "${type}"`)
+    if (!isSupportedToolType(type)) {
+      console.error(`Error: type must be "editor", "terminal", or "ai", got "${type}"`)
       process.exit(1)
     }
 
@@ -149,7 +187,12 @@ const listCommand = new Command('list')
     let entries = getAllEntries(toolType)
 
     if (options.detected) {
-      const detected = toolType === 'editor' ? await getEditorList() : await getTerminalList()
+      const detected =
+        toolType === 'editor'
+          ? await getEditorList()
+          : toolType === 'terminal'
+            ? await getTerminalList()
+            : await getAiToolList()
       entries = detected.map((item) => ({
         name: item.name,
         slug: item.slug,
@@ -173,8 +216,8 @@ const listCommand = new Command('list')
   })
 
 const setCommand = new Command('set')
-  .description('Set the default editor or terminal')
-  .argument('<type>', 'What to configure: editor | terminal')
+  .description('Set the default editor, terminal, or AI tool')
+  .argument('<type>', 'What to configure: editor | terminal | ai')
   .argument('[slug]', 'Slug of the tool to set as default')
   .option('-i, --interactive', 'Choose interactively')
   .option('-p, --project <project>', 'Set the default for a specific project')
@@ -185,8 +228,8 @@ const setCommand = new Command('set')
       slugArg: string | undefined,
       options: { interactive?: boolean; project?: string; clear?: boolean },
     ) => {
-      if (type !== 'editor' && type !== 'terminal') {
-        console.error(`Error: type must be "editor" or "terminal", got "${type}"`)
+      if (!isSupportedToolType(type)) {
+        console.error(`Error: type must be "editor", "terminal", or "ai", got "${type}"`)
         process.exit(1)
       }
 
@@ -212,8 +255,10 @@ const setCommand = new Command('set')
 
         if (toolType === 'editor') {
           preferencesStore.setDefaultEditor(null)
-        } else {
+        } else if (toolType === 'terminal') {
           preferencesStore.setDefaultTerminal(null)
+        } else {
+          preferencesStore.setDefaultAiTool(null)
         }
 
         console.log(`Cleared global default ${toolType}`)
@@ -256,8 +301,10 @@ const setCommand = new Command('set')
           await updateProjectCommand(project, toolType, chosen)
         } else if (toolType === 'editor') {
           preferencesStore.setDefaultEditor(chosen)
-        } else {
+        } else if (toolType === 'terminal') {
           preferencesStore.setDefaultTerminal(chosen)
+        } else {
+          preferencesStore.setDefaultAiTool(chosen)
         }
 
         console.log(
@@ -278,8 +325,10 @@ const setCommand = new Command('set')
         await updateProjectCommand(project, toolType, command)
       } else if (toolType === 'editor') {
         preferencesStore.setDefaultEditor(command)
-      } else {
+      } else if (toolType === 'terminal') {
         preferencesStore.setDefaultTerminal(command)
+      } else {
+        preferencesStore.setDefaultAiTool(command)
       }
 
       const allEntries = getAllEntries(toolType)
